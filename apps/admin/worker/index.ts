@@ -7,6 +7,7 @@ import { customers, licenses } from "./db/schema";
 import { requireSession, sessionEmail } from "./auth";
 import { authRoutes } from "./authRoutes";
 import { issueLicense } from "./license";
+import { STAND_IDS } from "../shared/stands";
 import { ulid } from "./ulid";
 import type { Env } from "./env";
 
@@ -83,14 +84,14 @@ app.get("/licenses", async (c) => {
       id: licenses.id,
       customerId: licenses.customerId,
       customerName: customers.name,
-      edition: licenses.edition,
+      stands: licenses.stands,
       expiresAt: licenses.expiresAt,
       createdAt: licenses.createdAt,
     })
     .from(licenses)
     .innerJoin(customers, eq(customers.id, licenses.customerId))
     .orderBy(desc(licenses.createdAt));
-  return c.json(rows);
+  return c.json(rows.map((r) => ({ ...r, stands: JSON.parse(r.stands) as string[] })));
 });
 
 app.post(
@@ -99,7 +100,9 @@ app.post(
     "json",
     z.object({
       customerId: z.string().min(1),
-      edition: z.enum(["free", "standard", "enterprise"]),
+      stands: z.array(z.string()).min(1).refine((s) => s.every((id) => STAND_IDS.includes(id)), {
+        message: "unknown stand id",
+      }),
       expiresAt: z.number().int().positive(),
     }),
   ),
@@ -111,13 +114,13 @@ app.post(
     const signed = await issueLicense(c.env, {
       customerId: customer.id,
       customerName: customer.name,
-      edition: body.edition,
+      stands: body.stands,
       expiresAt: body.expiresAt,
     });
     await db.insert(licenses).values({
       id: signed.id,
       customerId: customer.id,
-      edition: body.edition,
+      stands: JSON.stringify(body.stands),
       expiresAt: body.expiresAt,
       payloadB64: signed.payloadB64,
       signature: signed.signature,

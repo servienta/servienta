@@ -8,7 +8,7 @@ import { ulid } from "./ulid";
 export interface LicenseInput {
   customerId: string;
   customerName: string;
-  edition: string;
+  stands: string[];
   expiresAt: number; // epoch millis UTC
 }
 
@@ -32,7 +32,7 @@ export async function issueLicense(env: Env, input: LicenseInput) {
     jti: ulid(),
     sub: input.customerId,
     name: input.customerName,
-    edition: input.edition,
+    stands: input.stands,
     iat: Date.now(),
     exp: input.expiresAt,
   };

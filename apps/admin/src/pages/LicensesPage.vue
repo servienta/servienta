@@ -2,12 +2,13 @@
 import { ref, onMounted } from "vue";
 import { api } from "../api";
 import { useCustomersStore } from "../stores/customers";
+import { STANDS } from "../../shared/stands";
 
 interface LicenseRow {
   id: string;
   customerId: string;
   customerName: string;
-  edition: string;
+  stands: string[];
   expiresAt: number;
   createdAt: number;
 }
@@ -15,7 +16,7 @@ interface LicenseRow {
 const store = useCustomersStore();
 const rows = ref<LicenseRow[]>([]);
 const customerId = ref("");
-const edition = ref<"free" | "standard" | "enterprise">("standard");
+const stands = ref<string[]>([]);
 const expires = ref("");
 const issued = ref<string | null>(null);
 const error = ref<string | null>(null);
@@ -25,7 +26,7 @@ interface LicensePayload {
   jti: string;
   sub: string;
   name: string;
-  edition: string;
+  stands: string[];
   iat: number;
   exp: number;
 }
@@ -81,7 +82,7 @@ async function issue() {
       method: "POST",
       body: JSON.stringify({
         customerId: customerId.value,
-        edition: edition.value,
+        stands: stands.value,
         expiresAt: new Date(expires.value + "T00:00:00Z").getTime(),
       }),
     });
@@ -103,14 +104,15 @@ async function issue() {
         <option v-for="c in store.items" :key="c.id" :value="c.id">{{ c.name }}</option>
       </select>
     </label>
-    <label class="block text-sm">
-      <span class="text-zinc-500">Edition</span>
-      <select v-model="edition" class="mt-1 block rounded-md border border-zinc-300 px-3 py-1.5">
-        <option value="free">free</option>
-        <option value="standard">standard</option>
-        <option value="enterprise">enterprise</option>
-      </select>
-    </label>
+    <fieldset class="block text-sm">
+      <legend class="text-zinc-500">Stands</legend>
+      <div class="mt-1 grid max-w-xl grid-cols-2 gap-x-4 gap-y-1 rounded-md border border-zinc-300 p-3 sm:grid-cols-3">
+        <label v-for="s in STANDS" :key="s.id" class="flex items-center gap-2">
+          <input v-model="stands" type="checkbox" :value="s.id" class="rounded border-zinc-300" />
+          <span>{{ s.label }}</span>
+        </label>
+      </div>
+    </fieldset>
     <label class="block text-sm">
       <span class="text-zinc-500">Expires</span>
       <input v-model="expires" required type="date" class="mt-1 block rounded-md border border-zinc-300 px-3 py-1.5" />
@@ -127,12 +129,12 @@ async function issue() {
   <div class="mt-6 overflow-x-auto rounded-lg border border-zinc-200 bg-white">
     <table class="w-full text-sm">
       <thead class="border-b border-zinc-200 text-left text-zinc-500">
-        <tr><th class="px-4 py-2">Customer</th><th class="px-4 py-2">Edition</th><th class="px-4 py-2">Expires</th><th class="px-4 py-2">Issued</th><th class="px-4 py-2"></th></tr>
+        <tr><th class="px-4 py-2">Customer</th><th class="px-4 py-2">Stands</th><th class="px-4 py-2">Expires</th><th class="px-4 py-2">Issued</th><th class="px-4 py-2"></th></tr>
       </thead>
       <tbody>
         <tr v-for="l in rows" :key="l.id" class="border-b border-zinc-100 last:border-0">
           <td class="px-4 py-2 font-medium">{{ l.customerName }}</td>
-          <td class="px-4 py-2">{{ l.edition }}</td>
+          <td class="px-4 py-2 text-zinc-600">{{ l.stands.join(", ") }}</td>
           <td class="px-4 py-2">{{ new Date(l.expiresAt).toISOString().slice(0, 10) }}</td>
           <td class="px-4 py-2 text-zinc-500">{{ new Date(l.createdAt).toISOString().slice(0, 10) }}</td>
           <td class="px-4 py-2 text-right">
@@ -157,7 +159,7 @@ async function issue() {
     </div>
     <dl class="mt-3 grid grid-cols-2 gap-x-6 gap-y-1 text-sm sm:grid-cols-3">
       <div><dt class="text-zinc-500">Customer</dt><dd class="font-medium">{{ viewing.payload.name }}</dd></div>
-      <div><dt class="text-zinc-500">Edition</dt><dd class="font-medium">{{ viewing.payload.edition }}</dd></div>
+      <div class="col-span-2"><dt class="text-zinc-500">Stands</dt><dd class="font-medium">{{ viewing.payload.stands.join(", ") }}</dd></div>
       <div><dt class="text-zinc-500">Format</dt><dd class="font-medium">v{{ viewing.payload.v }}</dd></div>
       <div><dt class="text-zinc-500">Issued</dt><dd class="font-medium">{{ new Date(viewing.payload.iat).toISOString().slice(0, 10) }}</dd></div>
       <div><dt class="text-zinc-500">Expires</dt><dd class="font-medium">{{ new Date(viewing.payload.exp).toISOString().slice(0, 10) }}</dd></div>

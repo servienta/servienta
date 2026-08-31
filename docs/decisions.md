@@ -23,6 +23,29 @@ Revisit trigger: <metric / date / condition>
 
 ---
 
+## D15 — License semantics: a license enumerates the customer's stands
+
+Date: 2026-08-31
+Context: the scaffolded license carried a placeholder `edition` enum (free/standard/enterprise)
+with no defined meaning. Owner decision: a license defines **which stands are available to the
+customer** — the file server and each protocol receiver are the units of licensing.
+Options considered: (A) named tiers mapping to stand bundles; (B) the license payload carries the
+explicit list of licensed stand ids.
+Choice: **B** — the payload's `stands` array is the grant itself; bundles, if ever needed, become a
+convenience in the admin UI, not a license concept. Stand ids (file transports licensed
+individually, per owner): `http`, `https`, `ftp`, `tftp`, `scp`, `syslog`, `snmp-traps`,
+`radius`, `tacacs`, `dns`, `ntp`, `kafka`, `ipfix`. The engine (phase 5, R12) starts only licensed
+stands; an unlicensed stand is reported as "not licensed" — distinguishable from "not running"
+(N5). What the no-license Free mode includes stays open in D10 until the engine enforces licensing.
+Amends: D10 ("edition limits are data" — the data is now the stands list); the admin's edition
+field is replaced.
+Reversibility: two-way until the first paid delivery; after that a payload change bumps the license
+format version (`v`).
+Revisit trigger: a real customer needs limits a stand list cannot express (instance counts, seats,
+expiry per stand) — extend the payload then, not before.
+
+---
+
 ## D14 — Admin auth: single-user email+password, no Cloudflare Access
 
 Date: 2026-08-31

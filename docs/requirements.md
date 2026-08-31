@@ -173,9 +173,9 @@ version bump; the current version is available on request.
 returns the version the delivery declares.
 
 **R12 — Offline license validation.** The engine validates a signed license file at startup with no
-network access (N2): signature, expiry, edition limits. A missing, expired, or tampered license is
-an explicit, documented refusal — never silent degradation (the N5 spirit). The Free edition runs
-without a license file within its documented limits. The engine embeds only the public verification
+network access (N2): signature, expiry, and the licensed stands (D15) — only they are started. A missing, expired, or tampered license is
+an explicit, documented refusal — never silent degradation (the N5 spirit). The Free mode runs
+without a license file within its documented limits (stand set per D10/D15, still open). The engine embeds only the public verification
 key; the signing key never ships ([D10](decisions.md)).
 *Verification:* the suite starts the engine with a valid, an expired, a tampered, and no license
 file, and observes exactly the documented behavior in each case.
