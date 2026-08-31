@@ -236,7 +236,7 @@ names the latest phase they have been verified against.
 
 | Requirement | Phase | Status | Covering test |
 | --- | --- | --- | --- |
-| R1 | 0 | not started | — |
+| R1 | 0 | in progress — HTTP of five transports | `TestFixtureByteCompareHTTP` |
 | R2 | 1 | not started | — |
 | R3.1 | 2 | not started | — |
 | R3.2 | 2 | not started | — |
@@ -246,19 +246,19 @@ names the latest phase they have been verified against.
 | R3.6 | 3 | not started | — |
 | R3.7 | 4 | not started | — |
 | R3.8 | 4 | not started | — |
-| R4 | 0, cross-cutting | not started | — |
-| R5 | 0, cross-cutting | not started | — |
-| R6 | 0 | not started | — |
-| R7 | 0 | not started | — |
+| R4 | 0, cross-cutting | passing (phase 0 surface) | `TestRunIsolation`, `TestReferenceReceiverRoundTrip` |
+| R5 | 0, cross-cutting | passing (phase 0 surface) | `TestResetTwice` |
+| R6 | 0 | in progress — opacity passing, large-file at CI scale | `TestFixtureByteCompareHTTP` |
+| R7 | 0 | in progress — compose written, clean-host check pending | — |
 | R8 | 3 | not started | — |
 | R9 | 1 | not started | — |
-| R10 | 0 | not started | — |
-| R11 | 0, cross-cutting | not started | — |
+| R10 | 0 | passing | `TestReferenceReceiverRoundTrip` |
+| R11 | 0, cross-cutting | in progress — schema ships, version passing; generated-client check pending | `TestVersion` |
 | R12 | 5 | not started | — |
 | N1 | measured after 0 | not measured | — |
 | N2 | cross-cutting | not started | — |
 | N3 | cross-cutting | not started | — |
 | N4 | cross-cutting | not started | — |
-| N5 | 0 | not started | — |
+| N5 | 0 | passing | `TestEmptyVsUnknown` |
 | N6 | cross-cutting | not started | — |
 | N7 | cross-cutting | not started | — |

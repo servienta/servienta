@@ -24,7 +24,6 @@
     "ACCESS_TEAM_DOMAIN": "",
     "ACCESS_AUD": "",
     "LICENSE_PUBLIC_KEY": "MCowBQYDK2VwAyEAOi42TytGwPNapeKWDHyVBKsINgQdWa8dAPmEXHJnAvE="
-  }
-  // Once the servienta.com zone exists on the account:
-  // "routes": [{ "pattern": "admin.servienta.com", "custom_domain": true }]
+  },
+  "routes": [{ "pattern": "admin.servienta.com", "custom_domain": true }]
 }

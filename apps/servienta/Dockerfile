@@ -1,0 +1,12 @@
+# N7: reproducible build from a tagged source tree; the engine is the
+# delivery's only container (D12).
+FROM golang:1.24-alpine AS build
+WORKDIR /src
+COPY go.mod ./
+RUN go mod download
+COPY . .
+RUN CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o /servienta ./cmd/servienta
+
+FROM scratch
+COPY --from=build /servienta /servienta
+ENTRYPOINT ["/servienta"]

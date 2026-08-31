@@ -1,0 +1,12 @@
+# R7: one command brings the engine up. Host ports are never fixed (N4) —
+# compose assigns them; GET /api/v1/endpoints reports in-container addresses,
+# `docker compose port` maps them to the host.
+services:
+  servienta:
+    build: .
+    ports:
+      - "8080" # control API
+      - "8081" # files: HTTP
+      - "9000" # reference receiver
+    volumes:
+      - ${SERVIENTA_FIXTURES:-./fixtures}:/fixtures:ro

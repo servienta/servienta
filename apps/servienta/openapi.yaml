@@ -1,0 +1,79 @@
+# The engine's HTTP contract (R11). Ships with the delivery; breaking changes
+# bump `info.version`, which GET /api/v1/version reports as `contract`.
+openapi: 3.1.0
+info:
+  title: Servienta engine control API
+  version: 0.1.0
+paths:
+  /api/v1/version:
+    get:
+      summary: Contract version
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [contract]
+                properties: { contract: { type: string } }
+  /api/v1/endpoints:
+    get:
+      summary: Live address of every engine service (R7)
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: { type: string }
+  /api/v1/reset:
+    post:
+      summary: Instance-wide reset to a known state (R5, D3)
+      responses:
+        "204": { description: Reset complete }
+  /api/v1/runs/{id}:
+    parameters:
+      - { name: id, in: path, required: true, schema: { type: string } }
+    put:
+      summary: Declare a run and claim its source addresses (R4, D4)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [sources]
+              properties:
+                sources:
+                  type: array
+                  minItems: 1
+                  items: { type: string }
+      responses:
+        "201": { description: Declared }
+        "409": { description: Source already claimed, or run already declared }
+    delete:
+      summary: Release a run's claims (messages stay)
+      responses:
+        "204": { description: Released }
+        "404": { description: Run is not declared }
+  /api/v1/received/{service}:
+    get:
+      summary: Recorded messages in arrival order (R4)
+      parameters:
+        - { name: service, in: path, required: true, schema: { type: string } }
+        - { name: run, in: query, required: false, schema: { type: string } }
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required: [ts, source, content]
+                  properties:
+                    ts: { type: string, format: date-time }
+                    source: { type: string }
+                    run: { type: string }
+                    content: { type: object }
+        "404": { description: "Unknown receiver (N5) or undeclared run (R4) — never an empty 200" }
