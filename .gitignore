@@ -1,0 +1,12 @@
+# All shipped configuration, including throwaway credentials, is committed by design (N6, N3).
+# Nothing here hides secrets - there are none to hide.
+
+# local compose overrides
+docker-compose.override.yml
+
+# fixtures are mounted from outside; they never enter the repository
+fixtures/
+
+# run artifacts
+*.log
+.cache/
