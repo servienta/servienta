@@ -1,14 +1,16 @@
 # The full stand: the engine (data plane) plus the console (management UI on
 # :8080). The console reaches the engine over the internal network through the
-# engine's versioned contract only (D11). Host ports stay ephemeral except the
-# console's :8080, which is the one thing an operator opens (N4).
+# engine's versioned contract only (D11). A shared named volume holds the
+# license the console writes and the engine reads at startup (variant B).
 services:
   engine:
     build: ./apps/engine
+    restart: unless-stopped # picks up a new license on console-triggered reload
+    environment:
+      SERVIENTA_LICENSE: /license/license.json
     volumes:
       - ${SERVIENTA_FIXTURES:-./fixtures}:/fixtures:ro
-      # Mount a license to unlock stands; absent => Free mode (http only).
-      - ${SERVIENTA_LICENSE:-./license.json}:/license.json:ro
+      - license:/license
     # No published host ports: only the console talks to it, on the internal net.
 
   console:
@@ -17,5 +19,11 @@ services:
     environment:
       CONSOLE_ENGINE_BASE: http://engine:8080
       CONSOLE_ADDR: ":8080"
+      CONSOLE_LICENSE_PATH: /license/license.json
+    volumes:
+      - license:/license
     ports:
       - "8080:8080"
+
+volumes:
+  license:

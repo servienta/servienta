@@ -9,12 +9,16 @@ import (
 	"io"
 	"io/fs"
 	"net/http"
+	"os"
 	"time"
 )
 
 type Config struct {
 	// EngineBase is the engine control API base URL, e.g. http://engine:8080.
 	EngineBase string
+	// LicensePath is the shared-volume path the engine reads its license from;
+	// the console writes here on upload (variant B).
+	LicensePath string
 	// SPA is the built Vue app, embedded at build time.
 	SPA fs.FS
 }
@@ -51,6 +55,47 @@ func (s *Server) Handler() http.Handler {
 			q = "?run=" + run
 		}
 		s.proxy(w, r, http.MethodGet, "/api/v1/received/"+r.PathValue("service")+q, nil)
+	})
+
+	// Upload a license: validate it is well-formed JSON with the two fields the
+	// engine expects, write it to the shared volume, and ask the engine to
+	// reload. The console never signs — the engine still verifies the signature,
+	// so a bad file just lands the engine in free mode with an error (R12).
+	mux.HandleFunc("POST /api/console/license", func(w http.ResponseWriter, r *http.Request) {
+		var f struct {
+			PayloadB64 string `json:"payload_b64"`
+			Signature  string `json:"signature"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&f); err != nil || f.PayloadB64 == "" || f.Signature == "" {
+			writeJSON(w, http.StatusBadRequest, map[string]string{"error": "expected a license file with payload_b64 and signature"})
+			return
+		}
+		if s.cfg.LicensePath == "" {
+			writeJSON(w, http.StatusInternalServerError, map[string]string{"error": "console has no license path configured"})
+			return
+		}
+		body, _ := json.Marshal(f)
+		if err := os.WriteFile(s.cfg.LicensePath, body, 0o644); err != nil {
+			writeJSON(w, http.StatusInternalServerError, map[string]string{"error": "write license: " + err.Error()})
+			return
+		}
+		// Ask the engine to restart and pick up the new license.
+		req, _ := http.NewRequest(http.MethodPost, s.cfg.EngineBase+"/api/v1/reload", nil)
+		if _, err := s.engine.Do(req); err != nil {
+			writeJSON(w, http.StatusBadGateway, map[string]string{"error": "license saved, but engine reload failed: " + err.Error()})
+			return
+		}
+		writeJSON(w, http.StatusAccepted, map[string]string{"status": "license saved; engine reloading"})
+	})
+
+	// Remove the license (revert to free mode) and reload.
+	mux.HandleFunc("DELETE /api/console/license", func(w http.ResponseWriter, r *http.Request) {
+		if s.cfg.LicensePath != "" {
+			os.Remove(s.cfg.LicensePath)
+		}
+		req, _ := http.NewRequest(http.MethodPost, s.cfg.EngineBase+"/api/v1/reload", nil)
+		s.engine.Do(req)
+		writeJSON(w, http.StatusAccepted, map[string]string{"status": "license removed; engine reloading"})
 	})
 
 	// SPA (deep links fall back to index.html).
@@ -103,4 +148,3 @@ func trimLeadingSlash(p string) string {
 	}
 	return p[1:]
 }
-

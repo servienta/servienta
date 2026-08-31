@@ -8,6 +8,8 @@ import (
 	"errors"
 	"net"
 	"net/http"
+	"os"
+	"time"
 
 	"github.com/servienta/servienta/apps/engine/internal/core"
 )
@@ -49,6 +51,19 @@ func (s *Server) handler() http.Handler {
 	})
 	mux.HandleFunc("GET /api/v1/license", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusOK, s.license)
+	})
+	// Reload re-reads the mounted license by restarting: the engine still
+	// validates the license only at startup (R12), so applying a new one means
+	// starting up again. Docker's restart policy brings the process back.
+	mux.HandleFunc("POST /api/v1/reload", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusAccepted)
+		if f, ok := w.(http.Flusher); ok {
+			f.Flush()
+		}
+		go func() {
+			time.Sleep(200 * time.Millisecond)
+			os.Exit(0)
+		}()
 	})
 	mux.HandleFunc("POST /api/v1/reset", func(w http.ResponseWriter, r *http.Request) {
 		s.store.Reset()

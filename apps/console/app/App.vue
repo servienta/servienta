@@ -10,6 +10,9 @@ const error = ref<string | null>(null);
 const received = ref<unknown[] | null>(null);
 const service = ref("reference");
 const resetMsg = ref<string | null>(null);
+const licenseText = ref("");
+const licenseMsg = ref<string | null>(null);
+const uploading = ref(false);
 
 async function refresh() {
   error.value = null;
@@ -44,6 +47,50 @@ async function reset() {
   }
 }
 
+async function applyLicense() {
+  licenseMsg.value = null;
+  uploading.value = true;
+  try {
+    const parsed = JSON.parse(licenseText.value);
+    await api("/console/license", { method: "POST", body: JSON.stringify(parsed) });
+    licenseMsg.value = "License applied — engine restarting…";
+    licenseText.value = "";
+    await waitForEngine();
+  } catch (e) {
+    licenseMsg.value = (e as Error).message;
+  } finally {
+    uploading.value = false;
+  }
+}
+
+async function removeLicense() {
+  if (!confirm("Remove the license and revert to free mode?")) return;
+  licenseMsg.value = null;
+  uploading.value = true;
+  try {
+    await api("/console/license", { method: "DELETE" });
+    licenseMsg.value = "License removed — engine restarting…";
+    await waitForEngine();
+  } catch (e) {
+    licenseMsg.value = (e as Error).message;
+  } finally {
+    uploading.value = false;
+  }
+}
+
+async function waitForEngine() {
+  // The engine exits and Docker restarts it; poll until it answers again.
+  for (let i = 0; i < 40; i++) {
+    await new Promise((r) => setTimeout(r, 500));
+    try {
+      await refresh();
+      if (engineOk.value) return;
+    } catch {
+      // still restarting
+    }
+  }
+}
+
 onMounted(refresh);
 </script>
 
@@ -73,6 +120,18 @@ onMounted(refresh);
         <p v-if="license.error" class="mt-2 text-sm text-red-600">License rejected: {{ license.error }} — running in free mode.</p>
         <div class="mt-3 flex flex-wrap gap-2">
           <span v-for="s in license.stands" :key="s" class="rounded-md bg-zinc-100 px-2 py-1 text-xs font-medium text-zinc-700">{{ s }}</span>
+        </div>
+
+        <div class="mt-4 border-t border-zinc-100 pt-4">
+          <label class="text-sm font-medium">Apply a license</label>
+          <p class="mt-1 text-xs text-zinc-500">Paste the license file issued in the admin panel (the JSON with payload_b64 and signature). The engine restarts to apply it.</p>
+          <textarea v-model="licenseText" rows="4" placeholder='{"payload_b64":"…","signature":"…"}' class="mt-2 w-full rounded-md border border-zinc-300 p-2 font-mono text-xs"></textarea>
+          <div class="mt-2 flex items-center gap-3">
+            <button :disabled="uploading || !licenseText" class="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-40" @click="applyLicense">Apply</button>
+            <button v-if="license.mode === 'licensed'" :disabled="uploading" class="text-sm text-red-500 hover:text-red-700" @click="removeLicense">Remove license</button>
+            <span v-if="uploading" class="text-sm text-zinc-400">working…</span>
+          </div>
+          <p v-if="licenseMsg" class="mt-2 text-sm text-emerald-700">{{ licenseMsg }}</p>
         </div>
       </section>
 

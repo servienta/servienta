@@ -97,6 +97,9 @@ A Workers app ([D13](decisions.md)) — ships independently of everything else, 
   the single schema source.
 - **License issuance (D10/R12):** Ed25519 via WebCrypto in the Worker; the signing key is a
   Worker secret (`wrangler secret put`), never in the repository or any delivery.
+- **License upload:** the customer console (not admin) accepts an issued license, writes it to a
+  volume shared with the engine, and triggers an engine reload (restart) to apply it — the engine
+  still verifies the signature at startup, so the console never gains signing power.
 - **Deploys:** Wrangler; workers.dev URL until the servienta.com zone exists, then the custom
   domain attaches.
 
