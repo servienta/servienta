@@ -43,6 +43,11 @@ func startEngine(t *testing.T) *engine {
 		FilesUser:      filesUser,
 		FilesPassword:  filesPassword,
 		ReferenceAddr:  "127.0.0.1:0",
+		SyslogUDPAddr:  "127.0.0.1:0",
+		SyslogTCPAddr:  "127.0.0.1:0",
+		SyslogRELPAddr: "127.0.0.1:0",
+		SNMPTrapAddr:   "127.0.0.1:0",
+		SNMPCommunity:  "throwaway-public",
 		FixturesDir:    fixtures,
 	})
 	if err != nil {
@@ -105,6 +110,21 @@ func (e *engine) sendLines(t *testing.T, fromIP string, lines ...string) {
 	defer conn.Close()
 	for _, l := range lines {
 		fmt.Fprintln(conn, l)
+	}
+}
+
+func (e *engine) receivedN(t *testing.T, service, run string, n int) []map[string]any {
+	t.Helper()
+	deadline := time.Now().Add(3 * time.Second)
+	for {
+		msgs := e.receivedNoWait(t, service, run)
+		if len(msgs) >= n || time.Now().After(deadline) {
+			if len(msgs) != n {
+				t.Fatalf("%s: want %d messages, got %d", service, n, len(msgs))
+			}
+			return msgs
+		}
+		time.Sleep(20 * time.Millisecond)
 	}
 }
 

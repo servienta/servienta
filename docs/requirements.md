@@ -238,8 +238,8 @@ names the latest phase they have been verified against.
 | --- | --- | --- | --- |
 | R1 | 0 | passing — all five transports | `TestFixtureByteCompareAllTransports`, `TestFilesAuthRequired` |
 | R2 | 1 | passing (HTTP surface) | `TestFileFaults` |
-| R3.1 | 2 | not started | — |
-| R3.2 | 2 | not started | — |
+| R3.1 | 2 | passing — UDP, TCP, RELP | `TestSyslogAllTransports` |
+| R3.2 | 2 | passing — v2c; v3 USM seeded | `TestSNMPv2cTrap` |
 | R3.3 | 3 | not started | — |
 | R3.4 | 3 | not started | — |
 | R3.5 | 3 | not started | — |

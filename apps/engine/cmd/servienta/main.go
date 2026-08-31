@@ -32,6 +32,11 @@ func main() {
 		FilesUser:      envOr("SERVIENTA_FILES_USER", "servienta"),
 		FilesPassword:  envOr("SERVIENTA_FILES_PASSWORD", "throwaway-not-a-secret"),
 		ReferenceAddr:  envOr("SERVIENTA_REFERENCE_ADDR", ":9000"),
+		SyslogUDPAddr:  envOr("SERVIENTA_SYSLOG_UDP_ADDR", ":5514"),
+		SyslogTCPAddr:  envOr("SERVIENTA_SYSLOG_TCP_ADDR", ":5515"),
+		SyslogRELPAddr: envOr("SERVIENTA_SYSLOG_RELP_ADDR", ":5516"),
+		SNMPTrapAddr:   envOr("SERVIENTA_SNMP_ADDR", ":1162"),
+		SNMPCommunity:  envOr("SERVIENTA_SNMP_COMMUNITY", "throwaway-public"),
 		FixturesDir:    envOr("SERVIENTA_FIXTURES", "/fixtures"),
 	}
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)

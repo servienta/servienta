@@ -17,11 +17,14 @@ type Recorder interface {
 	Mode(service string) (mode string, delayMs int)
 }
 
-// Receiver is one protocol endpoint. Start binds addr, serves until ctx is
-// canceled, and reports the actual bound address (R7: no fixed host ports).
-// Recorded state lives in the core, so POST /reset needs nothing from the
-// receiver (R5); failure modes (R9) extend this interface in phase 1.
+// Receiver is one protocol service. A service may expose several protocol
+// surfaces (e.g. syslog over UDP, TCP, and RELP): Endpoints names them, and
+// Start binds each to the resolved address and reports the actual bound
+// address (R7: no fixed host ports). All surfaces record under Name(), so a
+// test reads them back together at /received/<name> (R4). Recorded state and
+// failure modes live in the core, so reset needs nothing from the receiver.
 type Receiver interface {
 	Name() string
-	Start(ctx context.Context, addr string, rec Recorder) (net.Addr, error)
+	Endpoints() []string // labels this receiver binds; single-surface receivers return {Name()}
+	Start(ctx context.Context, addrs map[string]string, rec Recorder) (map[string]net.Addr, error)
 }

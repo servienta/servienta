@@ -14,37 +14,33 @@ import (
 
 type Receiver struct{}
 
-func (Receiver) Name() string { return "reference" }
+func (Receiver) Name() string        { return "reference" }
+func (Receiver) Endpoints() []string { return []string{"reference"} }
 
-func (Receiver) Start(ctx context.Context, addr string, rec receiver.Recorder) (net.Addr, error) {
-	ln, err := net.Listen("tcp", addr)
+func (Receiver) Start(ctx context.Context, addrs map[string]string, rec receiver.Recorder) (map[string]net.Addr, error) {
+	ln, err := net.Listen("tcp", addrs["reference"])
 	if err != nil {
 		return nil, err
 	}
-	go func() {
-		<-ctx.Done()
-		ln.Close()
-	}()
+	go func() { <-ctx.Done(); ln.Close() }()
 	go func() {
 		for {
 			conn, err := ln.Accept()
 			if err != nil {
-				return // listener closed
+				return
 			}
 			go handle(conn, rec)
 		}
 	}()
-	return ln.Addr(), nil
+	return map[string]net.Addr{"reference": ln.Addr()}, nil
 }
 
 func handle(conn net.Conn, rec receiver.Recorder) {
 	defer conn.Close()
 	mode, delayMs := rec.Mode("reference")
 	switch mode {
-	case "refuse":
-		return // accepted then immediately closed; simplest "refuse" for a raw TCP toy
-	case "drop":
-		return // accept and silently drop
+	case "refuse", "drop":
+		return
 	case "delay":
 		time.Sleep(time.Duration(delayMs) * time.Millisecond)
 	}
@@ -55,7 +51,7 @@ func handle(conn net.Conn, rec receiver.Recorder) {
 	sc := bufio.NewScanner(conn)
 	for sc.Scan() {
 		if mode == "cut" {
-			return // drop mid-message: recorded nothing, sender sees a reset
+			return
 		}
 		_ = rec.Record("reference", host, map[string]any{"line": sc.Text()})
 	}

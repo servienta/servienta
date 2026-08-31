@@ -9,11 +9,14 @@ import (
 	"fmt"
 	"net"
 
+	"github.com/gosnmp/gosnmp"
 	"github.com/servienta/servienta/apps/engine/internal/control"
 	"github.com/servienta/servienta/apps/engine/internal/core"
 	"github.com/servienta/servienta/apps/engine/internal/fileserver"
 	"github.com/servienta/servienta/apps/engine/internal/receiver"
 	"github.com/servienta/servienta/apps/engine/internal/receiver/reference"
+	"github.com/servienta/servienta/apps/engine/internal/receiver/snmptrap"
+	"github.com/servienta/servienta/apps/engine/internal/receiver/syslog"
 )
 
 type Config struct {
@@ -26,27 +29,68 @@ type Config struct {
 	FilesUser      string // credentials for HTTPS, FTP, SCP (R1); throwaway (N6)
 	FilesPassword  string
 	ReferenceAddr  string
+	SyslogUDPAddr  string
+	SyslogTCPAddr  string
+	SyslogRELPAddr string
+	SNMPTrapAddr   string
+	SNMPCommunity  string
 	FixturesDir    string
 }
 
 type App struct {
-	Endpoints map[string]string // service -> host:port (R7)
+	Endpoints map[string]string // service/endpoint -> host:port (R7)
 	cancel    context.CancelFunc
 }
 
-// Receivers is the engine's receiver registry (R10): adding a protocol means
-// appending its Receiver here — nothing in the core changes.
-var Receivers = []receiver.Receiver{
-	reference.Receiver{},
+func receivers(cfg Config) []receiver.Receiver {
+	return []receiver.Receiver{
+		reference.Receiver{},
+		syslog.Receiver{},
+		snmptrap.Receiver{Cfg: snmptrap.Config{
+			Community: cfg.SNMPCommunity,
+			USMUsers:  usmUsers(),
+		}},
+	}
 }
 
-func receiverAddr(cfg Config, name string) string {
-	switch name {
-	case "reference":
-		return cfg.ReferenceAddr
-	default:
-		return ":0"
+// usmUsers seeds the four MD5/SHA × DES/AES-128 USM users (R3.2, throwaway N6).
+func usmUsers() []gosnmp.UsmSecurityParameters {
+	mk := func(name string, auth gosnmp.SnmpV3AuthProtocol, priv gosnmp.SnmpV3PrivProtocol) gosnmp.UsmSecurityParameters {
+		return gosnmp.UsmSecurityParameters{
+			UserName:                 name,
+			AuthenticationProtocol:   auth,
+			AuthenticationPassphrase: "throwaway-auth",
+			PrivacyProtocol:          priv,
+			PrivacyPassphrase:        "throwaway-priv",
+		}
 	}
+	return []gosnmp.UsmSecurityParameters{
+		mk("usm-md5-des", gosnmp.MD5, gosnmp.DES),
+		mk("usm-md5-aes", gosnmp.MD5, gosnmp.AES),
+		mk("usm-sha-des", gosnmp.SHA, gosnmp.DES),
+		mk("usm-sha-aes", gosnmp.SHA, gosnmp.AES),
+	}
+}
+
+func receiverAddrs(cfg Config, labels []string) map[string]string {
+	m := map[string]string{}
+	for _, l := range labels {
+		switch l {
+		case "reference":
+			m[l] = cfg.ReferenceAddr
+		case "syslog-udp":
+			m[l] = cfg.SyslogUDPAddr
+		case "syslog-tcp":
+			m[l] = cfg.SyslogTCPAddr
+		case "syslog-relp":
+			m[l] = cfg.SyslogRELPAddr
+		case "snmp-traps":
+			m[l] = cfg.SNMPTrapAddr
+		default:
+			m[l] = ":0"
+		}
+	}
+	return m
 }
 
 func Start(parent context.Context, cfg Config) (*App, error) {
@@ -54,11 +98,13 @@ func Start(parent context.Context, cfg Config) (*App, error) {
 	store := core.NewStore()
 	endpoints := map[string]string{}
 
-	starters := []struct {
+	files := []struct {
 		name  string
 		start func() (net.Addr, error)
 	}{
-		{"files-http", func() (net.Addr, error) { return fileserver.StartHTTP(ctx, cfg.FilesHTTPAddr, cfg.FixturesDir, store.Faults) }},
+		{"files-http", func() (net.Addr, error) {
+			return fileserver.StartHTTP(ctx, cfg.FilesHTTPAddr, cfg.FixturesDir, store.Faults)
+		}},
 		{"files-https", func() (net.Addr, error) {
 			return fileserver.StartHTTPS(ctx, cfg.FilesHTTPSAddr, cfg.FixturesDir, cfg.FilesUser, cfg.FilesPassword)
 		}},
@@ -70,7 +116,7 @@ func Start(parent context.Context, cfg Config) (*App, error) {
 			return fileserver.StartSCP(ctx, cfg.FilesSCPAddr, cfg.FixturesDir, cfg.FilesUser, cfg.FilesPassword)
 		}},
 	}
-	for _, sv := range starters {
+	for _, sv := range files {
 		addr, err := sv.start()
 		if err != nil {
 			cancel()
@@ -79,14 +125,16 @@ func Start(parent context.Context, cfg Config) (*App, error) {
 		endpoints[sv.name] = addr.String()
 	}
 
-	for _, r := range Receivers {
+	for _, r := range receivers(cfg) {
 		store.RegisterService(r.Name())
-		addr, err := r.Start(ctx, receiverAddr(cfg, r.Name()), store)
+		addrs, err := r.Start(ctx, receiverAddrs(cfg, r.Endpoints()), store)
 		if err != nil {
 			cancel()
 			return nil, fmt.Errorf("receiver %s: %w", r.Name(), err)
 		}
-		endpoints[r.Name()] = addr.String()
+		for label, addr := range addrs {
+			endpoints[label] = addr.String()
+		}
 	}
 
 	ctl, err := control.New(store, endpoints).Start(ctx, cfg.ControlAddr)

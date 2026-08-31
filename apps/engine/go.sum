@@ -6,6 +6,8 @@ github.com/fclairamb/ftpserverlib v0.32.3 h1:JUe5V+2VLYz23H4cZV0OujVqBqfwCjUcNdl
 github.com/fclairamb/ftpserverlib v0.32.3/go.mod h1:2R5f+iqvWQzhYJusc9OJXDut3ONKMiWPjSPqaWGzX6Y=
 github.com/gliderlabs/ssh v0.3.8 h1:a4YXD1V7xMF9g5nTkdfnja3Sxy1PVDCj1Zg4Wb8vY6c=
 github.com/gliderlabs/ssh v0.3.8/go.mod h1:xYoytBv1sV0aL3CavoDuJIQNURXkkfPA/wxQ1pL1fAU=
+github.com/gosnmp/gosnmp v1.44.0 h1:6SUNAJWjSu/j05rm+M1G39NoPW8jvShiFqYf6XNnM+k=
+github.com/gosnmp/gosnmp v1.44.0/go.mod h1:30xQDXCVXXehh/xwRd62+JwIizwc3HZaBi4F/Hv5/0o=
 github.com/jlaffaye/ftp v0.2.4 h1:JqI85DdkfZj8ntaHk8W9U2SC3jNfiPUU70+wtIWmlfE=
 github.com/jlaffaye/ftp v0.2.4/go.mod h1:Y1ZnkzxownGIuX7xQ1mQzzkZ21+DbjVIyeKL/V+IIz4=
 github.com/pin/tftp/v3 v3.2.0 h1:q6K5G6T0TA7e3wDJsB/7VpD3iaWwVEJD/nEuh3q9Sk0=

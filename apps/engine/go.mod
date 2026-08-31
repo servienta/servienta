@@ -6,6 +6,7 @@ require (
 	github.com/bramvdbogaerde/go-scp v1.6.1
 	github.com/fclairamb/ftpserverlib v0.32.3
 	github.com/gliderlabs/ssh v0.3.8
+	github.com/gosnmp/gosnmp v1.44.0
 	github.com/jlaffaye/ftp v0.2.4
 	github.com/pin/tftp/v3 v3.2.0
 	github.com/spf13/afero v1.15.0
