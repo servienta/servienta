@@ -6,13 +6,11 @@ import { STANDS } from "../../shared/stands";
 import { PLANS, planById } from "../../shared/plans";
 
 interface LicenseRow {
-  id: string;
-  customerId: string;
-  customerName: string;
-  plan: string;
-  stands: string[];
-  expiresAt: number;
-  createdAt: number;
+  id: string; customerId: string; customerName: string; plan: string;
+  stands: string[]; expiresAt: number; createdAt: number;
+}
+interface LicensePayload {
+  v: number; jti: string; sub: string; name: string; stands: string[]; plan: string; iat: number; exp: number;
 }
 
 const store = useCustomersStore();
@@ -20,6 +18,10 @@ const rows = ref<LicenseRow[]>([]);
 const customerId = ref("");
 const plan = ref<string>("standard");
 const stands = ref<string[]>([]);
+const expires = ref("");
+const error = ref<string | null>(null);
+const viewing = ref<{ id: string; file: string; payload: LicensePayload } | null>(null);
+const copied = ref(false);
 
 function applyPlan() {
   const p = planById(plan.value);
@@ -27,166 +29,114 @@ function applyPlan() {
   if (p.id !== "custom") stands.value = [...p.stands];
   expires.value = new Date(Date.now() + p.termDays * 86400000).toISOString().slice(0, 10);
 }
-const expires = ref("");
-const issued = ref<string | null>(null);
-const error = ref<string | null>(null);
-
-interface LicensePayload {
-  v: number;
-  jti: string;
-  sub: string;
-  name: string;
-  stands: string[];
-  plan: string;
-  iat: number;
-  exp: number;
-}
-const viewing = ref<{ id: string; file: string; payload: LicensePayload } | null>(null);
-const copied = ref(false);
-
-async function view(id: string) {
-  error.value = null;
-  copied.value = false;
-  try {
-    const file = await api<{ payload_b64: string; signature: string }>(`/licenses/${id}/file`);
-    viewing.value = {
-      id,
-      file: JSON.stringify(file, null, 2),
-      payload: JSON.parse(atob(file.payload_b64)) as LicensePayload,
-    };
-  } catch (e) {
-    error.value = (e as Error).message;
-  }
-}
-
-async function copyFile() {
-  if (!viewing.value) return;
-  await navigator.clipboard.writeText(viewing.value.file);
-  copied.value = true;
-}
-
-function downloadFile() {
-  if (!viewing.value) return;
-  const url = URL.createObjectURL(new Blob([viewing.value.file], { type: "application/json" }));
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `servienta-license-${viewing.value.id}.json`;
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
-async function load() {
-  rows.value = await api<LicenseRow[]>("/licenses");
-}
+async function load() { rows.value = await api<LicenseRow[]>("/licenses"); }
 
 onMounted(() => {
   applyPlan();
-  Promise.all([load(), store.loaded ? Promise.resolve() : store.load()]).catch(
-    (e) => (error.value = e.message),
-  );
+  Promise.all([load(), store.loaded ? Promise.resolve() : store.load()]).catch((e) => (error.value = e.message));
 });
 
 async function issue() {
   error.value = null;
-  issued.value = null;
   try {
-    const file = await api<{ payload_b64: string; signature: string }>("/licenses", {
+    await api("/licenses", {
       method: "POST",
       body: JSON.stringify({
-        customerId: customerId.value,
-        plan: plan.value,
-        stands: stands.value,
+        customerId: customerId.value, plan: plan.value, stands: stands.value,
         expiresAt: new Date(expires.value + "T00:00:00Z").getTime(),
       }),
     });
-    issued.value = JSON.stringify(file, null, 2);
     await load();
-  } catch (e) {
-    error.value = (e as Error).message;
-  }
+  } catch (e) { error.value = (e as Error).message; }
 }
+async function view(id: string) {
+  error.value = null; copied.value = false;
+  try {
+    const file = await api<{ payload_b64: string; signature: string }>(`/licenses/${id}/file`);
+    viewing.value = { id, file: JSON.stringify(file, null, 2), payload: JSON.parse(atob(file.payload_b64)) as LicensePayload };
+  } catch (e) { error.value = (e as Error).message; }
+}
+async function copyFile() { if (!viewing.value) return; await navigator.clipboard.writeText(viewing.value.file); copied.value = true; }
+function downloadFile() {
+  if (!viewing.value) return;
+  const url = URL.createObjectURL(new Blob([viewing.value.file], { type: "application/json" }));
+  const a = document.createElement("a"); a.href = url; a.download = `servienta-license-${viewing.value.id}.json`; a.click(); URL.revokeObjectURL(url);
+}
+const cols = "1.1fr 100px 1.6fr 110px 110px 60px";
 </script>
 
 <template>
-  <h1 class="text-xl font-semibold">Licenses</h1>
+  <h1 style="margin:0;font-size:24px;font-weight:600;letter-spacing:-0.03em">Licenses</h1>
 
-  <form class="mt-6 flex flex-wrap items-end gap-3" @submit.prevent="issue">
-    <label class="block text-sm">
-      <span class="text-zinc-500">Customer</span>
-      <select v-model="customerId" required class="mt-1 block rounded-md border border-zinc-300 px-3 py-1.5">
-        <option v-for="c in store.items" :key="c.id" :value="c.id">{{ c.name }}</option>
-      </select>
-    </label>
-    <label class="block text-sm">
-      <span class="text-zinc-500">Plan</span>
-      <select v-model="plan" class="mt-1 block rounded-md border border-zinc-300 px-3 py-1.5" @change="applyPlan">
-        <option v-for="pl in PLANS" :key="pl.id" :value="pl.id">{{ pl.label }}</option>
-      </select>
-    </label>
-    <fieldset class="block text-sm">
-      <legend class="text-zinc-500">Stands <span v-if="plan !== 'custom'" class="text-zinc-400">(set by plan)</span></legend>
-      <div class="mt-1 grid max-w-xl grid-cols-2 gap-x-4 gap-y-1 rounded-md border border-zinc-300 p-3 sm:grid-cols-3">
-        <label v-for="s in STANDS" :key="s.id" class="flex items-center gap-2">
-          <input v-model="stands" type="checkbox" :value="s.id" :disabled="plan !== 'custom'" class="rounded border-zinc-300 disabled:opacity-50" />
+  <div class="card" style="margin-top:24px;padding:18px">
+    <form style="display:flex;flex-wrap:wrap;align-items:flex-end;gap:14px" @submit.prevent="issue">
+      <label style="display:block">
+        <span class="label">Customer</span>
+        <select v-model="customerId" required class="inp" style="margin-top:5px;display:block;width:200px">
+          <option v-for="c in store.items" :key="c.id" :value="c.id">{{ c.name }}</option>
+        </select>
+      </label>
+      <label style="display:block">
+        <span class="label">Plan</span>
+        <select v-model="plan" class="inp" style="margin-top:5px;display:block;width:150px" @change="applyPlan">
+          <option v-for="pl in PLANS" :key="pl.id" :value="pl.id">{{ pl.label }}</option>
+        </select>
+      </label>
+      <label style="display:block">
+        <span class="label">Expires</span>
+        <input v-model="expires" required type="date" class="inp" style="margin-top:5px;display:block" />
+      </label>
+      <button class="btn" style="padding:9px 20px">Issue</button>
+    </form>
+
+    <fieldset style="margin:18px 0 0;padding:0;border:none">
+      <legend class="label" style="padding:0">Stands <span v-if="plan !== 'custom'" style="color:var(--dim);text-transform:none;letter-spacing:0">(set by plan)</span></legend>
+      <div style="margin-top:8px;display:grid;grid-template-columns:repeat(4,1fr);gap:8px 20px;border:1px solid var(--bd-soft);border-radius:8px;padding:14px;background:var(--input-bg)">
+        <label v-for="s in STANDS" :key="s.id" style="display:flex;align-items:center;gap:8px;font-size:13px" :style="{ color: stands.includes(s.id) ? 'var(--fg)' : 'var(--dim)' }">
+          <input v-model="stands" type="checkbox" :value="s.id" :disabled="plan !== 'custom'" style="accent-color:#8b6cff" />
           <span>{{ s.label }}</span>
         </label>
       </div>
     </fieldset>
-    <label class="block text-sm">
-      <span class="text-zinc-500">Expires</span>
-      <input v-model="expires" required type="date" class="mt-1 block rounded-md border border-zinc-300 px-3 py-1.5" />
-    </label>
-    <button class="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700">Issue</button>
-  </form>
-  <p v-if="error" class="mt-2 text-sm text-red-600">{{ error }}</p>
+  </div>
+  <p v-if="error" style="margin:10px 0 0;font-size:13px;color:var(--err)">{{ error }}</p>
 
-  <div v-if="issued" class="mt-4 rounded-lg border border-emerald-200 bg-emerald-50 p-4">
-    <div class="text-sm font-medium text-emerald-800">License file — hand this to the customer (mounted next to the engine):</div>
-    <pre class="mt-2 overflow-x-auto text-xs text-zinc-700">{{ issued }}</pre>
+  <div class="card" style="margin-top:16px;overflow:hidden">
+    <div class="label" :style="{ display:'grid', gridTemplateColumns:cols, gap:'14px', padding:'10px 16px', borderBottom:'1px solid var(--bd)' }">
+      <span>Customer</span><span>Plan</span><span>Stands</span><span>Expires</span><span>Issued</span><span></span>
+    </div>
+    <div v-for="l in rows" :key="l.id" class="row" :style="{ display:'grid', gridTemplateColumns:cols, gap:'14px', alignItems:'center', padding:'11px 16px', borderBottom:'1px solid var(--bd-soft)' }">
+      <span style="font-size:13.5px;font-weight:500">{{ l.customerName }}</span>
+      <span><span class="chip">{{ l.plan }}</span></span>
+      <span class="mono" style="font-size:11.5px;color:var(--dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ l.stands.join(", ") }}</span>
+      <span class="mono" style="font-size:12px;color:var(--body)">{{ new Date(l.expiresAt).toISOString().slice(0,10) }}</span>
+      <span class="mono" style="font-size:12px;color:var(--dim)">{{ new Date(l.createdAt).toISOString().slice(0,10) }}</span>
+      <span class="link" style="text-align:right;font-size:13px" @click="view(l.id)">View</span>
+    </div>
+    <div v-if="rows.length === 0" style="padding:24px;text-align:center;font-size:13px;color:var(--dim)">No licenses issued</div>
   </div>
 
-  <div class="mt-6 overflow-x-auto rounded-lg border border-zinc-200 bg-white">
-    <table class="w-full text-sm">
-      <thead class="border-b border-zinc-200 text-left text-zinc-500">
-        <tr><th class="px-4 py-2">Customer</th><th class="px-4 py-2">Plan</th><th class="px-4 py-2">Stands</th><th class="px-4 py-2">Expires</th><th class="px-4 py-2">Issued</th><th class="px-4 py-2"></th></tr>
-      </thead>
-      <tbody>
-        <tr v-for="l in rows" :key="l.id" class="border-b border-zinc-100 last:border-0">
-          <td class="px-4 py-2 font-medium">{{ l.customerName }}</td>
-          <td class="px-4 py-2"><span class="rounded bg-zinc-100 px-2 py-0.5 text-xs font-medium">{{ l.plan }}</span></td>
-          <td class="px-4 py-2 text-zinc-600">{{ l.stands.join(", ") }}</td>
-          <td class="px-4 py-2">{{ new Date(l.expiresAt).toISOString().slice(0, 10) }}</td>
-          <td class="px-4 py-2 text-zinc-500">{{ new Date(l.createdAt).toISOString().slice(0, 10) }}</td>
-          <td class="px-4 py-2 text-right">
-            <button class="text-sm text-zinc-500 underline-offset-2 hover:text-zinc-900 hover:underline" @click="view(l.id)">View</button>
-          </td>
-        </tr>
-        <tr v-if="rows.length === 0">
-          <td colspan="5" class="px-4 py-6 text-center text-zinc-400">No licenses issued</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div v-if="viewing" class="mt-6 rounded-lg border border-zinc-200 bg-white p-4">
-    <div class="flex items-center justify-between">
-      <div class="text-sm font-medium">License {{ viewing.id }}</div>
-      <div class="flex gap-3 text-sm">
-        <button class="text-zinc-500 hover:text-zinc-900" @click="copyFile">{{ copied ? "Copied" : "Copy" }}</button>
-        <button class="text-zinc-500 hover:text-zinc-900" @click="downloadFile">Download</button>
-        <button class="text-zinc-500 hover:text-zinc-900" @click="viewing = null">Close</button>
+  <div v-if="viewing" class="card" style="margin-top:16px;padding:18px">
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div class="mono" style="font-size:12.5px;font-weight:500">License {{ viewing.id }}</div>
+      <div style="display:flex;gap:16px;font-size:13px">
+        <span class="link" @click="copyFile">{{ copied ? "Copied" : "Copy" }}</span>
+        <span class="link" @click="downloadFile">Download</span>
+        <span class="link" @click="viewing = null">Close</span>
       </div>
     </div>
-    <dl class="mt-3 grid grid-cols-2 gap-x-6 gap-y-1 text-sm sm:grid-cols-3">
-      <div><dt class="text-zinc-500">Customer</dt><dd class="font-medium">{{ viewing.payload.name }}</dd></div>
-      <div class="col-span-2"><dt class="text-zinc-500">Stands</dt><dd class="font-medium">{{ viewing.payload.stands.join(", ") }}</dd></div>
-      <div><dt class="text-zinc-500">Plan</dt><dd class="font-medium">{{ viewing.payload.plan }}</dd></div>
-      <div><dt class="text-zinc-500">Format</dt><dd class="font-medium">v{{ viewing.payload.v }}</dd></div>
-      <div><dt class="text-zinc-500">Issued</dt><dd class="font-medium">{{ new Date(viewing.payload.iat).toISOString().slice(0, 10) }}</dd></div>
-      <div><dt class="text-zinc-500">Expires</dt><dd class="font-medium">{{ new Date(viewing.payload.exp).toISOString().slice(0, 10) }}</dd></div>
-      <div><dt class="text-zinc-500">Customer id</dt><dd class="font-mono text-xs">{{ viewing.payload.sub }}</dd></div>
-    </dl>
-    <div class="mt-3 text-xs text-zinc-500">License file — the customer mounts this next to the engine:</div>
-    <pre class="mt-1 overflow-x-auto rounded-md bg-zinc-50 p-3 text-xs text-zinc-700">{{ viewing.file }}</pre>
+    <div style="margin-top:16px;display:grid;grid-template-columns:repeat(3,1fr);gap:6px 24px">
+      <div><div class="label">Customer</div><div style="margin-top:3px;font-size:13.5px;font-weight:500">{{ viewing.payload.name }}</div></div>
+      <div style="grid-column:span 2"><div class="label">Stands</div><div class="mono" style="margin-top:3px;font-size:12.5px">{{ viewing.payload.stands.join(", ") }}</div></div>
+      <div><div class="label">Plan</div><div style="margin-top:3px;font-size:13.5px;font-weight:500">{{ viewing.payload.plan }}</div></div>
+      <div><div class="label">Format</div><div style="margin-top:3px;font-size:13.5px;font-weight:500">v{{ viewing.payload.v }}</div></div>
+      <div><div class="label">Expires</div><div style="margin-top:3px;font-size:13.5px;font-weight:500">{{ new Date(viewing.payload.exp).toISOString().slice(0,10) }}</div></div>
+    </div>
+    <div style="margin-top:16px;font-size:12px;color:var(--dim)">License file — the customer mounts this next to the engine:</div>
+    <pre class="mono" style="margin:6px 0 0;border-radius:8px;background:var(--code-bg);border:1px solid var(--bd-soft);padding:14px;font-size:11.5px;line-height:1.8;color:var(--body);overflow-x:auto">{{ viewing.file }}</pre>
   </div>
 </template>
+
+<style scoped>
+.row:hover { background:var(--hover); }
+</style>

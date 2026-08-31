@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { RouterLink, RouterView, useRoute, useRouter } from "vue-router";
 import { api } from "./api";
+import Mark from "./components/Mark.vue";
+import ThemeToggle from "./components/ThemeToggle.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -12,20 +14,33 @@ async function signOut() {
 </script>
 
 <template>
-  <div class="min-h-screen bg-zinc-50 text-zinc-900">
-    <header v-if="!route.meta.public" class="border-b border-zinc-200 bg-white">
-      <div class="mx-auto flex max-w-5xl items-center gap-8 px-6 py-4">
-        <span class="font-semibold tracking-tight">Servienta Admin</span>
-        <nav class="flex gap-4 text-sm">
-          <RouterLink to="/" class="text-zinc-500 hover:text-zinc-900" active-class="text-zinc-900 font-medium">Dashboard</RouterLink>
-          <RouterLink to="/customers" class="text-zinc-500 hover:text-zinc-900" active-class="text-zinc-900 font-medium">Customers</RouterLink>
-          <RouterLink to="/licenses" class="text-zinc-500 hover:text-zinc-900" active-class="text-zinc-900 font-medium">Licenses</RouterLink>
+  <div style="min-height:100vh">
+    <div v-if="!route.meta.public" style="border-bottom:1px solid var(--bd);background:var(--surface)">
+      <div style="max-width:1000px;margin:0 auto;padding:0 24px;height:56px;display:flex;align-items:center;gap:28px">
+        <div style="display:flex;align-items:center;gap:9px">
+          <Mark :size="3" />
+          <span style="font-size:15px;font-weight:600;letter-spacing:-0.02em">Servienta</span>
+          <span class="mono" style="font-size:10.5px;letter-spacing:0.1em;text-transform:uppercase;color:#8b6cff;border:1px solid rgba(139,108,255,0.4);border-radius:4px;padding:2px 6px">admin</span>
+        </div>
+        <nav style="display:flex;gap:4px">
+          <RouterLink to="/" class="tab" active-class="tab-on">Dashboard</RouterLink>
+          <RouterLink to="/customers" class="tab" active-class="tab-on">Customers</RouterLink>
+          <RouterLink to="/licenses" class="tab" active-class="tab-on">Licenses</RouterLink>
         </nav>
-        <button class="ml-auto text-sm text-zinc-500 hover:text-zinc-900" @click="signOut">Sign out</button>
+        <div style="margin-left:auto;display:flex;align-items:center;gap:14px">
+          <ThemeToggle />
+          <span class="link" style="font-size:13.5px" @click="signOut">Sign out</span>
+        </div>
       </div>
-    </header>
-    <main class="mx-auto max-w-5xl px-6 py-8">
+    </div>
+    <main style="max-width:1000px;margin:0 auto;padding:32px 24px 80px">
       <RouterView />
     </main>
   </div>
 </template>
+
+<style scoped>
+.tab { font-size:13.5px; padding:5px 11px; border-radius:6px; color:var(--mu); font-weight:400; }
+.tab:hover { color:var(--fg); }
+.tab-on { color:var(--fg); font-weight:500; background:var(--chip-bg); }
+</style>
