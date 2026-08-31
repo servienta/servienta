@@ -47,6 +47,8 @@ func main() {
 		TACACSSecret:   envOr("SERVIENTA_TACACS_SECRET", "throwaway-tacacs"),
 		DNSAddr:        envOr("SERVIENTA_DNS_ADDR", ":5353"),
 		NTPAddr:        envOr("SERVIENTA_NTP_ADDR", ":1123"),
+		KafkaAddr:      envOr("SERVIENTA_KAFKA_ADDR", ":9092"),
+		IPFIXAddr:      envOr("SERVIENTA_IPFIX_ADDR", ":4739"),
 		FixturesDir:    envOr("SERVIENTA_FIXTURES", "/fixtures"),
 		LicensePath:    envOr("SERVIENTA_LICENSE", "/license.json"),
 		LicensePubKey:  envOr("SERVIENTA_LICENSE_PUBKEY", embeddedLicensePubKey),

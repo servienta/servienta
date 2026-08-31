@@ -244,8 +244,8 @@ names the latest phase they have been verified against.
 | R3.4 | 3 | passing — pass/fail | `TestTACACSResponseControl` |
 | R3.5 | 3 | passing — record/NXDOMAIN/SERVFAIL | `TestDNSResponseControl` |
 | R3.6 | 3 | passing — time/stratum | `TestNTPResponseControl` |
-| R3.7 | 4 | not started | — |
-| R3.8 | 4 | not started | — |
+| R3.7 | 4 | passing — kfake broker | `TestKafkaProduce` |
+| R3.8 | 4 | passing — collector | `TestIPFIXExport` |
 | R4 | 0, cross-cutting | passing (phase 0 surface) | `TestRunIsolation`, `TestReferenceReceiverRoundTrip` |
 | R5 | 0, cross-cutting | passing (phase 0 surface) | `TestResetTwice` |
 | R6 | 0 | passing — opacity + streaming; large-file at CI scale | `TestFixtureByteCompareAllTransports` |

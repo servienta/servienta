@@ -54,8 +54,10 @@ func startEngine(t *testing.T) *engine {
 		TACACSSecret:   "throwaway-tacacs",
 		DNSAddr:        "127.0.0.1:0",
 		NTPAddr:        "127.0.0.1:0",
+		KafkaAddr:      "127.0.0.1:0",
+		IPFIXAddr:      "127.0.0.1:0",
 		FixturesDir:    fixtures,
-		LicensedStands: []string{"reference", "http", "https", "ftp", "tftp", "scp", "syslog", "snmp-traps", "radius", "tacacs", "dns", "ntp"},
+		LicensedStands: []string{"reference", "http", "https", "ftp", "tftp", "scp", "syslog", "snmp-traps", "radius", "tacacs", "dns", "ntp", "kafka", "ipfix"},
 	})
 	if err != nil {
 		cancel()

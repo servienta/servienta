@@ -15,6 +15,8 @@ import (
 	"github.com/servienta/servienta/apps/engine/internal/fileserver"
 	"github.com/servienta/servienta/apps/engine/internal/receiver"
 	dnsrecv "github.com/servienta/servienta/apps/engine/internal/receiver/dns"
+	"github.com/servienta/servienta/apps/engine/internal/receiver/ipfix"
+	"github.com/servienta/servienta/apps/engine/internal/receiver/kafka"
 	"github.com/servienta/servienta/apps/engine/internal/receiver/ntp"
 	"github.com/servienta/servienta/apps/engine/internal/receiver/radius"
 	"github.com/servienta/servienta/apps/engine/internal/receiver/reference"
@@ -44,6 +46,8 @@ type Config struct {
 	TACACSSecret   string
 	DNSAddr        string
 	NTPAddr        string
+	KafkaAddr      string
+	IPFIXAddr      string
 	FixturesDir    string
 	LicensePath    string   // mounted license file; absent => Free mode
 	LicensePubKey  string   // embedded Ed25519 public key (base64)
@@ -68,6 +72,8 @@ func receivers(cfg Config) []receiver.Receiver {
 		tacacs.Receiver{Secret: cfg.TACACSSecret},
 		dnsrecv.Receiver{},
 		ntp.Receiver{},
+		kafka.Receiver{},
+		ipfix.Receiver{},
 	}
 }
 
@@ -112,6 +118,10 @@ func receiverAddrs(cfg Config, labels []string) map[string]string {
 			m[l] = cfg.DNSAddr
 		case "ntp":
 			m[l] = cfg.NTPAddr
+		case "kafka":
+			m[l] = cfg.KafkaAddr
+		case "ipfix":
+			m[l] = cfg.IPFIXAddr
 		default:
 			m[l] = ":0"
 		}
