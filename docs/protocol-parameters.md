@@ -7,6 +7,9 @@ updated: 2026-08-31
 
 # Protocol parameters
 
+> The engine's runtime configuration is the source of truth: see
+> [guide/configuration.md](guide/configuration.md). This file is the acceptance-time spec.
+
 The canonical parameter set every engine instance is configured with (phase 0 input #3, roadmap).
 All values are supplied by configuration (env vars, R1) with these defaults. **Every credential
 below is throwaway by construction (N6): fixed, publicly known, documented here precisely so it can
@@ -21,11 +24,13 @@ never be mistaken for a real one.**
 | Files: FTP | listen address | `SERVIENTA_FILES_FTP_ADDR` | `:2121` |
 | Files: TFTP | listen address (no auth in protocol) | `SERVIENTA_FILES_TFTP_ADDR` | `:6969/udp` |
 | Files: SCP | listen address / host key | `SERVIENTA_FILES_SCP_ADDR` | `:2222`, throwaway host key generated at startup |
+| SNMP traps | listen address | `SERVIENTA_SNMP_ADDR` | `:1162/udp` |
 | Fixture tree | mount path | `SERVIENTA_FIXTURES` | `/fixtures` (read-only) |
+| License | mounted file / public key | `SERVIENTA_LICENSE` / `SERVIENTA_LICENSE_PUBKEY` | `/license.json` / embedded |
 | Reference receiver | listen address | `SERVIENTA_REFERENCE_ADDR` | `:9000` |
-| Syslog | UDP/TCP/RELP addresses | `SERVIENTA_SYSLOG_*_ADDR` | `:5514` per transport |
+| Syslog | UDP / TCP / RELP addresses | `SERVIENTA_SYSLOG_UDP_ADDR` / `_TCP_ADDR` / `_RELP_ADDR` | `:5514` / `:5515` / `:5516` |
 | SNMP traps | v2c community | `SERVIENTA_SNMP_COMMUNITY` | `throwaway-public` |
-| SNMP traps | USM users | `SERVIENTA_SNMP_USM_*` | `usm-md5-des`, `usm-md5-aes`, `usm-sha-des`, `usm-sha-aes`; auth pass `throwaway-auth`, priv pass `throwaway-priv` |
+| SNMP traps | USM users (built in, not env-configured) | — | `usm-md5-des`, `usm-md5-aes`, `usm-sha-des`, `usm-sha-aes`; auth pass `throwaway-auth`, priv pass `throwaway-priv` |
 | RADIUS | shared secret | `SERVIENTA_RADIUS_SECRET` | `throwaway-radius` |
 | TACACS+ | shared secret | `SERVIENTA_TACACS_SECRET` | `throwaway-tacacs` |
 | DNS / NTP | listen addresses | `SERVIENTA_DNS_ADDR` / `SERVIENTA_NTP_ADDR` | `:5353/udp` / `:1123/udp` |
