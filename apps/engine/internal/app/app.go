@@ -175,7 +175,9 @@ func Start(parent context.Context, cfg Config) (*App, error) {
 	}
 
 	for _, r := range receivers(cfg) {
-		if !granted[r.Name()] {
+		// The reference receiver is the R10 worked example and the public demo
+		// receiver — never a billable stand, so it always runs (even in Free mode).
+		if r.Name() != "reference" && !granted[r.Name()] {
 			continue // unlicensed receiver: not started
 		}
 		store.RegisterService(r.Name())
