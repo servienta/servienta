@@ -23,10 +23,16 @@ func envOr(key, def string) string {
 
 func main() {
 	cfg := app.Config{
-		ControlAddr:   envOr("SERVIENTA_CONTROL_ADDR", ":8080"),
-		FilesHTTPAddr: envOr("SERVIENTA_FILES_HTTP_ADDR", ":8081"),
-		ReferenceAddr: envOr("SERVIENTA_REFERENCE_ADDR", ":9000"),
-		FixturesDir:   envOr("SERVIENTA_FIXTURES", "/fixtures"),
+		ControlAddr:    envOr("SERVIENTA_CONTROL_ADDR", ":8080"),
+		FilesHTTPAddr:  envOr("SERVIENTA_FILES_HTTP_ADDR", ":8081"),
+		FilesHTTPSAddr: envOr("SERVIENTA_FILES_HTTPS_ADDR", ":8443"),
+		FilesFTPAddr:   envOr("SERVIENTA_FILES_FTP_ADDR", ":2121"),
+		FilesTFTPAddr:  envOr("SERVIENTA_FILES_TFTP_ADDR", ":6969"),
+		FilesSCPAddr:   envOr("SERVIENTA_FILES_SCP_ADDR", ":2222"),
+		FilesUser:      envOr("SERVIENTA_FILES_USER", "servienta"),
+		FilesPassword:  envOr("SERVIENTA_FILES_PASSWORD", "throwaway-not-a-secret"),
+		ReferenceAddr:  envOr("SERVIENTA_REFERENCE_ADDR", ":9000"),
+		FixturesDir:    envOr("SERVIENTA_FIXTURES", "/fixtures"),
 	}
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()

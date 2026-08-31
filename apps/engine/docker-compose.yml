@@ -7,6 +7,10 @@ services:
     ports:
       - "8080" # control API
       - "8081" # files: HTTP
+      - "8443" # files: HTTPS
+      - "2121" # files: FTP (passive data ports are ephemeral; map them when crossing hosts)
+      - "6969/udp" # files: TFTP
+      - "2222" # files: SCP
       - "9000" # reference receiver
     volumes:
       - ${SERVIENTA_FIXTURES:-./fixtures}:/fixtures:ro

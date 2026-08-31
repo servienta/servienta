@@ -21,10 +21,11 @@ import (
 )
 
 type engine struct {
-	control string // base URL
-	files   string
-	refAddr string
-	close   func()
+	control   string // base URL
+	files     string
+	refAddr   string
+	endpoints map[string]string
+	close     func()
 }
 
 func startEngine(t *testing.T) *engine {
@@ -33,20 +34,27 @@ func startEngine(t *testing.T) *engine {
 	writeFixtures(t, fixtures)
 	ctx, cancel := context.WithCancel(context.Background())
 	a, err := app.Start(ctx, app.Config{
-		ControlAddr:   "127.0.0.1:0",
-		FilesHTTPAddr: "127.0.0.1:0",
-		ReferenceAddr: "127.0.0.1:0",
-		FixturesDir:   fixtures,
+		ControlAddr:    "127.0.0.1:0",
+		FilesHTTPAddr:  "127.0.0.1:0",
+		FilesHTTPSAddr: "127.0.0.1:0",
+		FilesFTPAddr:   "127.0.0.1:0",
+		FilesTFTPAddr:  "127.0.0.1:0",
+		FilesSCPAddr:   "127.0.0.1:0",
+		FilesUser:      filesUser,
+		FilesPassword:  filesPassword,
+		ReferenceAddr:  "127.0.0.1:0",
+		FixturesDir:    fixtures,
 	})
 	if err != nil {
 		cancel()
 		t.Fatalf("start: %v", err)
 	}
 	e := &engine{
-		control: "http://" + a.Endpoints["control"],
-		files:   "http://" + a.Endpoints["files-http"],
-		refAddr: a.Endpoints["reference"],
-		close:   func() { a.Close(); cancel() },
+		control:   "http://" + a.Endpoints["control"],
+		files:     "http://" + a.Endpoints["files-http"],
+		refAddr:   a.Endpoints["reference"],
+		endpoints: a.Endpoints,
+		close:     func() { a.Close(); cancel() },
 	}
 	t.Cleanup(e.close)
 	return e
