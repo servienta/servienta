@@ -35,6 +35,7 @@ Everything starts on free tiers; the domain is the only unavoidable spend (D7).
 | [docs/roadmap.md](docs/roadmap.md) | Phases 0–4, phase 0 acceptance criteria, inputs, risks |
 | [docs/stack.md](docs/stack.md) | Stack: engine libraries, console, site, hosting, free-tier budget |
 | [docs/decisions.md](docs/decisions.md) | Decision log D0–D9 |
+| [docs/guide/](docs/guide/README.md) | **User guide** — how to run and use the whole system |
 | [CLAUDE.md](CLAUDE.md) | Working rules for this repository |
 
 ## Next step

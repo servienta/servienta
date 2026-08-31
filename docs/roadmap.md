@@ -36,7 +36,7 @@ below pass again over everything delivered so far, not just over the phase's add
 3. The same suite, run twice in a row with nothing but `POST /reset` between the runs, passes both
    times.
 4. The delivery includes documentation: how to start the harness, how to mount the fixture tree, how
-   to set the protocol parameters for each service, and how to add another receiver.
+   to set the protocol parameters for each service, and how to add another receiver. — see [guide/](guide/README.md).
 5. A machine-readable schema of the HTTP contract is part of the delivery, and a version query
    returns the version the delivery declares (R11).
 6. The reference receiver has been added from the public documentation alone, with no core edits
