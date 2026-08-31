@@ -12,7 +12,7 @@ with the marketing site and the admin panel (D13).
 | --- | --- | --- |
 | **Engine** | The test-services data plane: protocol receivers, five-transport file server, versioned HTTP contract | Go + Docker compose, runs on customer/CI infrastructure |
 | **Console** | Management, settings, statistics | Vue 3 + Tailwind + Go API, one Docker service on :80, TLS at Cloudflare edge — console.servienta.com |
-| **Admin** | Vendor back office: license issuance, customers, plans | Vue 3 + Hono on Cloudflare Workers + Cloudflare D1, Cloudflare Access in front — admin.servienta.com |
+| **Admin** | Vendor back office: license issuance, customers, plans | Vue 3 + Hono on Cloudflare Workers + Cloudflare D1, single-user login — admin.servienta.com |
 | **Marketing site** | Public website | Static on Workers — servienta.com, www.servienta.com |
 
 The engine is a set of **services and processes**: endpoints that accept data from the application

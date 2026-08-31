@@ -4,6 +4,22 @@ import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
 // timestamps, JSON as text. Keep every column inside the SQLite∩Postgres
 // common subset.
 
+export const users = sqliteTable("users", {
+  id: text("id").primaryKey(),
+  email: text("email").notNull().unique(),
+  passwordHash: text("password_hash").notNull(),
+  createdAt: integer("created_at").notNull(),
+});
+
+export const resetTokens = sqliteTable("reset_tokens", {
+  tokenHash: text("token_hash").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id),
+  expiresAt: integer("expires_at").notNull(),
+  usedAt: integer("used_at"),
+});
+
 export const customers = sqliteTable("customers", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),

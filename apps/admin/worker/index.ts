@@ -4,7 +4,8 @@ import { z } from "zod";
 import { drizzle } from "drizzle-orm/d1";
 import { desc, eq } from "drizzle-orm";
 import { customers, licenses } from "./db/schema";
-import { requireAccess } from "./auth";
+import { requireSession, sessionEmail } from "./auth";
+import { authRoutes } from "./authRoutes";
 import { issueLicense } from "./license";
 import { ulid } from "./ulid";
 import type { Env } from "./env";
@@ -12,15 +13,21 @@ import type { Env } from "./env";
 // TODO(stack.md): move route definitions to @hono/zod-openapi once the
 // surface settles, so the OpenAPI document is generated, not hand-kept.
 
-const app = new Hono<{ Bindings: Env; Variables: { accessEmail: string } }>().basePath("/api");
+const app = new Hono<{ Bindings: Env; Variables: { userEmail: string } }>().basePath("/api");
 
 app.get("/health", (c) =>
   c.json({ ok: true, service: "servienta-admin", time: new Date().toISOString() }),
 );
 
-app.use("*", requireAccess);
+app.route("/auth", authRoutes);
 
-app.get("/me", (c) => c.json({ email: c.get("accessEmail") }));
+app.get("/me", async (c) => {
+  const email = await sessionEmail(c);
+  if (!email) return c.json({ error: "unauthorized" }, 401);
+  return c.json({ email });
+});
+
+app.use("*", requireSession);
 
 app.get("/customers", async (c) => {
   const db = drizzle(c.env.DB);

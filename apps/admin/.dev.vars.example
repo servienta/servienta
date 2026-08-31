@@ -1,2 +1,2 @@
-# Local development only: lets `wrangler dev` skip Cloudflare Access.
-DEV_ALLOW_INSECURE=true
+# Local development only
+SESSION_SECRET=dev-only-session-secret

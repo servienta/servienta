@@ -17,8 +17,8 @@ Servienta — a provider of testing services. Four deployables (D7, details in
   SQLite now, Postgres later (D9 as amended by D11). console.servienta.com. Talks to engines only
   through the versioned engine contract — it is the contract's first client.
 - **Admin** — vendor back office (license issuance per D10, customers, plans). Its own Workers
-  app at admin.servienta.com: Vue 3 SPA + Hono API + Cloudflare D1, authenticated by Cloudflare
-  Access (the Worker verifies the Access JWT; no app-level password store) — D13.
+  app at admin.servienta.com: Vue 3 SPA + Hono API + Cloudflare D1 (D13); single-user
+  email+password auth with session cookies and email reset (D14).
 - **Marketing site** — static HTML + Tailwind on Workers. servienta.com, www.servienta.com.
 
 **The boundary that must not be crossed.** The application under test and the system it works with
@@ -92,5 +92,5 @@ core in phase 0), D7 (topology, domains, free-first), D8 (console/site stack), D
 portability), D10 (licensing: offline signed license, Free edition, R12), D11 (console and admin in
 Docker on the vendor host; SQLite → Postgres), D12 (Kafka simulated in-process by kfake — the
 engine is the only delivered container), D13 (implementation starts with the marketing site and
-the admin panel on Cloudflare). Outstanding phase 0 inputs: the fixture tree, the executable acceptance
+the admin panel on Cloudflare), D14 (admin auth: single-user email+password). Outstanding phase 0 inputs: the fixture tree, the executable acceptance
 suite, the protocol parameters — see `docs/roadmap.md` → "Before phase 0 starts".

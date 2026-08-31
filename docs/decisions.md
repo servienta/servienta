@@ -23,9 +23,31 @@ Revisit trigger: <metric / date / condition>
 
 ---
 
+## D14 — Admin auth: single-user email+password, no Cloudflare Access
+
+Date: 2026-08-31
+Context: owner decision — Cloudflare Access (D13) is unwanted ceremony for a one-person back
+office; required instead: plain login for andrew@molyuk.com with a password-reset capability.
+Options considered: (A) keep Access; (B) better-auth — a full auth framework for one fixed user;
+(C) minimal app-level auth sized to the actual requirement.
+Choice: **C**. One user row in Cloudflare D1 (PBKDF2-SHA-256 via WebCrypto — argon2 is not
+Workers-native and heavy KDFs collide with the free tier's CPU budget), stateless HMAC-signed
+session cookie (secret in a Worker secret), endpoints login/logout/change-password, and a
+forgot/reset flow: one-time token, 15-minute expiry, stored hashed, delivered by email through
+Resend (free tier; until RESEND_API_KEY is set, password change is available from inside the UI
+after login). The initial password is generated at seed time and handed to the owner out of band —
+no credential or its hash is committed.
+Amends: D13 (auth only; the Workers + Cloudflare D1 placement stands).
+Reversibility: two-way — the session cookie contract is internal to the admin.
+Revisit trigger: a second admin user, or any external exposure beyond the one owner — that is the
+moment to adopt better-auth or an IdP rather than grow this by hand.
+
+---
+
 ## D13 — Implementation starts with the marketing site and the admin panel, both on Cloudflare
 
 Date: 2026-08-31
+Status: **amended by D14 (2026-08-31): admin auth is app-level, not Cloudflare Access.**
 Context: owner decision — begin with the simple, independently shippable parts. The marketing site
 was already Cloudflare-hosted (D7). The admin panel returns to Cloudflare, revising D11's
 placement: the vendor back office has no tie to the customer-facing Docker host, and on Workers it

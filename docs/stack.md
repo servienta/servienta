@@ -28,7 +28,7 @@ Four deployables ([D7](decisions.md)):
 | --- | --- | --- | --- | --- |
 | **Engine** | The test-services data plane: protocol receivers, file server, versioned HTTP contract (R1–R11) | Go, Docker compose | Any container host — customer machine, CI agent, later managed nodes. Works with no internet (N2) | none (customer-addressed) |
 | **Console** | Management, settings, statistics | Vue 3 SPA + Go API — one Docker service listening on :80 | Vendor host (Docker); TLS at Cloudflare edge | console.servienta.com |
-| **Admin** | Vendor back office: license issuance, customers, plans | Vue 3 SPA + Hono API on Workers + Cloudflare D1; auth = Cloudflare Access | Cloudflare (free plan) | admin.servienta.com |
+| **Admin** | Vendor back office: license issuance, customers, plans | Vue 3 SPA + Hono API on Workers + Cloudflare D1; single-user email+password auth (D14) | Cloudflare (free plan) | admin.servienta.com |
 | **Marketing site** | Public website | Static HTML + Tailwind on Workers static assets | Cloudflare (free plan) | servienta.com, www.servienta.com |
 
 The console talks to engines **only** through the engine's versioned HTTP contract (R11) — it is the
@@ -89,8 +89,10 @@ A Workers app ([D13](decisions.md)) — ships independently of everything else, 
 - **API:** Hono on Cloudflare Workers, `zod` validation, OpenAPI via `@hono/zod-openapi`.
 - **Frontend:** Vue 3 + TypeScript, Vite, Pinia, Vue Router, Tailwind CSS v4 — served as Workers
   static assets from the same deploy; API routes take precedence.
-- **Auth:** **Cloudflare Access** (Zero Trust, free ≤50 seats) in front of the subdomain; the
-  Worker verifies the `Cf-Access-Jwt-Assertion` JWT. No application-level password store.
+- **Auth:** single-user email+password ([D14](decisions.md)): PBKDF2-SHA-256 hash in Cloudflare
+  D1, stateless HMAC-signed session cookie (SESSION_SECRET Worker secret), login/logout/change,
+  and forgot/reset via a hashed one-time token emailed through Resend (disabled until
+  RESEND_API_KEY is set; password change from the UI works regardless).
 - **Data:** Cloudflare D1 under [D9](decisions.md)'s portability rules; Drizzle ORM migrations as
   the single schema source.
 - **License issuance (D10/R12):** Ed25519 via WebCrypto in the Worker; the signing key is a
@@ -120,8 +122,7 @@ docs/            requirements, roadmap, decisions, stack
 - **VCS/CI:** GitHub + GitHub Actions (free tier). JS tooling: pnpm workspaces + Turborepo (`turbo run build/deploy`).
 - **Images:** ghcr.io (free for public images).
 - **DNS/domains:** Cloudflare Registrar + DNS. Records: apex → marketing Worker, `www` → redirect,
-  `console` → proxied record to the vendor host (TLS at the edge), `admin` → admin Worker (behind
-  Cloudflare Access).
+  `console` → proxied record to the vendor host (TLS at the edge), `admin` → admin Worker.
 - **Transactional email** (auth flows, when needed): Resend free tier *(proposed)*; inbound via
   Cloudflare Email Routing (free).
 - **Error tracking:** Sentry free tier *(proposed, optional at start)*.
