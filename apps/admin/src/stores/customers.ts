@@ -22,5 +22,17 @@ export const useCustomersStore = defineStore("customers", {
       });
       this.items.unshift(row);
     },
+    async update(id: string, name: string, email: string) {
+      const row = await api<Customer>(`/customers/${id}`, {
+        method: "PUT",
+        body: JSON.stringify({ name, email }),
+      });
+      const i = this.items.findIndex((c) => c.id === id);
+      if (i >= 0) this.items[i] = row;
+    },
+    async remove(id: string) {
+      await api(`/customers/${id}`, { method: "DELETE" });
+      this.items = this.items.filter((c) => c.id !== id);
+    },
   },
 });

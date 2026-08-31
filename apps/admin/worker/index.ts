@@ -47,6 +47,35 @@ app.post(
   },
 );
 
+app.put(
+  "/customers/:id",
+  zValidator("json", z.object({ name: z.string().min(1), email: z.string().email() })),
+  async (c) => {
+    const body = c.req.valid("json");
+    const db = drizzle(c.env.DB);
+    const id = c.req.param("id");
+    const [existing] = await db.select().from(customers).where(eq(customers.id, id));
+    if (!existing) return c.json({ error: "not found" }, 404);
+    try {
+      await db.update(customers).set({ name: body.name, email: body.email }).where(eq(customers.id, id));
+    } catch {
+      return c.json({ error: "email already in use" }, 409);
+    }
+    return c.json({ ...existing, name: body.name, email: body.email });
+  },
+);
+
+// Deletes the customer AND every license issued to them.
+app.delete("/customers/:id", async (c) => {
+  const db = drizzle(c.env.DB);
+  const id = c.req.param("id");
+  const [existing] = await db.select().from(customers).where(eq(customers.id, id));
+  if (!existing) return c.json({ error: "not found" }, 404);
+  await db.delete(licenses).where(eq(licenses.customerId, id));
+  await db.delete(customers).where(eq(customers.id, id));
+  return c.body(null, 204);
+});
+
 app.get("/licenses", async (c) => {
   const db = drizzle(c.env.DB);
   const rows = await db
