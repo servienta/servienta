@@ -1,0 +1,13 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "servienta-site",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-08-01",
+  "assets": { "directory": "./public", "binding": "ASSETS" },
+  "workers_dev": true
+  // Once the servienta.com zone exists on the account, attach the domains:
+  // "routes": [
+  //   { "pattern": "servienta.com", "custom_domain": true },
+  //   { "pattern": "www.servienta.com", "custom_domain": true }
+  // ]
+}

@@ -1,0 +1,30 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "servienta-admin",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-08-01",
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"]
+  },
+  "workers_dev": true,
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "servienta-admin",
+      "database_id": "72cd5fe3-7383-4e1a-9323-9135c2714a30",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "vars": {
+    // Set both once the Cloudflare Access application for admin.servienta.com
+    // exists; until then the API refuses everything but /api/health.
+    "ACCESS_TEAM_DOMAIN": "",
+    "ACCESS_AUD": "",
+    "LICENSE_PUBLIC_KEY": "MCowBQYDK2VwAyEAOi42TytGwPNapeKWDHyVBKsINgQdWa8dAPmEXHJnAvE="
+  }
+  // Once the servienta.com zone exists on the account:
+  // "routes": [{ "pattern": "admin.servienta.com", "custom_domain": true }]
+}

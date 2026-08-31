@@ -1,0 +1,102 @@
+<script setup lang="ts">
+import { ref, onMounted } from "vue";
+import { api } from "../api";
+import { useCustomersStore } from "../stores/customers";
+
+interface LicenseRow {
+  id: string;
+  customerId: string;
+  customerName: string;
+  edition: string;
+  expiresAt: number;
+  createdAt: number;
+}
+
+const store = useCustomersStore();
+const rows = ref<LicenseRow[]>([]);
+const customerId = ref("");
+const edition = ref<"free" | "standard" | "enterprise">("standard");
+const expires = ref("");
+const issued = ref<string | null>(null);
+const error = ref<string | null>(null);
+
+async function load() {
+  rows.value = await api<LicenseRow[]>("/licenses");
+}
+
+onMounted(() => {
+  Promise.all([load(), store.loaded ? Promise.resolve() : store.load()]).catch(
+    (e) => (error.value = e.message),
+  );
+});
+
+async function issue() {
+  error.value = null;
+  issued.value = null;
+  try {
+    const file = await api<{ payload_b64: string; signature: string }>("/licenses", {
+      method: "POST",
+      body: JSON.stringify({
+        customerId: customerId.value,
+        edition: edition.value,
+        expiresAt: new Date(expires.value + "T00:00:00Z").getTime(),
+      }),
+    });
+    issued.value = JSON.stringify(file, null, 2);
+    await load();
+  } catch (e) {
+    error.value = (e as Error).message;
+  }
+}
+</script>
+
+<template>
+  <h1 class="text-xl font-semibold">Licenses</h1>
+
+  <form class="mt-6 flex flex-wrap items-end gap-3" @submit.prevent="issue">
+    <label class="block text-sm">
+      <span class="text-zinc-500">Customer</span>
+      <select v-model="customerId" required class="mt-1 block rounded-md border border-zinc-300 px-3 py-1.5">
+        <option v-for="c in store.items" :key="c.id" :value="c.id">{{ c.name }}</option>
+      </select>
+    </label>
+    <label class="block text-sm">
+      <span class="text-zinc-500">Edition</span>
+      <select v-model="edition" class="mt-1 block rounded-md border border-zinc-300 px-3 py-1.5">
+        <option value="free">free</option>
+        <option value="standard">standard</option>
+        <option value="enterprise">enterprise</option>
+      </select>
+    </label>
+    <label class="block text-sm">
+      <span class="text-zinc-500">Expires</span>
+      <input v-model="expires" required type="date" class="mt-1 block rounded-md border border-zinc-300 px-3 py-1.5" />
+    </label>
+    <button class="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700">Issue</button>
+  </form>
+  <p v-if="error" class="mt-2 text-sm text-red-600">{{ error }}</p>
+
+  <div v-if="issued" class="mt-4 rounded-lg border border-emerald-200 bg-emerald-50 p-4">
+    <div class="text-sm font-medium text-emerald-800">License file — hand this to the customer (mounted next to the engine):</div>
+    <pre class="mt-2 overflow-x-auto text-xs text-zinc-700">{{ issued }}</pre>
+  </div>
+
+  <div class="mt-6 overflow-x-auto rounded-lg border border-zinc-200 bg-white">
+    <table class="w-full text-sm">
+      <thead class="border-b border-zinc-200 text-left text-zinc-500">
+        <tr><th class="px-4 py-2">Customer</th><th class="px-4 py-2">Edition</th><th class="px-4 py-2">Expires</th><th class="px-4 py-2">Issued</th></tr>
+      </thead>
+      <tbody>
+        <tr v-for="l in rows" :key="l.id" class="border-b border-zinc-100 last:border-0">
+          <td class="px-4 py-2 font-medium">{{ l.customerName }}</td>
+          <td class="px-4 py-2">{{ l.edition }}</td>
+          <td class="px-4 py-2">{{ new Date(l.expiresAt).toISOString().slice(0, 10) }}</td>
+          <td class="px-4 py-2 text-zinc-500">{{ new Date(l.createdAt).toISOString().slice(0, 10) }}</td>
+        </tr>
+        <tr v-if="rows.length === 0">
+          <td colspan="4" class="px-4 py-6 text-center text-zinc-400">No licenses issued</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</template>

@@ -109,15 +109,15 @@ D8). Cloudflare Web Analytics (free, cookieless).
 Monorepo (this repository):
 
 ```
-engine/         Go module — the harness engine (requirements.md scope)
-console/        Go module — console service: REST API + console SPA, listens on :80 (Docker)
-console/app/    customer console SPA (console.servienta.com)
-admin/          vendor admin: Vue 3 SPA + Hono Worker API + Cloudflare D1 (admin.servienta.com)
-site/           marketing static site (Cloudflare Workers)
-docs/           requirements, roadmap, decisions, stack
+apps/servienta/  Go module — the engine (requirements.md scope), Docker
+apps/console/    Go module + Vue 3 SPA — customer console, Docker on :80 (console.servienta.com)
+apps/admin/      vendor admin: Vue 3 SPA + Hono Worker API + Cloudflare D1 (admin.servienta.com)
+apps/web/        marketing static site on Cloudflare Workers (servienta.com)
+packages/        shared libraries (@servienta/*), extracted only when a second consumer exists
+docs/            requirements, roadmap, decisions, stack
 ```
 
-- **VCS/CI:** GitHub + GitHub Actions (free tier). JS tooling: pnpm workspaces.
+- **VCS/CI:** GitHub + GitHub Actions (free tier). JS tooling: pnpm workspaces + Turborepo (`turbo run build/deploy`).
 - **Images:** ghcr.io (free for public images).
 - **DNS/domains:** Cloudflare Registrar + DNS. Records: apex → marketing Worker, `www` → redirect,
   `console` → proxied record to the vendor host (TLS at the edge), `admin` → admin Worker (behind

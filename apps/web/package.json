@@ -1,0 +1,13 @@
+{
+  "name": "@servienta/web",
+  "private": true,
+  "scripts": {
+    "build": "tailwindcss -i src/styles.css -o public/styles.css --minify",
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.1.0",
+    "tailwindcss": "^4.1.0"
+  }
+}

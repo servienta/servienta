@@ -1,0 +1,2 @@
+# Local development only: lets `wrangler dev` skip Cloudflare Access.
+DEV_ALLOW_INSECURE=true

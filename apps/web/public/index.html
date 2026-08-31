@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Servienta — network integrations, verifiable</title>
+  <meta name="description" content="A controlled set of network endpoints and a file server that make your application's integrations verifiable by automated tests." />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body class="bg-zinc-950 text-zinc-100 antialiased">
+  <header class="mx-auto flex max-w-5xl items-center justify-between px-6 py-6">
+    <span class="text-lg font-semibold tracking-tight">Servienta</span>
+    <nav class="flex items-center gap-6 text-sm text-zinc-400">
+      <a href="#how" class="hover:text-zinc-100">How it works</a>
+      <a href="#protocols" class="hover:text-zinc-100">Protocols</a>
+      <a href="https://console.servienta.com" class="rounded-md border border-zinc-700 px-3 py-1.5 text-zinc-200 hover:border-zinc-500">Console</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="mx-auto max-w-5xl px-6 pb-20 pt-16 text-center">
+      <p class="mb-4 text-sm font-medium uppercase tracking-widest text-emerald-400">Early preview</p>
+      <h1 class="mx-auto max-w-3xl text-balance text-5xl font-semibold tracking-tight">
+        Network integrations, verifiable.
+      </h1>
+      <p class="mx-auto mt-6 max-w-2xl text-pretty text-lg text-zinc-400">
+        Your application sends syslog, SNMP traps, RADIUS requests, flows — and downloads files over
+        five transports. Servienta gives your test suite a controlled instance of every one of those
+        endpoints: bring it up with one command, generate traffic, read back exactly what arrived,
+        reset, repeat.
+      </p>
+      <div class="mt-10 flex justify-center gap-4">
+        <a href="https://console.servienta.com" class="rounded-md bg-emerald-500 px-5 py-2.5 font-medium text-zinc-950 hover:bg-emerald-400">Get started</a>
+        <a href="#how" class="rounded-md border border-zinc-700 px-5 py-2.5 text-zinc-200 hover:border-zinc-500">Learn more</a>
+      </div>
+    </section>
+
+    <section id="how" class="border-t border-zinc-900 bg-zinc-900/40">
+      <div class="mx-auto grid max-w-5xl gap-8 px-6 py-16 sm:grid-cols-3">
+        <div>
+          <h3 class="font-semibold">One command up</h3>
+          <p class="mt-2 text-sm leading-relaxed text-zinc-400">
+            A single compose invocation brings up every endpoint on one network — on a laptop, a CI
+            agent, or an isolated host with no internet at all.
+          </p>
+        </div>
+        <div>
+          <h3 class="font-semibold">Read back what arrived</h3>
+          <p class="mt-2 text-sm leading-relaxed text-zinc-400">
+            Every received message — timestamp, source, parsed content — is one HTTP call away,
+            scoped to your test run. Two concurrent runs never see each other's traffic.
+          </p>
+        </div>
+        <div>
+          <h3 class="font-semibold">Break things on purpose</h3>
+          <p class="mt-2 text-sm leading-relaxed text-zinc-400">
+            Inject faults on both sides: unreachable hosts, rejected auth, cut transfers, silent
+            drops, delayed replies. One reset returns everything to a known state.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section id="protocols" class="mx-auto max-w-5xl px-6 py-16">
+      <h2 class="text-2xl font-semibold tracking-tight">The protocol surface</h2>
+      <p class="mt-2 max-w-2xl text-zinc-400">
+        A file server on HTTP, HTTPS, FTP, TFTP, and SCP — plus receivers for everything your
+        application sends outward.
+      </p>
+      <ul class="mt-8 grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
+        <li class="rounded-lg border border-zinc-800 px-4 py-3">Syslog <span class="text-zinc-500">UDP · TCP · RELP</span></li>
+        <li class="rounded-lg border border-zinc-800 px-4 py-3">SNMP traps <span class="text-zinc-500">v2c · v3 USM</span></li>
+        <li class="rounded-lg border border-zinc-800 px-4 py-3">RADIUS</li>
+        <li class="rounded-lg border border-zinc-800 px-4 py-3">TACACS+</li>
+        <li class="rounded-lg border border-zinc-800 px-4 py-3">DNS</li>
+        <li class="rounded-lg border border-zinc-800 px-4 py-3">NTP</li>
+        <li class="rounded-lg border border-zinc-800 px-4 py-3">Kafka</li>
+        <li class="rounded-lg border border-zinc-800 px-4 py-3">IPFIX</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="border-t border-zinc-900">
+    <div class="mx-auto flex max-w-5xl items-center justify-between px-6 py-8 text-sm text-zinc-500">
+      <span>© 2026 Servienta</span>
+      <span>Runs entirely on your infrastructure.</span>
+    </div>
+  </footer>
+</body>
+</html>
