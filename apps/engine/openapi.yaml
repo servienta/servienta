@@ -26,6 +26,22 @@ paths:
               schema:
                 type: object
                 additionalProperties: { type: string }
+  /api/v1/license:
+    get:
+      summary: Current license status and licensed stands (R12, D15)
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [mode, stands]
+                properties:
+                  mode: { type: string, enum: [free, licensed] }
+                  stands: { type: array, items: { type: string } }
+                  customer: { type: string }
+                  expires_at: { type: integer }
+                  error: { type: string }
   /api/v1/reset:
     post:
       summary: Instance-wide reset to a known state (R5, D3)

@@ -49,6 +49,7 @@ func startEngine(t *testing.T) *engine {
 		SNMPTrapAddr:   "127.0.0.1:0",
 		SNMPCommunity:  "throwaway-public",
 		FixturesDir:    fixtures,
+		LicensedStands: []string{"reference", "http", "https", "ftp", "tftp", "scp", "syslog", "snmp-traps"},
 	})
 	if err != nil {
 		cancel()

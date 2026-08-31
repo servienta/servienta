@@ -17,7 +17,7 @@ observations no test reads is infrastructure without an owner.
 | 2 | R3.1 and R3.2 (syslog, SNMP traps) | First checks of outbound integrations | in progress — syslog UDP/TCP/RELP + SNMP v2c passing |
 | 3 | R3.3–R3.6 with R8 (RADIUS, TACACS+, DNS, NTP) | Authentication and system-settings screens, failures included | not started |
 | 4 | R3.7 and R3.8 (Kafka, IPFIX) | Streaming and flow-export screens | not started |
-| 5 | R12 (offline license validation), per-customer registry access, license issuance in the admin panel | First paid delivery | not started |
+| 5 | R12 (offline license validation), per-customer registry access, license issuance in the admin panel | First paid delivery | in progress — engine validates + gates stands; console shows status |
 
 **R5 is implemented and confirmed first, before anything else comes to depend on it.** An incomplete
 reset produces flaky end-to-end runs, and flaky tests are worse than no tests: they get disabled,

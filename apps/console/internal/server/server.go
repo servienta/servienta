@@ -39,6 +39,7 @@ func (s *Server) Handler() http.Handler {
 	// Engine reachability + endpoint map, proxied through the contract (R7/R11).
 	mux.HandleFunc("GET /api/engine/endpoints", s.proxyGet("/api/v1/endpoints"))
 	mux.HandleFunc("GET /api/engine/version", s.proxyGet("/api/v1/version"))
+	mux.HandleFunc("GET /api/engine/license", s.proxyGet("/api/v1/license"))
 
 	// Manage the whole stand: reset, received, runs — all via the contract.
 	mux.HandleFunc("POST /api/engine/reset", func(w http.ResponseWriter, r *http.Request) {

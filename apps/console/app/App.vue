@@ -5,6 +5,7 @@ import { api } from "./api";
 const engineOk = ref<boolean | null>(null);
 const version = ref<string | null>(null);
 const endpoints = ref<Record<string, string>>({});
+const license = ref<{ mode: string; stands: string[]; customer?: string; expires_at?: number; error?: string } | null>(null);
 const error = ref<string | null>(null);
 const received = ref<unknown[] | null>(null);
 const service = ref("reference");
@@ -15,6 +16,7 @@ async function refresh() {
   try {
     version.value = (await api<{ contract: string }>("/engine/version")).contract;
     endpoints.value = await api<Record<string, string>>("/engine/endpoints");
+    license.value = await api("/engine/license");
     engineOk.value = true;
   } catch (e) {
     engineOk.value = false;
@@ -61,6 +63,18 @@ onMounted(refresh);
 
     <main class="mx-auto max-w-5xl space-y-6 px-6 py-8">
       <p v-if="error" class="rounded-md bg-red-50 px-4 py-2 text-sm text-red-700">{{ error }}</p>
+
+      <section v-if="license" class="rounded-lg border border-zinc-200 bg-white p-4">
+        <div class="flex items-center justify-between">
+          <h2 class="font-semibold">License</h2>
+          <span class="rounded-full px-2 py-0.5 text-xs font-medium" :class="license.mode === 'licensed' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'">{{ license.mode }}</span>
+        </div>
+        <p v-if="license.customer" class="mt-2 text-sm">Licensed to <span class="font-medium">{{ license.customer }}</span><span v-if="license.expires_at"> · expires {{ new Date(license.expires_at).toISOString().slice(0, 10) }}</span></p>
+        <p v-if="license.error" class="mt-2 text-sm text-red-600">License rejected: {{ license.error }} — running in free mode.</p>
+        <div class="mt-3 flex flex-wrap gap-2">
+          <span v-for="s in license.stands" :key="s" class="rounded-md bg-zinc-100 px-2 py-1 text-xs font-medium text-zinc-700">{{ s }}</span>
+        </div>
+      </section>
 
       <section class="rounded-lg border border-zinc-200 bg-white p-4">
         <div class="flex items-center justify-between">

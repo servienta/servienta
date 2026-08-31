@@ -23,6 +23,22 @@ Revisit trigger: <metric / date / condition>
 
 ---
 
+## D16 — Free mode serves the HTTP file server only
+
+Date: 2026-08-31
+Context: D10 left open what the no-license Free mode includes; the engine now
+enforces licensing (R12) and needs a concrete answer.
+Options considered: (A) Free = nothing (license always required); (B) Free =
+the HTTP file server only; (C) Free = all file transports.
+Choice: **B** — the import-check use case (the original R1/R6 pain) needs only
+file serving, and HTTP is the zero-credential transport, so Free mode is
+immediately useful without handing over the paid surface. A rejected or expired
+license falls back to Free and reports the error (R12: explicit, never silent).
+Reversibility: two-way — the Free stand set is data (`app.FreeStands`).
+Revisit trigger: product/pricing decides a different free tier.
+
+---
+
 ## D15 — License semantics: a license enumerates the customer's stands
 
 Date: 2026-08-31

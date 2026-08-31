@@ -254,7 +254,7 @@ names the latest phase they have been verified against.
 | R9 | 1 | passing (reference surface) | `TestReceiverModes` |
 | R10 | 0 | passing | `TestReferenceReceiverRoundTrip` |
 | R11 | 0, cross-cutting | in progress — schema ships, version passing; generated-client check pending | `TestVersion` |
-| R12 | 5 | not started | — |
+| R12 | 5 | passing | `TestLicenseGatesStands`, `TestFreeMode`, `TestExpiredLicenseRefused`, license unit tests |
 | N1 | measured after 0 | not measured | — |
 | N2 | cross-cutting | not started | — |
 | N3 | cross-cutting | not started | — |

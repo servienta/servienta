@@ -35,10 +35,14 @@ type Config struct {
 	SNMPTrapAddr   string
 	SNMPCommunity  string
 	FixturesDir    string
+	LicensePath    string   // mounted license file; absent => Free mode
+	LicensePubKey  string   // embedded Ed25519 public key (base64)
+	LicensedStands []string // test override; when set, skips file resolution
 }
 
 type App struct {
 	Endpoints map[string]string // service/endpoint -> host:port (R7)
+	License   LicenseStatus
 	cancel    context.CancelFunc
 }
 
@@ -98,25 +102,38 @@ func Start(parent context.Context, cfg Config) (*App, error) {
 	store := core.NewStore()
 	endpoints := map[string]string{}
 
+	lic := LicenseStatus{Mode: "licensed", Stands: cfg.LicensedStands}
+	if cfg.LicensedStands == nil {
+		lic = resolveLicense(cfg.LicensePath, cfg.LicensePubKey)
+	}
+	granted := map[string]bool{}
+	for _, s := range lic.Stands {
+		granted[s] = true
+	}
+
 	files := []struct {
+		stand string
 		name  string
 		start func() (net.Addr, error)
 	}{
-		{"files-http", func() (net.Addr, error) {
+		{"http", "files-http", func() (net.Addr, error) {
 			return fileserver.StartHTTP(ctx, cfg.FilesHTTPAddr, cfg.FixturesDir, store.Faults)
 		}},
-		{"files-https", func() (net.Addr, error) {
+		{"https", "files-https", func() (net.Addr, error) {
 			return fileserver.StartHTTPS(ctx, cfg.FilesHTTPSAddr, cfg.FixturesDir, cfg.FilesUser, cfg.FilesPassword)
 		}},
-		{"files-ftp", func() (net.Addr, error) {
+		{"ftp", "files-ftp", func() (net.Addr, error) {
 			return fileserver.StartFTP(ctx, cfg.FilesFTPAddr, cfg.FixturesDir, cfg.FilesUser, cfg.FilesPassword)
 		}},
-		{"files-tftp", func() (net.Addr, error) { return fileserver.StartTFTP(ctx, cfg.FilesTFTPAddr, cfg.FixturesDir) }},
-		{"files-scp", func() (net.Addr, error) {
+		{"tftp", "files-tftp", func() (net.Addr, error) { return fileserver.StartTFTP(ctx, cfg.FilesTFTPAddr, cfg.FixturesDir) }},
+		{"scp", "files-scp", func() (net.Addr, error) {
 			return fileserver.StartSCP(ctx, cfg.FilesSCPAddr, cfg.FixturesDir, cfg.FilesUser, cfg.FilesPassword)
 		}},
 	}
 	for _, sv := range files {
+		if !granted[sv.stand] {
+			continue // not licensed (D15): this stand simply does not start
+		}
 		addr, err := sv.start()
 		if err != nil {
 			cancel()
@@ -126,6 +143,9 @@ func Start(parent context.Context, cfg Config) (*App, error) {
 	}
 
 	for _, r := range receivers(cfg) {
+		if !granted[r.Name()] {
+			continue // unlicensed receiver: not started
+		}
 		store.RegisterService(r.Name())
 		addrs, err := r.Start(ctx, receiverAddrs(cfg, r.Endpoints()), store)
 		if err != nil {
@@ -137,14 +157,14 @@ func Start(parent context.Context, cfg Config) (*App, error) {
 		}
 	}
 
-	ctl, err := control.New(store, endpoints).Start(ctx, cfg.ControlAddr)
+	ctl, err := control.New(store, endpoints, lic).Start(ctx, cfg.ControlAddr)
 	if err != nil {
 		cancel()
 		return nil, fmt.Errorf("control: %w", err)
 	}
 	endpoints["control"] = ctl.String()
 
-	return &App{Endpoints: endpoints, cancel: cancel}, nil
+	return &App{Endpoints: endpoints, License: lic, cancel: cancel}, nil
 }
 
 func (a *App) Close() { a.cancel() }

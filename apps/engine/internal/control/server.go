@@ -18,10 +18,11 @@ const ContractVersion = "0.1.0"
 type Server struct {
 	store     *core.Store
 	endpoints map[string]string
+	license   any // app.LicenseStatus, kept as any to avoid an import cycle
 }
 
-func New(store *core.Store, endpoints map[string]string) *Server {
-	return &Server{store: store, endpoints: endpoints}
+func New(store *core.Store, endpoints map[string]string, licenseStatus any) *Server {
+	return &Server{store: store, endpoints: endpoints, license: licenseStatus}
 }
 
 func (s *Server) Start(ctx context.Context, addr string) (net.Addr, error) {
@@ -45,6 +46,9 @@ func (s *Server) handler() http.Handler {
 	})
 	mux.HandleFunc("GET /api/v1/endpoints", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusOK, s.endpoints)
+	})
+	mux.HandleFunc("GET /api/v1/license", func(w http.ResponseWriter, r *http.Request) {
+		writeJSON(w, http.StatusOK, s.license)
 	})
 	mux.HandleFunc("POST /api/v1/reset", func(w http.ResponseWriter, r *http.Request) {
 		s.store.Reset()

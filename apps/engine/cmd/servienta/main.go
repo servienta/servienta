@@ -14,6 +14,10 @@ import (
 	"github.com/servienta/servienta/apps/engine/internal/app"
 )
 
+// embeddedLicensePubKey is the Ed25519 public key the engine trusts (D10). The
+// matching private key lives only in the admin's Cloudflare secret.
+const embeddedLicensePubKey = "MCowBQYDK2VwAyEAOi42TytGwPNapeKWDHyVBKsINgQdWa8dAPmEXHJnAvE="
+
 func envOr(key, def string) string {
 	if v := os.Getenv(key); v != "" {
 		return v
@@ -38,6 +42,8 @@ func main() {
 		SNMPTrapAddr:   envOr("SERVIENTA_SNMP_ADDR", ":1162"),
 		SNMPCommunity:  envOr("SERVIENTA_SNMP_COMMUNITY", "throwaway-public"),
 		FixturesDir:    envOr("SERVIENTA_FIXTURES", "/fixtures"),
+		LicensePath:    envOr("SERVIENTA_LICENSE", "/license.json"),
+		LicensePubKey:  envOr("SERVIENTA_LICENSE_PUBKEY", embeddedLicensePubKey),
 	}
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()

@@ -7,6 +7,8 @@ services:
     build: ./apps/engine
     volumes:
       - ${SERVIENTA_FIXTURES:-./fixtures}:/fixtures:ro
+      # Mount a license to unlock stands; absent => Free mode (http only).
+      - ${SERVIENTA_LICENSE:-./license.json}:/license.json:ro
     # No published host ports: only the console talks to it, on the internal net.
 
   console:
