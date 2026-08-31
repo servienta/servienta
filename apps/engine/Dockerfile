@@ -1,6 +1,6 @@
 # N7: reproducible build from a tagged source tree; the engine is the
 # delivery's only container (D12).
-FROM golang:1.25-alpine AS build
+FROM golang:1.26-alpine AS build
 WORKDIR /src
 COPY go.mod go.sum ./
 RUN go mod download
