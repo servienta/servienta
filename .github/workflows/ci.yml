@@ -30,3 +30,9 @@ jobs:
       - run: |
           docker build             -t ghcr.io/servienta/engine:latest             -t ghcr.io/servienta/engine:${{ github.sha }}             apps/servienta
       - run: docker push --all-tags ghcr.io/servienta/engine
+      # Registry retention: keep the 5 newest versions, delete the rest.
+      - uses: actions/delete-package-versions@v5
+        with:
+          package-name: engine
+          package-type: container
+          min-versions-to-keep: 5
