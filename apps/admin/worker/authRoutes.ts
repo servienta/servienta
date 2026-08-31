@@ -42,7 +42,7 @@ authRoutes.post("/logout", async (c) => {
 
 authRoutes.post(
   "/change",
-  zValidator("json", z.object({ current: z.string().min(1), next: z.string().min(12) })),
+  zValidator("json", z.object({ current: z.string().min(1), next: z.string().min(10) })),
   async (c) => {
     const email = await sessionEmail(c);
     if (!email) return c.json({ error: "unauthorized" }, 401);
@@ -94,7 +94,7 @@ authRoutes.post(
 
 authRoutes.post(
   "/reset",
-  zValidator("json", z.object({ token: z.string().min(1), next: z.string().min(12) })),
+  zValidator("json", z.object({ token: z.string().min(1), next: z.string().min(10) })),
   async (c) => {
     const { token, next } = c.req.valid("json");
     const db = drizzle(c.env.DB);

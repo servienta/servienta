@@ -51,7 +51,7 @@ async function changePassword() {
     <div class="text-sm font-medium">Change password</div>
     <form class="mt-3 space-y-2" @submit.prevent="changePassword">
       <input v-model="current" type="password" required placeholder="Current password" class="w-full rounded-md border border-zinc-300 px-3 py-1.5 text-sm" />
-      <input v-model="next" type="password" required minlength="12" placeholder="New password (12+ chars)" class="w-full rounded-md border border-zinc-300 px-3 py-1.5 text-sm" />
+      <input v-model="next" type="password" required minlength="10" placeholder="New password (10+ chars)" class="w-full rounded-md border border-zinc-300 px-3 py-1.5 text-sm" />
       <button class="rounded-md bg-zinc-900 px-4 py-1.5 text-sm font-medium text-white hover:bg-zinc-700">Change</button>
     </form>
     <p v-if="changed" class="mt-2 text-sm text-emerald-700">Password changed.</p>
