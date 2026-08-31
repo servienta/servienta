@@ -14,9 +14,13 @@ import (
 	"github.com/servienta/servienta/apps/engine/internal/core"
 	"github.com/servienta/servienta/apps/engine/internal/fileserver"
 	"github.com/servienta/servienta/apps/engine/internal/receiver"
+	dnsrecv "github.com/servienta/servienta/apps/engine/internal/receiver/dns"
+	"github.com/servienta/servienta/apps/engine/internal/receiver/ntp"
+	"github.com/servienta/servienta/apps/engine/internal/receiver/radius"
 	"github.com/servienta/servienta/apps/engine/internal/receiver/reference"
 	"github.com/servienta/servienta/apps/engine/internal/receiver/snmptrap"
 	"github.com/servienta/servienta/apps/engine/internal/receiver/syslog"
+	"github.com/servienta/servienta/apps/engine/internal/receiver/tacacs"
 )
 
 type Config struct {
@@ -34,6 +38,12 @@ type Config struct {
 	SyslogRELPAddr string
 	SNMPTrapAddr   string
 	SNMPCommunity  string
+	RADIUSAddr     string
+	RADIUSSecret   string
+	TACACSAddr     string
+	TACACSSecret   string
+	DNSAddr        string
+	NTPAddr        string
 	FixturesDir    string
 	LicensePath    string   // mounted license file; absent => Free mode
 	LicensePubKey  string   // embedded Ed25519 public key (base64)
@@ -54,6 +64,10 @@ func receivers(cfg Config) []receiver.Receiver {
 			Community: cfg.SNMPCommunity,
 			USMUsers:  usmUsers(),
 		}},
+		radius.Receiver{Secret: cfg.RADIUSSecret},
+		tacacs.Receiver{Secret: cfg.TACACSSecret},
+		dnsrecv.Receiver{},
+		ntp.Receiver{},
 	}
 }
 
@@ -90,6 +104,14 @@ func receiverAddrs(cfg Config, labels []string) map[string]string {
 			m[l] = cfg.SyslogRELPAddr
 		case "snmp-traps":
 			m[l] = cfg.SNMPTrapAddr
+		case "radius":
+			m[l] = cfg.RADIUSAddr
+		case "tacacs":
+			m[l] = cfg.TACACSAddr
+		case "dns":
+			m[l] = cfg.DNSAddr
+		case "ntp":
+			m[l] = cfg.NTPAddr
 		default:
 			m[l] = ":0"
 		}

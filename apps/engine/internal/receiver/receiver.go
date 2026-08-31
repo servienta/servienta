@@ -15,6 +15,7 @@ import (
 type Recorder interface {
 	Record(service, sourceIP string, content map[string]any) error
 	Mode(service string) (mode string, delayMs int)
+	Response(service string) map[string]any // R8 control, nil = default
 }
 
 // Receiver is one protocol service. A service may expose several protocol

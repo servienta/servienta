@@ -26,19 +26,21 @@ type Message struct {
 }
 
 type Store struct {
-	mu       sync.Mutex
-	services map[string][]Message // registered receiver -> arrival-ordered messages
-	runs     map[string][]string  // run id -> claimed sources
-	claims   map[string]string    // source IP -> run id
-	Faults   *Faults              // instance-wide fault state (R2, R9)
+	mu        sync.Mutex
+	services  map[string][]Message // registered receiver -> arrival-ordered messages
+	runs      map[string][]string  // run id -> claimed sources
+	claims    map[string]string    // source IP -> run id
+	Faults    *Faults              // instance-wide fault state (R2, R9)
+	Responses *Responses           // instance-wide response controls (R8)
 }
 
 func NewStore() *Store {
 	return &Store{
-		services: map[string][]Message{},
-		runs:     map[string][]string{},
-		claims:   map[string]string{},
-		Faults:   NewFaults(),
+		services:  map[string][]Message{},
+		runs:      map[string][]string{},
+		claims:    map[string]string{},
+		Faults:    NewFaults(),
+		Responses: NewResponses(),
 	}
 }
 
@@ -138,11 +140,18 @@ func (s *Store) Reset() {
 	}
 	s.runs = map[string][]string{}
 	s.claims = map[string]string{}
-	s.Faults.Reset() // R5 must lift R2 and R9 faults too
+	s.Faults.Reset()    // R5 must lift R2 and R9 faults too
+	s.Responses.Reset() // R5 must restore R8 responses to default
 }
 
 // Mode exposes a receiver's R9 failure mode (implements receiver.Recorder).
 func (s *Store) Mode(service string) (string, int) {
 	m, d := s.Faults.ReceiverMode(service)
 	return string(m), d
+}
+
+// Response exposes a service's R8 response control (implements
+// receiver.Recorder). nil means "answer normally".
+func (s *Store) Response(service string) map[string]any {
+	return s.Responses.Get(service)
 }

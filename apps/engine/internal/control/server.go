@@ -95,6 +95,16 @@ func (s *Server) handler() http.Handler {
 			writeError(w, http.StatusBadRequest, "unknown fault kind: "+body.Kind)
 		}
 	})
+	// R8: control the reply of a request-response service (instance-wide, D3).
+	mux.HandleFunc("PUT /api/v1/responses/{service}", func(w http.ResponseWriter, r *http.Request) {
+		var spec map[string]any
+		if err := json.NewDecoder(r.Body).Decode(&spec); err != nil {
+			writeError(w, http.StatusBadRequest, "body must be a JSON object")
+			return
+		}
+		s.store.Responses.Set(r.PathValue("service"), spec)
+		w.WriteHeader(http.StatusNoContent)
+	})
 	// R9: put a receiver into a failure mode (instance-wide, D3).
 	mux.HandleFunc("PUT /api/v1/faults/receivers/{service}", func(w http.ResponseWriter, r *http.Request) {
 		var body struct {

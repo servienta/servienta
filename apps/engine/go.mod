@@ -8,9 +8,11 @@ require (
 	github.com/gliderlabs/ssh v0.3.8
 	github.com/gosnmp/gosnmp v1.44.0
 	github.com/jlaffaye/ftp v0.2.4
+	github.com/miekg/dns v1.1.73
 	github.com/pin/tftp/v3 v3.2.0
 	github.com/spf13/afero v1.15.0
 	golang.org/x/crypto v0.55.0
+	layeh.com/radius v0.0.0-20231213012653-1006025d24f8
 )
 
 require (

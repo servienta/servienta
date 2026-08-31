@@ -48,8 +48,14 @@ func startEngine(t *testing.T) *engine {
 		SyslogRELPAddr: "127.0.0.1:0",
 		SNMPTrapAddr:   "127.0.0.1:0",
 		SNMPCommunity:  "throwaway-public",
+		RADIUSAddr:     "127.0.0.1:0",
+		RADIUSSecret:   "throwaway-radius",
+		TACACSAddr:     "127.0.0.1:0",
+		TACACSSecret:   "throwaway-tacacs",
+		DNSAddr:        "127.0.0.1:0",
+		NTPAddr:        "127.0.0.1:0",
 		FixturesDir:    fixtures,
-		LicensedStands: []string{"reference", "http", "https", "ftp", "tftp", "scp", "syslog", "snmp-traps"},
+		LicensedStands: []string{"reference", "http", "https", "ftp", "tftp", "scp", "syslog", "snmp-traps", "radius", "tacacs", "dns", "ntp"},
 	})
 	if err != nil {
 		cancel()

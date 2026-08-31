@@ -240,17 +240,17 @@ names the latest phase they have been verified against.
 | R2 | 1 | passing (HTTP surface) | `TestFileFaults` |
 | R3.1 | 2 | passing — UDP, TCP, RELP | `TestSyslogAllTransports` |
 | R3.2 | 2 | passing — v2c; v3 USM seeded | `TestSNMPv2cTrap` |
-| R3.3 | 3 | not started | — |
-| R3.4 | 3 | not started | — |
-| R3.5 | 3 | not started | — |
-| R3.6 | 3 | not started | — |
+| R3.3 | 3 | passing — accept/reject | `TestRADIUSResponseControl` |
+| R3.4 | 3 | passing — pass/fail | `TestTACACSResponseControl` |
+| R3.5 | 3 | passing — record/NXDOMAIN/SERVFAIL | `TestDNSResponseControl` |
+| R3.6 | 3 | passing — time/stratum | `TestNTPResponseControl` |
 | R3.7 | 4 | not started | — |
 | R3.8 | 4 | not started | — |
 | R4 | 0, cross-cutting | passing (phase 0 surface) | `TestRunIsolation`, `TestReferenceReceiverRoundTrip` |
 | R5 | 0, cross-cutting | passing (phase 0 surface) | `TestResetTwice` |
 | R6 | 0 | passing — opacity + streaming; large-file at CI scale | `TestFixtureByteCompareAllTransports` |
 | R7 | 0 | in progress — compose written, clean-host check pending | — |
-| R8 | 3 | not started | — |
+| R8 | 3 | passing — all four services | `TestDNSResponseControl`, `TestNTPResponseControl`, `TestRADIUSResponseControl`, `TestTACACSResponseControl` |
 | R9 | 1 | passing (reference surface) | `TestReceiverModes` |
 | R10 | 0 | passing | `TestReferenceReceiverRoundTrip` |
 | R11 | 0, cross-cutting | in progress — schema ships, version passing; generated-client check pending | `TestVersion` |

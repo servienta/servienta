@@ -72,6 +72,24 @@ paths:
       responses:
         "204": { description: Released }
         "404": { description: Run is not declared }
+  /api/v1/responses/{service}:
+    put:
+      summary: Control a request-response service's reply for the run (R8)
+      parameters:
+        - { name: service, in: path, required: true, schema: { type: string, enum: [radius, tacacs, dns, ntp] } }
+      requestBody:
+        required: true
+        description: >
+          Free-form control the service interprets. radius/tacacs:
+          {outcome: accept|reject|pass|fail, reason}. dns:
+          {outcome: record|nxdomain|servfail|delay, address, delay_ms}.
+          ntp: {outcome: normal|offset|stratum|refuse, offset_ms, stratum}.
+          An empty object restores the default (successful reply).
+        content:
+          application/json:
+            schema: { type: object }
+      responses:
+        "204": { description: Response control set }
   /api/v1/received/{service}:
     get:
       summary: Recorded messages in arrival order (R4)
