@@ -23,6 +23,15 @@ import (
 	"github.com/servienta/servienta/apps/engine/internal/receiver/snmptrap"
 	"github.com/servienta/servienta/apps/engine/internal/receiver/syslog"
 	"github.com/servienta/servienta/apps/engine/internal/receiver/tacacs"
+	"github.com/servienta/servienta/apps/engine/internal/sender"
+	dnssnd "github.com/servienta/servienta/apps/engine/internal/sender/dnssend"
+	ipfixsnd "github.com/servienta/servienta/apps/engine/internal/sender/ipfixsend"
+	kafkasnd "github.com/servienta/servienta/apps/engine/internal/sender/kafkasend"
+	ntpsnd "github.com/servienta/servienta/apps/engine/internal/sender/ntpsend"
+	radiussnd "github.com/servienta/servienta/apps/engine/internal/sender/radiussend"
+	snmpsnd "github.com/servienta/servienta/apps/engine/internal/sender/snmpsend"
+	syslogsnd "github.com/servienta/servienta/apps/engine/internal/sender/syslogsend"
+	tacacssnd "github.com/servienta/servienta/apps/engine/internal/sender/tacacssend"
 )
 
 type Config struct {
@@ -57,6 +66,7 @@ type Config struct {
 type App struct {
 	Endpoints map[string]string // service/endpoint -> host:port (R7)
 	License   LicenseStatus
+	Senders   map[string]sender.Sender // licensed senders (R13), by stand id
 	cancel    context.CancelFunc
 }
 
@@ -93,6 +103,19 @@ func usmUsers() []gosnmp.UsmSecurityParameters {
 		mk("usm-md5-aes", gosnmp.MD5, gosnmp.AES),
 		mk("usm-sha-des", gosnmp.SHA, gosnmp.DES),
 		mk("usm-sha-aes", gosnmp.SHA, gosnmp.AES),
+	}
+}
+
+func senders() []sender.Sender {
+	return []sender.Sender{
+		syslogsnd.Sender{},
+		snmpsnd.Sender{},
+		radiussnd.Sender{},
+		tacacssnd.Sender{},
+		dnssnd.Sender{},
+		ntpsnd.Sender{},
+		kafkasnd.Sender{},
+		ipfixsnd.Sender{},
 	}
 }
 
@@ -191,14 +214,21 @@ func Start(parent context.Context, cfg Config) (*App, error) {
 		}
 	}
 
-	ctl, err := control.New(store, endpoints, lic).Start(ctx, cfg.ControlAddr)
+	activeSenders := map[string]sender.Sender{}
+	for _, s := range senders() {
+		if granted[s.Name()] {
+			activeSenders[s.Name()] = s
+		}
+	}
+
+	ctl, err := control.New(store, endpoints, lic, activeSenders).Start(ctx, cfg.ControlAddr)
 	if err != nil {
 		cancel()
 		return nil, fmt.Errorf("control: %w", err)
 	}
 	endpoints["control"] = ctl.String()
 
-	return &App{Endpoints: endpoints, License: lic, cancel: cancel}, nil
+	return &App{Endpoints: endpoints, License: lic, Senders: activeSenders, cancel: cancel}, nil
 }
 
 func (a *App) Close() { a.cancel() }

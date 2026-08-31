@@ -29,6 +29,10 @@ type engine struct {
 }
 
 func startEngine(t *testing.T) *engine {
+	return startEngineWithStands(t, []string{"reference", "http", "https", "ftp", "tftp", "scp", "syslog", "snmp-traps", "radius", "tacacs", "dns", "ntp", "kafka", "ipfix"})
+}
+
+func startEngineWithStands(t *testing.T, stands []string) *engine {
 	t.Helper()
 	fixtures := t.TempDir()
 	writeFixtures(t, fixtures)
@@ -57,7 +61,7 @@ func startEngine(t *testing.T) *engine {
 		KafkaAddr:      "127.0.0.1:0",
 		IPFIXAddr:      "127.0.0.1:0",
 		FixturesDir:    fixtures,
-		LicensedStands: []string{"reference", "http", "https", "ftp", "tftp", "scp", "syslog", "snmp-traps", "radius", "tacacs", "dns", "ntp", "kafka", "ipfix"},
+		LicensedStands: stands,
 	})
 	if err != nil {
 		cancel()
@@ -72,6 +76,13 @@ func startEngine(t *testing.T) *engine {
 	}
 	t.Cleanup(e.close)
 	return e
+}
+
+func decode(t *testing.T, body []byte, v any) {
+	t.Helper()
+	if err := json.Unmarshal(body, v); err != nil {
+		t.Fatalf("decode: %v (%s)", err, body)
+	}
 }
 
 var fixtureData = map[string][]byte{}

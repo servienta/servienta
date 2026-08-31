@@ -180,6 +180,22 @@ key; the signing key never ships ([D10](decisions.md)).
 *Verification:* the suite starts the engine with a valid, an expired, a tampered, and no license
 file, and observes exactly the documented behavior in each case.
 
+**R13 — Active send to a receiving application.** The mirror of R3: for an
+application that *receives* a protocol (a syslog server, a DNS server, a Kafka
+broker, …), the test asks the engine to send it a message. `POST
+/api/v1/send/<service>` takes a `target` (`host:port`) and the payload; the
+engine forms the protocol message and sends it to that target. For
+request-response protocols the engine is the client and returns the
+application's reply; for one-way protocols it confirms the send. **The target is
+supplied by the test on every request** — the engine never discovers, stores, or
+depends on the application's address (the boundary; see [D18](decisions.md)).
+Availability follows the stand grant (D15): sending a protocol requires that
+stand to be licensed.
+*Verification:* for each protocol the suite stands up a listener (standing in for
+the application), asks the engine to send to it, and confirms the listener
+received exactly the message (and, for request-response, that the returned reply
+matches what the listener answered).
+
 ## Non-functional requirements
 
 **N1 — Startup time.** The limit is set from measurement after phase 0, not assigned in advance. It
@@ -255,6 +271,7 @@ names the latest phase they have been verified against.
 | R10 | 0 | passing | `TestReferenceReceiverRoundTrip` |
 | R11 | 0, cross-cutting | in progress — schema ships, version passing; generated-client check pending | `TestVersion` |
 | R12 | 5 | passing | `TestLicenseGatesStands`, `TestFreeMode`, `TestExpiredLicenseRefused`, license unit tests |
+| R13 | 6 | passing — all 8 protocols | `TestSend*` |
 | N1 | measured after 0 | not measured | — |
 | N2 | cross-cutting | not started | — |
 | N3 | cross-cutting | not started | — |

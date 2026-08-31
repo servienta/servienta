@@ -95,6 +95,26 @@ paths:
             schema: { type: object }
       responses:
         "204": { description: Response control set }
+  /api/v1/send/{service}:
+    post:
+      summary: Send a protocol message to a receiving application (R13)
+      parameters:
+        - { name: service, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        description: >
+          {target: "host:port", ...payload}. The target is supplied on every
+          request (D18). syslog: {transport, message}. dns: {qname}. radius:
+          {secret, username, password}. tacacs: {secret, username}. ntp: {}.
+          snmp-traps: {community, oid, value}. kafka: {topic, key, value}.
+          ipfix: {src, dst}.
+        content:
+          application/json:
+            schema: { type: object, required: [target], properties: { target: { type: string } } }
+      responses:
+        "200": { description: "For request-response: the application's reply. For one-way: a confirmation." }
+        "404": { description: No licensed sender for this service }
+        "502": { description: Send failed (target unreachable, protocol error) }
   /api/v1/received/{service}:
     get:
       summary: Recorded messages in arrival order (R4)

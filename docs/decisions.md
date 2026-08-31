@@ -23,6 +23,32 @@ Revisit trigger: <metric / date / condition>
 
 ---
 
+## D18 — Active send: the test supplies the target every time
+
+Date: 2026-09-01
+Context: the harness was built to *receive* what the application sends outward
+(R3). A new need is the mirror — sending a protocol message *into* an
+application that receives it (a syslog/DNS server, a Kafka broker). This touches
+the core boundary: "the engine never reaches into the application under test."
+Options considered: (A) the engine is configured with the application's address
+and sends to it — makes the engine depend on and discover the application,
+breaking the boundary; (B) the test supplies the `target` on every send request,
+so the engine only executes a test-directed action and never holds or discovers
+the application's address.
+Choice: **B**. The initiator is always the test, exactly as with reads and
+resets; the engine forms and sends the protocol message to the target the test
+names, and holds nothing about the application between requests. Serving files
+and answering DNS were already "sending" in response to app-initiated requests
+(R1, R8); R13 adds test-initiated sends, still without the engine depending on
+the application. New capability recorded as R13.
+Reversibility: two-way — senders are stateless and additive; removing them
+touches nothing else.
+Revisit trigger: a real need for the engine to send on its own schedule
+(unprompted by a test) — that would genuinely cross the boundary and needs its
+own decision, not this one.
+
+---
+
 ## D17 — Pricing model: annual subscription, tiered by stand bundles
 
 Date: 2026-09-01

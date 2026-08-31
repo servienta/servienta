@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/servienta/servienta/apps/engine/internal/core"
+	"github.com/servienta/servienta/apps/engine/internal/sender"
 )
 
 // ContractVersion is bumped on any breaking change to this surface (R11).
@@ -21,10 +22,11 @@ type Server struct {
 	store     *core.Store
 	endpoints map[string]string
 	license   any // app.LicenseStatus, kept as any to avoid an import cycle
+	senders   map[string]sender.Sender
 }
 
-func New(store *core.Store, endpoints map[string]string, licenseStatus any) *Server {
-	return &Server{store: store, endpoints: endpoints, license: licenseStatus}
+func New(store *core.Store, endpoints map[string]string, licenseStatus any, senders map[string]sender.Sender) *Server {
+	return &Server{store: store, endpoints: endpoints, license: licenseStatus, senders: senders}
 }
 
 func (s *Server) Start(ctx context.Context, addr string) (net.Addr, error) {
@@ -109,6 +111,31 @@ func (s *Server) handler() http.Handler {
 		default:
 			writeError(w, http.StatusBadRequest, "unknown fault kind: "+body.Kind)
 		}
+	})
+	// R13: send a protocol message to a target the caller names (D18).
+	mux.HandleFunc("POST /api/v1/send/{service}", func(w http.ResponseWriter, r *http.Request) {
+		svc := r.PathValue("service")
+		snd, ok := s.senders[svc]
+		if !ok {
+			writeError(w, http.StatusNotFound, "no licensed sender for service "+svc)
+			return
+		}
+		var body map[string]any
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			writeError(w, http.StatusBadRequest, "body must be a JSON object")
+			return
+		}
+		target, _ := body["target"].(string)
+		if target == "" {
+			writeError(w, http.StatusBadRequest, "target (host:port) is required")
+			return
+		}
+		result, err := snd.Send(r.Context(), target, body)
+		if err != nil {
+			writeError(w, http.StatusBadGateway, err.Error())
+			return
+		}
+		writeJSON(w, http.StatusOK, result)
 	})
 	// R8: control the reply of a request-response service (instance-wide, D3).
 	mux.HandleFunc("PUT /api/v1/responses/{service}", func(w http.ResponseWriter, r *http.Request) {
