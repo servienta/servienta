@@ -74,6 +74,41 @@ func (s *Server) handler() http.Handler {
 		}
 		w.WriteHeader(http.StatusNoContent)
 	})
+	// R2: force a file fault for a named fixture (instance-wide, D3).
+	mux.HandleFunc("PUT /api/v1/faults/files/{fixture...}", func(w http.ResponseWriter, r *http.Request) {
+		var body struct {
+			Kind string `json:"kind"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			writeError(w, http.StatusBadRequest, "body must be {\"kind\": \"...\"}")
+			return
+		}
+		switch core.FileFaultKind(body.Kind) {
+		case core.FileAuthReject, core.FileMissing, core.FileTruncate, core.FileCorrupt:
+			s.store.Faults.SetFileFault(r.PathValue("fixture"), core.FileFaultKind(body.Kind))
+			w.WriteHeader(http.StatusNoContent)
+		default:
+			writeError(w, http.StatusBadRequest, "unknown fault kind: "+body.Kind)
+		}
+	})
+	// R9: put a receiver into a failure mode (instance-wide, D3).
+	mux.HandleFunc("PUT /api/v1/faults/receivers/{service}", func(w http.ResponseWriter, r *http.Request) {
+		var body struct {
+			Mode    string `json:"mode"`
+			DelayMs int    `json:"delay_ms"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			writeError(w, http.StatusBadRequest, "body must be {\"mode\": \"...\", \"delay_ms\": N}")
+			return
+		}
+		switch core.ReceiverMode(body.Mode) {
+		case core.ModeNormal, core.ModeRefuse, core.ModeDrop, core.ModeDelay, core.ModeCut, core.ModeProtoEr:
+			s.store.Faults.SetReceiverMode(r.PathValue("service"), core.ReceiverMode(body.Mode), body.DelayMs)
+			w.WriteHeader(http.StatusNoContent)
+		default:
+			writeError(w, http.StatusBadRequest, "unknown receiver mode: "+body.Mode)
+		}
+	})
 	mux.HandleFunc("GET /api/v1/received/{service}", func(w http.ResponseWriter, r *http.Request) {
 		msgs, err := s.store.Received(r.PathValue("service"), r.URL.Query().Get("run"))
 		switch {

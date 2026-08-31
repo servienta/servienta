@@ -108,6 +108,17 @@ func (e *engine) sendLines(t *testing.T, fromIP string, lines ...string) {
 	}
 }
 
+func (e *engine) receivedNoWait(t *testing.T, service, run string) []map[string]any {
+	t.Helper()
+	res, body := e.do(t, "GET", "/api/v1/received/"+service+"?run="+run, nil)
+	if res.StatusCode != http.StatusOK {
+		t.Fatalf("received: %d %s", res.StatusCode, body)
+	}
+	var msgs []map[string]any
+	json.Unmarshal(body, &msgs)
+	return msgs
+}
+
 func (e *engine) received(t *testing.T, service, run string) []map[string]any {
 	t.Helper()
 	path := "/api/v1/received/" + service

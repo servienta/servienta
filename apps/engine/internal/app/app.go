@@ -58,7 +58,7 @@ func Start(parent context.Context, cfg Config) (*App, error) {
 		name  string
 		start func() (net.Addr, error)
 	}{
-		{"files-http", func() (net.Addr, error) { return fileserver.StartHTTP(ctx, cfg.FilesHTTPAddr, cfg.FixturesDir) }},
+		{"files-http", func() (net.Addr, error) { return fileserver.StartHTTP(ctx, cfg.FilesHTTPAddr, cfg.FixturesDir, store.Faults) }},
 		{"files-https", func() (net.Addr, error) {
 			return fileserver.StartHTTPS(ctx, cfg.FilesHTTPSAddr, cfg.FixturesDir, cfg.FilesUser, cfg.FilesPassword)
 		}},

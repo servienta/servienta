@@ -237,7 +237,7 @@ names the latest phase they have been verified against.
 | Requirement | Phase | Status | Covering test |
 | --- | --- | --- | --- |
 | R1 | 0 | passing — all five transports | `TestFixtureByteCompareAllTransports`, `TestFilesAuthRequired` |
-| R2 | 1 | not started | — |
+| R2 | 1 | passing (HTTP surface) | `TestFileFaults` |
 | R3.1 | 2 | not started | — |
 | R3.2 | 2 | not started | — |
 | R3.3 | 3 | not started | — |
@@ -251,7 +251,7 @@ names the latest phase they have been verified against.
 | R6 | 0 | passing — opacity + streaming; large-file at CI scale | `TestFixtureByteCompareAllTransports` |
 | R7 | 0 | in progress — compose written, clean-host check pending | — |
 | R8 | 3 | not started | — |
-| R9 | 1 | not started | — |
+| R9 | 1 | passing (reference surface) | `TestReceiverModes` |
 | R10 | 0 | passing | `TestReferenceReceiverRoundTrip` |
 | R11 | 0, cross-cutting | in progress — schema ships, version passing; generated-client check pending | `TestVersion` |
 | R12 | 5 | not started | — |

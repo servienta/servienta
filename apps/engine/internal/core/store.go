@@ -30,6 +30,7 @@ type Store struct {
 	services map[string][]Message // registered receiver -> arrival-ordered messages
 	runs     map[string][]string  // run id -> claimed sources
 	claims   map[string]string    // source IP -> run id
+	Faults   *Faults              // instance-wide fault state (R2, R9)
 }
 
 func NewStore() *Store {
@@ -37,6 +38,7 @@ func NewStore() *Store {
 		services: map[string][]Message{},
 		runs:     map[string][]string{},
 		claims:   map[string]string{},
+		Faults:   NewFaults(),
 	}
 }
 
@@ -136,4 +138,11 @@ func (s *Store) Reset() {
 	}
 	s.runs = map[string][]string{}
 	s.claims = map[string]string{}
+	s.Faults.Reset() // R5 must lift R2 and R9 faults too
+}
+
+// Mode exposes a receiver's R9 failure mode (implements receiver.Recorder).
+func (s *Store) Mode(service string) (string, int) {
+	m, d := s.Faults.ReceiverMode(service)
+	return string(m), d
 }

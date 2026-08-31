@@ -13,7 +13,7 @@ observations no test reads is infrastructure without an owner.
 | Phase | Contents | What it unblocks | Status |
 | --- | --- | --- | --- |
 | 0 | R5 (reset), R7 (compose), R1 and R6 (file server), R4 (recording core: `/received`, run declarations), R10 (receiver interface, reference receiver), R11 (contract) | Reproducible runs; import verification; extensibility from the start | **in progress** |
-| 1 | R2 and R9 (fault injection on both sides) | Verification of error paths | not started |
+| 1 | R2 and R9 (fault injection on both sides) | Verification of error paths | in progress — HTTP + reference surface |
 | 2 | R3.1 and R3.2 (syslog, SNMP traps) | First checks of outbound integrations | not started |
 | 3 | R3.3–R3.6 with R8 (RADIUS, TACACS+, DNS, NTP) | Authentication and system-settings screens, failures included | not started |
 | 4 | R3.7 and R3.8 (Kafka, IPFIX) | Streaming and flow-export screens | not started |

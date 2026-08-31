@@ -10,9 +10,11 @@ import (
 
 // Recorder is the only write path a receiver has into the engine: every
 // message it accepts is recorded with its observed source address, and the
-// core attributes it to a run by claimed source (D4).
+// core attributes it to a run by claimed source (D4). It also exposes the
+// receiver's current R9 failure mode so the receiver can honor it.
 type Recorder interface {
 	Record(service, sourceIP string, content map[string]any) error
+	Mode(service string) (mode string, delayMs int)
 }
 
 // Receiver is one protocol endpoint. Start binds addr, serves until ctx is
