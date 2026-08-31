@@ -8,6 +8,7 @@ import { requireSession, sessionEmail } from "./auth";
 import { authRoutes } from "./authRoutes";
 import { issueLicense } from "./license";
 import { STAND_IDS } from "../shared/stands";
+import { PLAN_IDS } from "../shared/plans";
 import { ulid } from "./ulid";
 import type { Env } from "./env";
 
@@ -85,6 +86,7 @@ app.get("/licenses", async (c) => {
       customerId: licenses.customerId,
       customerName: customers.name,
       stands: licenses.stands,
+      plan: licenses.plan,
       expiresAt: licenses.expiresAt,
       createdAt: licenses.createdAt,
     })
@@ -100,6 +102,7 @@ app.post(
     "json",
     z.object({
       customerId: z.string().min(1),
+      plan: z.string().refine((p) => PLAN_IDS.includes(p), { message: "unknown plan" }),
       stands: z.array(z.string()).min(1).refine((s) => s.every((id) => STAND_IDS.includes(id)), {
         message: "unknown stand id",
       }),
@@ -115,12 +118,14 @@ app.post(
       customerId: customer.id,
       customerName: customer.name,
       stands: body.stands,
+      plan: body.plan,
       expiresAt: body.expiresAt,
     });
     await db.insert(licenses).values({
       id: signed.id,
       customerId: customer.id,
       stands: JSON.stringify(body.stands),
+      plan: body.plan,
       expiresAt: body.expiresAt,
       payloadB64: signed.payloadB64,
       signature: signed.signature,

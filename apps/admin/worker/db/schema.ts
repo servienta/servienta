@@ -34,6 +34,8 @@ export const licenses = sqliteTable("licenses", {
     .references(() => customers.id),
   // JSON array of licensed stand ids (D15, D9: JSON as text).
   stands: text("stands").notNull(),
+  // Pricing plan the license was sold under (D17); stands remain authoritative.
+  plan: text("plan").notNull(),
   expiresAt: integer("expires_at").notNull(),
   // The exact signed bytes (base64) and their Ed25519 signature (base64).
   // The engine verifies the bytes, so canonicalization never matters (D10).

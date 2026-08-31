@@ -9,6 +9,7 @@ export interface LicenseInput {
   customerId: string;
   customerName: string;
   stands: string[];
+  plan: string;
   expiresAt: number; // epoch millis UTC
 }
 
@@ -33,6 +34,7 @@ export async function issueLicense(env: Env, input: LicenseInput) {
     sub: input.customerId,
     name: input.customerName,
     stands: input.stands,
+    plan: input.plan,
     iat: Date.now(),
     exp: input.expiresAt,
   };

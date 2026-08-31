@@ -23,6 +23,39 @@ Revisit trigger: <metric / date / condition>
 
 ---
 
+## D17 — Pricing model: annual subscription, tiered by stand bundles
+
+Date: 2026-09-01
+Context: the license mechanism (D15/D16) can price on exactly two axes — the set
+of stands and the expiry — and nothing else: the engine is offline (N2), so
+usage cannot be metered or observed, and instance/seat counts cannot be
+enforced in a source-available binary. A pricing model has to live inside those
+limits.
+Options considered: (A) usage/consumption pricing — impossible to meter offline;
+(B) per-instance or per-seat — unenforceable offline, contract-only at best;
+(C) annual subscription tiered by stand bundles, instance count governed by
+contract. This is the self-hosted-infra standard (Elastic, HashiCorp, GitLab
+self-managed) precisely because they share these constraints.
+Choice: **C**. Plans (presets over the stand set):
+- **Free** — files-http + demo receiver, no license file (D16). Funnel/trial.
+- **Files** — all five file transports (http, https, ftp, tftp, scp).
+- **Standard** — Files + syslog, snmp-traps, dns, ntp.
+- **Enterprise** — everything (adds radius, tacacs, kafka, ipfix).
+- **Custom** — an arbitrary stand set, for negotiated deals (the admin already
+  supports freeform selection).
+Billing is an annual subscription: renewal is a reissued license with a new
+`exp` (already implemented). Instance count is a **contract term, not code** —
+offline enforcement is impossible and chasing it is wasted effort (see the
+fingerprint discussion; D10's "compliance clarity, not DRM"). Prices themselves
+are set out of band and are not encoded here.
+Reversibility: two-way — plans are presets over the stand list (data), and the
+license already carries the exact stands, so repricing never touches the engine.
+Revisit trigger: a customer need a stand bundle cannot express (per-stand
+metering, graduated limits), or a move to a hosted offering where usage *can* be
+metered — either reopens the axes available to pricing.
+
+---
+
 ## D16 — Free mode serves the HTTP file server only
 
 Date: 2026-08-31
