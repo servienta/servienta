@@ -11,7 +11,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/servienta/servienta/apps/servienta/internal/app"
+	"github.com/servienta/servienta/apps/engine/internal/app"
 )
 
 func envOr(key, def string) string {

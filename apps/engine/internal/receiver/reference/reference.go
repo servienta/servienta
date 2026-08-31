@@ -8,7 +8,7 @@ import (
 	"context"
 	"net"
 
-	"github.com/servienta/servienta/apps/servienta/internal/receiver"
+	"github.com/servienta/servienta/apps/engine/internal/receiver"
 )
 
 type Receiver struct{}

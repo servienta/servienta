@@ -17,7 +17,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/servienta/servienta/apps/servienta/internal/app"
+	"github.com/servienta/servienta/apps/engine/internal/app"
 )
 
 type engine struct {

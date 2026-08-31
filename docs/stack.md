@@ -111,7 +111,7 @@ D8). Cloudflare Web Analytics (free, cookieless).
 Monorepo (this repository):
 
 ```
-apps/servienta/  Go module — the engine (requirements.md scope), Docker
+apps/engine/  Go module — the engine (requirements.md scope), Docker
 apps/console/    Go module + Vue 3 SPA — customer console, Docker on :80 (console.servienta.com)
 apps/admin/      vendor admin: Vue 3 SPA + Hono Worker API + Cloudflare D1 (admin.servienta.com)
 apps/web/        marketing static site on Cloudflare Workers (servienta.com)

@@ -52,7 +52,7 @@ Phase 0 does not start until its inputs are closed:
 | --- | --- | --- |
 | D1 — control-layer runtime | contractor proposes, customer approves | decided 2026-08-31, revised by D6 — Go, see [decisions.md](decisions.md) |
 | Fixture tree available to mount | vendor | closed — [fixture-tree.md](fixture-tree.md) |
-| Acceptance suite in executable form | vendor | closed — [acceptance-suite.md](acceptance-suite.md), `apps/servienta/acceptance/` |
+| Acceptance suite in executable form | vendor | closed — [acceptance-suite.md](acceptance-suite.md), `apps/engine/acceptance/` |
 | Protocol parameters (ports, credentials, community, USM, topics) | vendor | closed — [protocol-parameters.md](protocol-parameters.md) |
 
 The last three rows are the "what the customer provides" list from the requirements. Without the

@@ -9,7 +9,7 @@ import (
 	"net"
 	"net/http"
 
-	"github.com/servienta/servienta/apps/servienta/internal/core"
+	"github.com/servienta/servienta/apps/engine/internal/core"
 )
 
 // ContractVersion is bumped on any breaking change to this surface (R11).

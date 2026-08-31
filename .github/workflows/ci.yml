@@ -2,18 +2,18 @@ name: CI
 on:
   push:
     branches: [main]
-    paths: ["apps/servienta/**", ".github/workflows/ci.yml"]
+    paths: ["apps/engine/**", ".github/workflows/ci.yml"]
   pull_request:
-    paths: ["apps/servienta/**"]
+    paths: ["apps/engine/**"]
 
 jobs:
   engine:
     runs-on: ubuntu-latest
-    defaults: { run: { working-directory: apps/servienta } }
+    defaults: { run: { working-directory: apps/engine } }
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
-        with: { go-version-file: apps/servienta/go.mod }
+        with: { go-version-file: apps/engine/go.mod }
       - run: go vet ./...
       - run: go test ./... -count=1
 
@@ -28,7 +28,7 @@ jobs:
       - uses: actions/checkout@v4
       - run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
       - run: |
-          docker build             -t ghcr.io/servienta/engine:latest             -t ghcr.io/servienta/engine:${{ github.sha }}             apps/servienta
+          docker build             -t ghcr.io/servienta/engine:latest             -t ghcr.io/servienta/engine:${{ github.sha }}             apps/engine
       - run: docker push --all-tags ghcr.io/servienta/engine
       # Registry retention: keep the 5 newest versions, delete the rest.
       - uses: actions/delete-package-versions@v5

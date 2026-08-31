@@ -8,11 +8,11 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/servienta/servienta/apps/servienta/internal/control"
-	"github.com/servienta/servienta/apps/servienta/internal/core"
-	"github.com/servienta/servienta/apps/servienta/internal/fileserver"
-	"github.com/servienta/servienta/apps/servienta/internal/receiver"
-	"github.com/servienta/servienta/apps/servienta/internal/receiver/reference"
+	"github.com/servienta/servienta/apps/engine/internal/control"
+	"github.com/servienta/servienta/apps/engine/internal/core"
+	"github.com/servienta/servienta/apps/engine/internal/fileserver"
+	"github.com/servienta/servienta/apps/engine/internal/receiver"
+	"github.com/servienta/servienta/apps/engine/internal/receiver/reference"
 )
 
 type Config struct {
