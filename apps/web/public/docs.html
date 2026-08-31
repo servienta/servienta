@@ -1,173 +1,260 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Servienta — Docs</title>
   <meta name="description" content="How to use Servienta: run the engine, record and read traffic, inject faults, steer replies, and apply a license." />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/styles.css" />
 </head>
-<body class="bg-zinc-950 text-zinc-100 antialiased">
-  <header class="mx-auto flex max-w-5xl items-center justify-between px-6 py-6">
-    <a href="/" class="text-lg font-semibold tracking-tight">Servienta</a>
-    <nav class="flex items-center gap-6 text-sm text-zinc-400">
-      <a href="/" class="hover:text-zinc-100">Home</a>
-      <a href="/#pricing" class="hover:text-zinc-100">Pricing</a>
-      <a href="#quickstart" class="hover:text-zinc-100">Quickstart</a>
-      <a href="#api" class="hover:text-zinc-100">API</a>
-    </nav>
+<body>
+  <header style="position:sticky;top:0;z-index:20;background:var(--hdr);backdrop-filter:blur(12px);border-bottom:1px solid var(--bds)">
+    <div style="max-width:1120px;margin:0 auto;padding:0 32px;height:64px;display:flex;align-items:center;justify-content:space-between">
+      <a href="/" style="display:flex;align-items:center;gap:10px;color:var(--fg)">
+        <span style="display:grid;grid-template-columns:repeat(3,3px);grid-template-rows:repeat(3,3px);gap:3px">
+          <i style="background:var(--dot)"></i><i style="background:var(--dot)"></i><i style="background:var(--dot)"></i>
+          <i style="background:var(--dot)"></i><i style="background:#8b6cff;box-shadow:0 0 8px rgba(139,108,255,0.8)"></i><i style="background:var(--dot)"></i>
+          <i style="background:var(--dot)"></i><i style="background:var(--dot)"></i><i style="background:var(--dot)"></i>
+        </span>
+        <span style="font-size:16px;font-weight:600;letter-spacing:-0.02em">Servienta</span>
+      </a>
+      <nav style="display:flex;align-items:center;gap:26px;font-size:14px">
+        <a href="/" style="color:var(--mu)">Home</a>
+        <a href="/#pricing" style="color:var(--mu)">Pricing</a>
+        <a href="#quickstart" style="color:var(--mu)">Quickstart</a>
+        <span style="width:1px;height:18px;background:var(--bd)"></span>
+        <button id="themeBtn" title="Toggle theme" aria-label="Toggle theme" style="display:flex;align-items:center;justify-content:center;width:24px;height:24px;color:var(--mu);cursor:pointer;background:none;border:none;padding:0">
+          <span style="position:relative;display:block;width:14px;height:14px;border-radius:999px;border:1.5px solid currentColor;overflow:hidden">
+            <span id="themeKnob" style="position:absolute;top:0;bottom:0;left:0;right:50%;background:currentColor"></span>
+          </span>
+        </button>
+      </nav>
+    </div>
   </header>
 
-  <div class="mx-auto grid max-w-5xl gap-10 px-6 pb-24 pt-6 md:grid-cols-[200px_1fr]">
-    <aside class="hidden md:block">
-      <nav class="sticky top-6 space-y-1 text-sm text-zinc-400">
-        <a href="#what" class="block hover:text-zinc-100">What it is</a>
-        <a href="#concepts" class="block hover:text-zinc-100">Concepts</a>
-        <a href="#quickstart" class="block hover:text-zinc-100">Quickstart</a>
-        <a href="#receivers" class="block hover:text-zinc-100">Receivers</a>
-        <a href="#responses" class="block hover:text-zinc-100">Response control</a>
-        <a href="#faults" class="block hover:text-zinc-100">Fault injection</a>
-        <a href="#licensing" class="block hover:text-zinc-100">Licensing</a>
-        <a href="#api" class="block hover:text-zinc-100">API reference</a>
+  <div style="max-width:1120px;margin:0 auto;padding:48px 32px 96px;display:grid;grid-template-columns:200px minmax(0,1fr);gap:56px">
+    <aside>
+      <nav style="position:sticky;top:96px;display:flex;flex-direction:column;gap:2px">
+        <a href="#what" style="font-size:13.5px;color:var(--mu);padding:5px 10px;border-radius:6px">What it is</a>
+        <a href="#concepts" style="font-size:13.5px;color:var(--mu);padding:5px 10px;border-radius:6px">Concepts</a>
+        <a href="#quickstart" style="font-size:13.5px;color:var(--mu);padding:5px 10px;border-radius:6px">Quickstart</a>
+        <a href="#receivers" style="font-size:13.5px;color:var(--mu);padding:5px 10px;border-radius:6px">Receivers</a>
+        <a href="#responses" style="font-size:13.5px;color:var(--mu);padding:5px 10px;border-radius:6px">Response control</a>
+        <a href="#faults" style="font-size:13.5px;color:var(--mu);padding:5px 10px;border-radius:6px">Fault injection</a>
+        <a href="#licensing" style="font-size:13.5px;color:var(--mu);padding:5px 10px;border-radius:6px">Licensing</a>
+        <a href="#api" style="font-size:13.5px;color:var(--mu);padding:5px 10px;border-radius:6px">API reference</a>
       </nav>
     </aside>
 
-    <main class="min-w-0 space-y-14">
+    <main style="min-width:0;display:flex;flex-direction:column;gap:56px">
       <section id="what">
-        <h1 class="text-3xl font-semibold tracking-tight">Documentation</h1>
-        <p class="mt-4 max-w-2xl text-zinc-400">
-          Servienta gives your test suite a controlled instance of the network services your
-          application talks to — a file server on five transports and receivers for syslog, SNMP
-          traps, RADIUS, TACACS+, DNS, NTP, Kafka, and IPFIX. Bring it up with one command, generate
-          traffic, read back exactly what arrived, inject faults, and reset — reproducibly, offline.
-        </p>
-        <p class="mt-3 max-w-2xl text-sm text-zinc-500">
-          The application under test is out of scope: the engine never reaches into it. It only
-          accepts, serves, and reports what it observed.
-        </p>
+        <div class="mono" style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--acc)">Documentation</div>
+        <h1 style="margin:14px 0 0;font-size:40px;font-weight:600;letter-spacing:-0.035em">What it is</h1>
+        <p style="margin:20px 0 0;max-width:660px;font-size:16px;line-height:1.7;color:var(--mu);text-wrap:pretty">Servienta gives your test suite a controlled instance of the network services your application talks to — a file server on five transports and receivers for syslog, SNMP traps, RADIUS, TACACS+, DNS, NTP, Kafka, and IPFIX. Bring it up with one command, generate traffic, read back exactly what arrived, inject faults, and reset — reproducibly, offline.</p>
+        <p style="margin:16px 0 0;max-width:660px;font-size:14px;line-height:1.7;color:var(--di)">The application under test is out of scope: the engine never reaches into it. It only accepts, serves, and reports what it observed.</p>
       </section>
 
       <section id="concepts">
-        <h2 class="text-2xl font-semibold tracking-tight">Core concepts</h2>
-        <dl class="mt-4 space-y-3 text-sm text-zinc-300">
-          <div><dt class="font-medium text-zinc-100">Instance</dt><dd class="text-zinc-400">One bring-up of the engine. Mutations — reset, faults, response controls — are instance-wide.</dd></div>
-          <div><dt class="font-medium text-zinc-100">Run</dt><dd class="text-zinc-400">One test execution inside an instance, identified by a run id you choose. Messages are read back per run.</dd></div>
-          <div><dt class="font-medium text-zinc-100">Source claim</dt><dd class="text-zinc-400">A run declares the source addresses whose traffic belongs to it. The engine attributes each message to a run by source — so two runs share one instance without reading each other's traffic.</dd></div>
-          <div><dt class="font-medium text-zinc-100">Stand</dt><dd class="text-zinc-400">One licensable service. The free image runs the file server (HTTP) and a demo receiver; a license unlocks the rest.</dd></div>
-        </dl>
+        <h2 style="margin:0;font-size:26px;font-weight:600;letter-spacing:-0.025em">Core concepts</h2>
+        <div style="margin-top:20px;display:flex;flex-direction:column">
+          <div style="display:grid;grid-template-columns:160px minmax(0,1fr);gap:24px;padding:16px 0;border-top:1px solid var(--bds)">
+            <div style="font-size:14.5px;font-weight:500;color:var(--fg)">Instance</div>
+            <div style="font-size:14.5px;line-height:1.7;color:var(--mu)">One bring-up of the engine. Mutations — reset, faults, response controls — are instance-wide.</div>
+          </div>
+          <div style="display:grid;grid-template-columns:160px minmax(0,1fr);gap:24px;padding:16px 0;border-top:1px solid var(--bds)">
+            <div style="font-size:14.5px;font-weight:500;color:var(--fg)">Run</div>
+            <div style="font-size:14.5px;line-height:1.7;color:var(--mu)">One test execution inside an instance, identified by a run id you choose. Messages are read back per run.</div>
+          </div>
+          <div style="display:grid;grid-template-columns:160px minmax(0,1fr);gap:24px;padding:16px 0;border-top:1px solid var(--bds)">
+            <div style="font-size:14.5px;font-weight:500;color:var(--fg)">Source claim</div>
+            <div style="font-size:14.5px;line-height:1.7;color:var(--mu)">A run declares the source addresses whose traffic belongs to it. The engine attributes each message to a run by source — so two runs share one instance without reading each other's traffic.</div>
+          </div>
+          <div style="display:grid;grid-template-columns:160px minmax(0,1fr);gap:24px;padding:16px 0;border-top:1px solid var(--bds)">
+            <div style="font-size:14.5px;font-weight:500;color:var(--fg)">Stand</div>
+            <div style="font-size:14.5px;line-height:1.7;color:var(--mu)">One licensable service. The free image runs the file server (HTTP) and a demo receiver; a license unlocks the rest.</div>
+          </div>
+        </div>
       </section>
 
       <section id="quickstart">
-        <h2 class="text-2xl font-semibold tracking-tight">Quickstart</h2>
-        <p class="mt-2 text-zinc-400">Run the engine, serve a file, record a message, read it back, reset. Free image, no license.</p>
-        <pre class="mt-4 overflow-x-auto rounded-lg border border-zinc-800 bg-black p-4 text-sm leading-relaxed text-zinc-300"><code>docker pull ghcr.io/servienta/engine:latest
+        <h2 style="margin:0;font-size:26px;font-weight:600;letter-spacing:-0.025em">Quickstart</h2>
+        <p style="margin:10px 0 0;font-size:15px;line-height:1.7;color:var(--mu)">Run the engine, serve a file, record a message, read it back, reset. Free image, no license.</p>
+        <pre class="mono" style="margin:20px 0 0;border:1px solid #26262f;border-radius:10px;background:#111116;padding:18px;font-size:12.5px;line-height:1.9;color:#d4d4dd;overflow-x:auto">docker pull ghcr.io/servienta/engine:latest
 mkdir -p fixtures &amp;&amp; echo hello &gt; fixtures/hello.txt
 
 docker run --rm -p 8080:8080 -p 8081:8081 -p 9000:9000 \
   -v "$PWD/fixtures:/fixtures:ro" ghcr.io/servienta/engine:latest
 
-# discover endpoints, serve a fixture byte-for-byte
+<span style="color:#71717f"># discover endpoints, serve a fixture byte-for-byte</span>
 curl http://localhost:8080/api/v1/endpoints
 curl http://localhost:8081/hello.txt
 
-# declare a run, send traffic, read it back
+<span style="color:#71717f"># declare a run, send traffic, read it back</span>
 curl -X PUT http://localhost:8080/api/v1/runs/run-1 -d '{"sources":["172.17.0.1"]}'
 echo 'hello from my app' | nc localhost 9000
 curl 'http://localhost:8080/api/v1/received/reference?run=run-1'
 
-# reset to a known state
-curl -X POST http://localhost:8080/api/v1/reset</code></pre>
-        <p class="mt-3 rounded-md border border-zinc-800 bg-zinc-900/40 p-3 text-sm text-zinc-400">
-          Your app can't put a run id inside a raw syslog packet, so a run <em>claims the source
-          addresses</em> its traffic comes from. The engine attributes each message to a run by
-          source; one source belongs to one active run.
-        </p>
+<span style="color:#71717f"># reset to a known state</span>
+curl -X POST http://localhost:8080/api/v1/reset</pre>
+        <div style="margin-top:16px;border-left:2px solid #8b6cff;background:rgba(139,108,255,0.06);padding:14px 18px;border-radius:0 8px 8px 0">
+          <p style="margin:0;font-size:14px;line-height:1.7;color:var(--mu)">Your app can't put a run id inside a raw syslog packet, so a run <em style="color:var(--bo);font-style:italic">claims the source addresses</em> its traffic comes from. The engine attributes each message to a run by source; one source belongs to one active run.</p>
+        </div>
       </section>
 
       <section id="receivers">
-        <h2 class="text-2xl font-semibold tracking-tight">Receivers</h2>
-        <p class="mt-2 text-zinc-400">Send to a service, read it back parsed at <code class="text-zinc-300">/api/v1/received/&lt;service&gt;?run=&lt;id&gt;</code>.</p>
-        <div class="mt-4 overflow-x-auto">
-          <table class="w-full text-sm">
-            <thead class="text-left text-zinc-500"><tr><th class="py-2 pr-4">Service</th><th class="py-2 pr-4">Protocol</th><th class="py-2">Recorded content</th></tr></thead>
-            <tbody class="text-zinc-300">
-              <tr class="border-t border-zinc-800"><td class="py-2 pr-4">reference</td><td class="py-2 pr-4">TCP line (demo, free)</td><td class="py-2">line</td></tr>
-              <tr class="border-t border-zinc-800"><td class="py-2 pr-4">syslog</td><td class="py-2 pr-4">UDP · TCP · RELP</td><td class="py-2">facility, severity, message</td></tr>
-              <tr class="border-t border-zinc-800"><td class="py-2 pr-4">snmp-traps</td><td class="py-2 pr-4">v2c · v3 USM</td><td class="py-2">variable bindings</td></tr>
-              <tr class="border-t border-zinc-800"><td class="py-2 pr-4">radius / tacacs</td><td class="py-2 pr-4">authentication</td><td class="py-2">username (reply steerable)</td></tr>
-              <tr class="border-t border-zinc-800"><td class="py-2 pr-4">dns / ntp</td><td class="py-2 pr-4">resolution / time</td><td class="py-2">query (reply steerable)</td></tr>
-              <tr class="border-t border-zinc-800"><td class="py-2 pr-4">kafka</td><td class="py-2 pr-4">broker (in-process)</td><td class="py-2">topic, key, value</td></tr>
-              <tr class="border-t border-zinc-800"><td class="py-2 pr-4">ipfix</td><td class="py-2 pr-4">collector</td><td class="py-2">flow record fields</td></tr>
-            </tbody>
-          </table>
+        <h2 style="margin:0;font-size:26px;font-weight:600;letter-spacing:-0.025em">Receivers</h2>
+        <p style="margin:10px 0 0;font-size:15px;line-height:1.7;color:var(--mu)">Send to a service, read it back parsed at <code class="mono" style="font-size:13px;color:var(--bo);background:var(--s3);padding:2px 6px;border-radius:4px">/api/v1/received/&lt;service&gt;?run=&lt;id&gt;</code>.</p>
+        <div style="margin-top:20px;border:1px solid var(--bd);border-radius:10px;overflow:hidden">
+          <div class="mono" style="display:grid;grid-template-columns:1.1fr 1.2fr 1.6fr;padding:10px 16px;background:var(--s3);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--di)">
+            <span>Service</span><span>Protocol</span><span>Recorded content</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1.1fr 1.2fr 1.6fr;padding:12px 16px;border-top:1px solid var(--bds);font-size:13.5px;background:var(--s2)">
+            <span class="mono" style="font-size:12.5px;color:var(--acc2)">reference</span>
+            <span style="color:var(--mu)">TCP line (demo, free)</span>
+            <span style="color:var(--bo)">line</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1.1fr 1.2fr 1.6fr;padding:12px 16px;border-top:1px solid var(--bds);font-size:13.5px;background:var(--s2)">
+            <span class="mono" style="font-size:12.5px;color:var(--acc2)">syslog</span>
+            <span style="color:var(--mu)">UDP · TCP · RELP</span>
+            <span style="color:var(--bo)">facility, severity, message</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1.1fr 1.2fr 1.6fr;padding:12px 16px;border-top:1px solid var(--bds);font-size:13.5px;background:var(--s2)">
+            <span class="mono" style="font-size:12.5px;color:var(--acc2)">snmp-traps</span>
+            <span style="color:var(--mu)">v2c · v3 USM</span>
+            <span style="color:var(--bo)">variable bindings</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1.1fr 1.2fr 1.6fr;padding:12px 16px;border-top:1px solid var(--bds);font-size:13.5px;background:var(--s2)">
+            <span class="mono" style="font-size:12.5px;color:var(--acc2)">radius / tacacs</span>
+            <span style="color:var(--mu)">authentication</span>
+            <span style="color:var(--bo)">username (reply steerable)</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1.1fr 1.2fr 1.6fr;padding:12px 16px;border-top:1px solid var(--bds);font-size:13.5px;background:var(--s2)">
+            <span class="mono" style="font-size:12.5px;color:var(--acc2)">dns / ntp</span>
+            <span style="color:var(--mu)">resolution / time</span>
+            <span style="color:var(--bo)">query (reply steerable)</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1.1fr 1.2fr 1.6fr;padding:12px 16px;border-top:1px solid var(--bds);font-size:13.5px;background:var(--s2)">
+            <span class="mono" style="font-size:12.5px;color:var(--acc2)">kafka</span>
+            <span style="color:var(--mu)">broker (in-process)</span>
+            <span style="color:var(--bo)">topic, key, value</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1.1fr 1.2fr 1.6fr;padding:12px 16px;border-top:1px solid var(--bds);font-size:13.5px;background:var(--s2)">
+            <span class="mono" style="font-size:12.5px;color:var(--acc2)">ipfix</span>
+            <span style="color:var(--mu)">collector</span>
+            <span style="color:var(--bo)">flow record fields</span>
+          </div>
         </div>
       </section>
 
       <section id="responses">
-        <h2 class="text-2xl font-semibold tracking-tight">Response control</h2>
-        <p class="mt-2 text-zinc-400">Steer what RADIUS, TACACS+, DNS, and NTP answer, for the run. Default is a successful reply; reset restores it.</p>
-        <pre class="mt-4 overflow-x-auto rounded-lg border border-zinc-800 bg-black p-4 text-sm leading-relaxed text-zinc-300"><code>curl -X PUT .../api/v1/responses/radius -d '{"outcome":"reject","reason":"locked"}'
+        <h2 style="margin:0;font-size:26px;font-weight:600;letter-spacing:-0.025em">Response control</h2>
+        <p style="margin:10px 0 0;font-size:15px;line-height:1.7;color:var(--mu)">Steer what RADIUS, TACACS+, DNS, and NTP answer, for the run. Default is a successful reply; reset restores it.</p>
+        <pre class="mono" style="margin:20px 0 0;border:1px solid #26262f;border-radius:10px;background:#111116;padding:18px;font-size:12.5px;line-height:1.9;color:#d4d4dd;overflow-x:auto">curl -X PUT .../api/v1/responses/radius -d '{"outcome":"reject","reason":"locked"}'
 curl -X PUT .../api/v1/responses/dns    -d '{"outcome":"nxdomain"}'
 curl -X PUT .../api/v1/responses/ntp    -d '{"outcome":"stratum","stratum":5}'
-curl -X PUT .../api/v1/responses/dns    -d '{}'   # restore default</code></pre>
+curl -X PUT .../api/v1/responses/dns    -d '{}'   <span style="color:#71717f"># restore default</span></pre>
       </section>
 
       <section id="faults">
-        <h2 class="text-2xl font-semibold tracking-tight">Fault injection</h2>
-        <p class="mt-2 text-zinc-400">Force failures on both sides to test your error paths. Reset lifts them.</p>
-        <pre class="mt-4 overflow-x-auto rounded-lg border border-zinc-800 bg-black p-4 text-sm leading-relaxed text-zinc-300"><code># file faults: auth-reject | missing | truncate | corrupt
+        <h2 style="margin:0;font-size:26px;font-weight:600;letter-spacing:-0.025em">Fault injection</h2>
+        <p style="margin:10px 0 0;font-size:15px;line-height:1.7;color:var(--mu)">Force failures on both sides to test your error paths. Reset lifts them.</p>
+        <pre class="mono" style="margin:20px 0 0;border:1px solid #26262f;border-radius:10px;background:#111116;padding:18px;font-size:12.5px;line-height:1.9;color:#d4d4dd;overflow-x:auto"><span style="color:#71717f"># file faults: auth-reject | missing | truncate | corrupt</span>
 curl -X PUT .../api/v1/faults/files/hello.txt -d '{"kind":"truncate"}'
 
-# receiver modes: refuse | drop | delay | cut | error
-curl -X PUT .../api/v1/faults/receivers/syslog -d '{"mode":"drop"}'</code></pre>
+<span style="color:#71717f"># receiver modes: refuse | drop | delay | cut | error</span>
+curl -X PUT .../api/v1/faults/receivers/syslog -d '{"mode":"drop"}'</pre>
       </section>
 
       <section id="licensing">
-        <h2 class="text-2xl font-semibold tracking-tight">Licensing</h2>
-        <p class="mt-2 max-w-2xl text-zinc-400">
-          A license enables a set of stands. It is an Ed25519-signed file, validated at startup,
-          fully offline. The free image runs the file server and a demo receiver; the service
-          receivers unlock with a license — Files, Standard, Enterprise, or a custom stand set.
-        </p>
-        <pre class="mt-4 overflow-x-auto rounded-lg border border-zinc-800 bg-black p-4 text-sm leading-relaxed text-zinc-300"><code># mount a license and start
+        <h2 style="margin:0;font-size:26px;font-weight:600;letter-spacing:-0.025em">Licensing</h2>
+        <p style="margin:10px 0 0;max-width:660px;font-size:15px;line-height:1.7;color:var(--mu)">A license enables a set of stands. It is an Ed25519-signed file, validated at startup, fully offline. The free image runs the file server and a demo receiver; the service receivers unlock with a license — Files, Standard, Enterprise, or a custom stand set.</p>
+        <pre class="mono" style="margin:20px 0 0;border:1px solid #26262f;border-radius:10px;background:#111116;padding:18px;font-size:12.5px;line-height:1.9;color:#d4d4dd;overflow-x:auto"><span style="color:#71717f"># mount a license and start</span>
 SERVIENTA_LICENSE=./license.json docker compose up -d
 
-# or paste it in the console: License card -> Apply a license</code></pre>
-        <p class="mt-3 text-sm text-zinc-500">
-          Offline licensing of self-hosted software is compliance clarity, not DRM: it makes what is
-          enabled signed and verifiable, and prevents forgery. Every shipped credential is throwaway
-          and documented as such.
-        </p>
+<span style="color:#71717f"># or paste it in the console: License card -&gt; Apply a license</span></pre>
+        <p style="margin:16px 0 0;max-width:660px;font-size:13.5px;line-height:1.75;color:var(--di)">Offline licensing of self-hosted software is compliance clarity, not DRM: it makes what is enabled signed and verifiable, and prevents forgery. Every shipped credential is throwaway and documented as such.</p>
       </section>
 
       <section id="api">
-        <h2 class="text-2xl font-semibold tracking-tight">API reference</h2>
-        <p class="mt-2 text-zinc-400">Base path <code class="text-zinc-300">/api/v1</code> on the control port (default 8080). Full schema ships as <code class="text-zinc-300">openapi.yaml</code>.</p>
-        <div class="mt-4 overflow-x-auto">
-          <table class="w-full text-sm">
-            <tbody class="text-zinc-300">
-              <tr class="border-t border-zinc-800"><td class="py-1.5 pr-4 font-mono text-emerald-400">GET</td><td class="py-1.5 pr-4 font-mono">/version</td><td class="py-1.5 text-zinc-400">Contract version</td></tr>
-              <tr class="border-t border-zinc-800"><td class="py-1.5 pr-4 font-mono text-emerald-400">GET</td><td class="py-1.5 pr-4 font-mono">/endpoints</td><td class="py-1.5 text-zinc-400">Service addresses</td></tr>
-              <tr class="border-t border-zinc-800"><td class="py-1.5 pr-4 font-mono text-emerald-400">GET</td><td class="py-1.5 pr-4 font-mono">/license</td><td class="py-1.5 text-zinc-400">License status</td></tr>
-              <tr class="border-t border-zinc-800"><td class="py-1.5 pr-4 font-mono text-amber-400">PUT</td><td class="py-1.5 pr-4 font-mono">/runs/{id}</td><td class="py-1.5 text-zinc-400">Declare a run (claim sources)</td></tr>
-              <tr class="border-t border-zinc-800"><td class="py-1.5 pr-4 font-mono text-red-400">DEL</td><td class="py-1.5 pr-4 font-mono">/runs/{id}</td><td class="py-1.5 text-zinc-400">Release a run</td></tr>
-              <tr class="border-t border-zinc-800"><td class="py-1.5 pr-4 font-mono text-emerald-400">GET</td><td class="py-1.5 pr-4 font-mono">/received/{service}</td><td class="py-1.5 text-zinc-400">Read messages</td></tr>
-              <tr class="border-t border-zinc-800"><td class="py-1.5 pr-4 font-mono text-sky-400">POST</td><td class="py-1.5 pr-4 font-mono">/reset</td><td class="py-1.5 text-zinc-400">Reset the instance</td></tr>
-              <tr class="border-t border-zinc-800"><td class="py-1.5 pr-4 font-mono text-amber-400">PUT</td><td class="py-1.5 pr-4 font-mono">/responses/{service}</td><td class="py-1.5 text-zinc-400">Steer a reply</td></tr>
-              <tr class="border-t border-zinc-800"><td class="py-1.5 pr-4 font-mono text-amber-400">PUT</td><td class="py-1.5 pr-4 font-mono">/faults/files/{fixture}</td><td class="py-1.5 text-zinc-400">File fault</td></tr>
-              <tr class="border-t border-zinc-800"><td class="py-1.5 pr-4 font-mono text-amber-400">PUT</td><td class="py-1.5 pr-4 font-mono">/faults/receivers/{service}</td><td class="py-1.5 text-zinc-400">Receiver fault</td></tr>
-            </tbody>
-          </table>
+        <h2 style="margin:0;font-size:26px;font-weight:600;letter-spacing:-0.025em">API reference</h2>
+        <p style="margin:10px 0 0;font-size:15px;line-height:1.7;color:var(--mu)">Base path <code class="mono" style="font-size:13px;color:var(--bo);background:var(--s3);padding:2px 6px;border-radius:4px">/api/v1</code> on the control port (default 8080). Full schema ships as <code class="mono" style="font-size:13px;color:var(--bo);background:var(--s3);padding:2px 6px;border-radius:4px">openapi.yaml</code>.</p>
+        <div style="margin-top:20px;border:1px solid var(--bd);border-radius:10px;overflow:hidden">
+          <div style="display:grid;grid-template-columns:56px minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:center;padding:10px 16px;border-bottom:1px solid var(--bds);background:var(--s2)">
+            <span class="mono" style="font-size:11px;font-weight:500;text-align:center;padding:3px 0;border-radius:4px;background:rgba(52,211,153,0.14);color:#34d399">GET</span>
+            <span class="mono" style="font-size:12.5px;color:var(--bo)">/version</span>
+            <span style="font-size:13.5px;color:var(--mu)">Contract version</span>
+          </div>
+          <div style="display:grid;grid-template-columns:56px minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:center;padding:10px 16px;border-bottom:1px solid var(--bds);background:var(--s2)">
+            <span class="mono" style="font-size:11px;font-weight:500;text-align:center;padding:3px 0;border-radius:4px;background:rgba(52,211,153,0.14);color:#34d399">GET</span>
+            <span class="mono" style="font-size:12.5px;color:var(--bo)">/endpoints</span>
+            <span style="font-size:13.5px;color:var(--mu)">Service addresses</span>
+          </div>
+          <div style="display:grid;grid-template-columns:56px minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:center;padding:10px 16px;border-bottom:1px solid var(--bds);background:var(--s2)">
+            <span class="mono" style="font-size:11px;font-weight:500;text-align:center;padding:3px 0;border-radius:4px;background:rgba(52,211,153,0.14);color:#34d399">GET</span>
+            <span class="mono" style="font-size:12.5px;color:var(--bo)">/license</span>
+            <span style="font-size:13.5px;color:var(--mu)">License status</span>
+          </div>
+          <div style="display:grid;grid-template-columns:56px minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:center;padding:10px 16px;border-bottom:1px solid var(--bds);background:var(--s2)">
+            <span class="mono" style="font-size:11px;font-weight:500;text-align:center;padding:3px 0;border-radius:4px;background:rgba(251,191,36,0.14);color:#fbbf24">PUT</span>
+            <span class="mono" style="font-size:12.5px;color:var(--bo)">/runs/{id}</span>
+            <span style="font-size:13.5px;color:var(--mu)">Declare a run (claim sources)</span>
+          </div>
+          <div style="display:grid;grid-template-columns:56px minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:center;padding:10px 16px;border-bottom:1px solid var(--bds);background:var(--s2)">
+            <span class="mono" style="font-size:11px;font-weight:500;text-align:center;padding:3px 0;border-radius:4px;background:rgba(248,113,113,0.14);color:#f87171">DEL</span>
+            <span class="mono" style="font-size:12.5px;color:var(--bo)">/runs/{id}</span>
+            <span style="font-size:13.5px;color:var(--mu)">Release a run</span>
+          </div>
+          <div style="display:grid;grid-template-columns:56px minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:center;padding:10px 16px;border-bottom:1px solid var(--bds);background:var(--s2)">
+            <span class="mono" style="font-size:11px;font-weight:500;text-align:center;padding:3px 0;border-radius:4px;background:rgba(52,211,153,0.14);color:#34d399">GET</span>
+            <span class="mono" style="font-size:12.5px;color:var(--bo)">/received/{service}</span>
+            <span style="font-size:13.5px;color:var(--mu)">Read messages</span>
+          </div>
+          <div style="display:grid;grid-template-columns:56px minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:center;padding:10px 16px;border-bottom:1px solid var(--bds);background:var(--s2)">
+            <span class="mono" style="font-size:11px;font-weight:500;text-align:center;padding:3px 0;border-radius:4px;background:rgba(139,108,255,0.16);color:#a68eff">POST</span>
+            <span class="mono" style="font-size:12.5px;color:var(--bo)">/reset</span>
+            <span style="font-size:13.5px;color:var(--mu)">Reset the instance</span>
+          </div>
+          <div style="display:grid;grid-template-columns:56px minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:center;padding:10px 16px;border-bottom:1px solid var(--bds);background:var(--s2)">
+            <span class="mono" style="font-size:11px;font-weight:500;text-align:center;padding:3px 0;border-radius:4px;background:rgba(251,191,36,0.14);color:#fbbf24">PUT</span>
+            <span class="mono" style="font-size:12.5px;color:var(--bo)">/responses/{service}</span>
+            <span style="font-size:13.5px;color:var(--mu)">Steer a reply</span>
+          </div>
+          <div style="display:grid;grid-template-columns:56px minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:center;padding:10px 16px;border-bottom:1px solid var(--bds);background:var(--s2)">
+            <span class="mono" style="font-size:11px;font-weight:500;text-align:center;padding:3px 0;border-radius:4px;background:rgba(251,191,36,0.14);color:#fbbf24">PUT</span>
+            <span class="mono" style="font-size:12.5px;color:var(--bo)">/faults/files/{fixture}</span>
+            <span style="font-size:13.5px;color:var(--mu)">File fault</span>
+          </div>
+          <div style="display:grid;grid-template-columns:56px minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:center;padding:10px 16px;border-bottom:1px solid var(--bds);background:var(--s2)">
+            <span class="mono" style="font-size:11px;font-weight:500;text-align:center;padding:3px 0;border-radius:4px;background:rgba(251,191,36,0.14);color:#fbbf24">PUT</span>
+            <span class="mono" style="font-size:12.5px;color:var(--bo)">/faults/receivers/{service}</span>
+            <span style="font-size:13.5px;color:var(--mu)">Receiver fault</span>
+          </div>
         </div>
       </section>
     </main>
   </div>
 
-  <footer class="border-t border-zinc-900">
-    <div class="mx-auto flex max-w-5xl items-center justify-between px-6 py-8 text-sm text-zinc-500">
+  <footer style="border-top:1px solid var(--bds)">
+    <div style="max-width:1120px;margin:0 auto;padding:32px;display:flex;align-items:center;justify-content:space-between;font-size:13.5px;color:var(--di)">
       <span>© 2026 Servienta</span>
-      <a href="/" class="hover:text-zinc-300">servienta.com</a>
+      <a href="/" style="color:var(--di)">servienta.com</a>
     </div>
   </footer>
+
+  <script>
+    (function () {
+      var root = document.documentElement, knob = document.getElementById('themeKnob');
+      function apply(t) { root.setAttribute('data-theme', t);
+        if (knob) { knob.style.left = t === 'dark' ? '0' : '50%'; knob.style.right = t === 'dark' ? '50%' : '0'; }
+        try { localStorage.setItem('servienta-theme', t); } catch (e) {} }
+      try { var s = localStorage.getItem('servienta-theme'); if (s) apply(s); } catch (e) {}
+      var btn = document.getElementById('themeBtn');
+      if (btn) btn.addEventListener('click', function () { apply(root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'); });
+    })();
+  </script>
 </body>
 </html>

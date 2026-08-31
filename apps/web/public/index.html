@@ -1,188 +1,303 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Servienta — network integrations, verifiable</title>
-  <meta name="description" content="A controlled set of network endpoints and a file server that make your application's integrations verifiable by automated tests." />
+  <meta name="description" content="A controlled instance of every network endpoint your application talks to — up in one command, readable from your tests, resettable." />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/styles.css" />
 </head>
-<body class="bg-zinc-950 text-zinc-100 antialiased">
-  <header class="mx-auto flex max-w-5xl items-center justify-between px-6 py-6">
-    <span class="text-lg font-semibold tracking-tight">Servienta</span>
-    <nav class="flex items-center gap-6 text-sm text-zinc-400">
-      <a href="#how" class="hover:text-zinc-100">How it works</a>
-      <a href="#protocols" class="hover:text-zinc-100">Protocols</a>
-      <a href="#pricing" class="hover:text-zinc-100">Pricing</a>
-      <a href="/docs" class="hover:text-zinc-100">Docs</a>
-      <a href="#run" class="rounded-md border border-zinc-700 px-3 py-1.5 text-zinc-200 hover:border-zinc-500">Run it</a>
-    </nav>
+<body>
+  <header style="position:sticky;top:0;z-index:20;background:var(--hdr);backdrop-filter:blur(12px);border-bottom:1px solid var(--bds)">
+    <div style="max-width:1120px;margin:0 auto;padding:0 32px;height:64px;display:flex;align-items:center;justify-content:space-between">
+      <a href="/" style="display:flex;align-items:center;gap:10px;color:var(--fg)">
+        <span style="display:grid;grid-template-columns:repeat(3,3px);grid-template-rows:repeat(3,3px);gap:3px">
+          <i style="background:var(--dot)"></i><i style="background:var(--dot)"></i><i style="background:var(--dot)"></i>
+          <i style="background:var(--dot)"></i><i style="background:#8b6cff;box-shadow:0 0 8px rgba(139,108,255,0.8)"></i><i style="background:var(--dot)"></i>
+          <i style="background:var(--dot)"></i><i style="background:var(--dot)"></i><i style="background:var(--dot)"></i>
+        </span>
+        <span style="font-size:16px;font-weight:600;letter-spacing:-0.02em">Servienta</span>
+      </a>
+      <nav style="display:flex;align-items:center;gap:26px;font-size:14px">
+        <a href="#how" style="color:var(--mu)">How it works</a>
+        <a href="#protocols" style="color:var(--mu)">Protocols</a>
+        <a href="#pricing" style="color:var(--mu)">Pricing</a>
+        <a href="/docs" style="color:var(--mu)">Docs</a>
+        <span style="width:1px;height:18px;background:var(--bd)"></span>
+        <button id="themeBtn" title="Toggle theme" aria-label="Toggle theme" style="display:flex;align-items:center;justify-content:center;width:24px;height:24px;color:var(--mu);cursor:pointer;background:none;border:none;padding:0">
+          <span style="position:relative;display:block;width:14px;height:14px;border-radius:999px;border:1.5px solid currentColor;overflow:hidden">
+            <span id="themeKnob" style="position:absolute;top:0;bottom:0;left:0;right:50%;background:currentColor"></span>
+          </span>
+        </button>
+        <a href="#run" style="border:1px solid var(--bdx);border-radius:6px;padding:6px 14px;color:var(--fg);font-size:13px;font-weight:500">Run it</a>
+      </nav>
+    </div>
   </header>
 
   <main>
-    <section class="mx-auto max-w-5xl px-6 pb-20 pt-16 text-center">
-      <p class="mb-4 text-sm font-medium uppercase tracking-widest text-emerald-400">Early preview</p>
-      <h1 class="mx-auto max-w-3xl text-balance text-5xl font-semibold tracking-tight">
-        Network integrations, verifiable.
-      </h1>
-      <p class="mx-auto mt-6 max-w-2xl text-pretty text-lg text-zinc-400">
-        Your application sends syslog, SNMP traps, RADIUS requests, flows — and downloads files over
-        five transports. Servienta gives your test suite a controlled instance of every one of those
-        endpoints: bring it up with one command, generate traffic, read back exactly what arrived,
-        reset, repeat.
-      </p>
-      <div class="mt-10 flex justify-center gap-4">
-        <a href="#run" class="rounded-md bg-emerald-500 px-5 py-2.5 font-medium text-zinc-950 hover:bg-emerald-400">Run it now</a>
-        <a href="#how" class="rounded-md border border-zinc-700 px-5 py-2.5 text-zinc-200 hover:border-zinc-500">Learn more</a>
+    <section style="max-width:1120px;margin:0 auto;padding:96px 32px 88px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:64px;align-items:center">
+      <div>
+        <div style="display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(139,108,255,0.35);background:rgba(139,108,255,0.08);border-radius:999px;padding:5px 12px 5px 10px;margin-bottom:28px">
+          <span style="width:5px;height:5px;border-radius:999px;background:#8b6cff;animation:blink 2.4s infinite;display:block"></span>
+          <span class="mono" style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--acc2)">Early preview</span>
+        </div>
+        <h1 style="margin:0;font-size:60px;line-height:1.02;font-weight:700;letter-spacing:-0.035em;text-wrap:balance">Network integrations,<br /><span style="color:var(--acc)">verifiable.</span></h1>
+        <p style="margin:28px 0 0;max-width:520px;font-size:17px;line-height:1.65;color:var(--mu);text-wrap:pretty">Your application sends syslog, SNMP traps, RADIUS requests, flows — and downloads files over five transports. Servienta gives your test suite a controlled instance of every one of those endpoints: bring it up with one command, generate traffic, read back exactly what arrived, reset, repeat.</p>
+        <div style="display:flex;gap:12px;margin-top:36px">
+          <a href="#run" style="background:#6d4ee6;color:#fff;border-radius:7px;padding:12px 22px;font-size:14px;font-weight:600">Run it now</a>
+          <a href="#how" style="border:1px solid var(--bdx);border-radius:7px;padding:12px 22px;font-size:14px;font-weight:500;color:var(--fg)">Learn more</a>
+        </div>
+      </div>
+      <div style="min-width:0;border:1px solid var(--bd);border-radius:12px;background:#15151b;overflow:hidden;box-shadow:0 24px 64px -24px rgba(0,0,0,0.55)">
+        <div style="display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid #26262f;background:#1c1c23">
+          <i style="width:9px;height:9px;border-radius:999px;background:#3f3f4b;display:block"></i>
+          <i style="width:9px;height:9px;border-radius:999px;background:#3f3f4b;display:block"></i>
+          <i style="width:9px;height:9px;border-radius:999px;background:#3f3f4b;display:block"></i>
+          <span class="mono" style="margin-left:8px;font-size:11px;color:#71717f">my-test-suite — bash</span>
+        </div>
+        <pre class="mono" style="margin:0;padding:20px;font-size:12.5px;line-height:1.9;color:#d4d4dd;overflow-x:auto"><span style="color:#71717f"># declare a run, send it traffic, read back what arrived</span>
+<span style="color:#8b6cff">$</span> curl -X PUT localhost:8080/api/v1/runs/run-1 \
+    -d '{"sources":["172.17.0.1"]}'
+<span style="color:#8b6cff">$</span> echo 'hello from my app' | nc localhost 9000
+<span style="color:#8b6cff">$</span> curl 'localhost:8080/api/v1/received/reference?run=run-1'
+<span style="color:#34d399">[{ "at": "2026-09-01T10:22:04Z",
+   "source": "172.17.0.1",
+   "run": "run-1",
+   "line": "hello from my app" }]</span><span style="color:#8b6cff;animation:blink 1.1s step-end infinite"> ▍</span></pre>
       </div>
     </section>
 
-    <section id="how" class="border-t border-zinc-900 bg-zinc-900/40">
-      <div class="mx-auto grid max-w-5xl gap-8 px-6 py-16 sm:grid-cols-3">
-        <div>
-          <h3 class="font-semibold">One command up</h3>
-          <p class="mt-2 text-sm leading-relaxed text-zinc-400">
-            A single compose invocation brings up every endpoint on one network — on a laptop, a CI
-            agent, or an isolated host with no internet at all.
-          </p>
+    <section id="how" style="border-top:1px solid var(--bds);border-bottom:1px solid var(--bds)">
+      <div style="max-width:1120px;margin:0 auto;padding:0 32px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr))">
+        <div style="padding:48px 40px 48px 0;border-right:1px solid var(--bds)">
+          <div class="mono" style="font-size:11px;color:var(--acc);letter-spacing:0.1em">01</div>
+          <h3 style="margin:14px 0 0;font-size:19px;font-weight:600;letter-spacing:-0.02em">One command up</h3>
+          <p style="margin:10px 0 0;font-size:14.5px;line-height:1.7;color:var(--mu)">A single compose invocation brings up every endpoint on one network — on a laptop, a CI agent, or an isolated host with no internet at all.</p>
         </div>
-        <div>
-          <h3 class="font-semibold">Read back what arrived</h3>
-          <p class="mt-2 text-sm leading-relaxed text-zinc-400">
-            Every received message — timestamp, source, parsed content — is one HTTP call away,
-            scoped to your test run. Two concurrent runs never see each other's traffic.
-          </p>
+        <div style="padding:48px 40px;border-right:1px solid var(--bds)">
+          <div class="mono" style="font-size:11px;color:var(--acc);letter-spacing:0.1em">02</div>
+          <h3 style="margin:14px 0 0;font-size:19px;font-weight:600;letter-spacing:-0.02em">Read back what arrived</h3>
+          <p style="margin:10px 0 0;font-size:14.5px;line-height:1.7;color:var(--mu)">Every received message — timestamp, source, parsed content — is one HTTP call away, scoped to your test run. Two concurrent runs never see each other's traffic.</p>
         </div>
-        <div>
-          <h3 class="font-semibold">Break things on purpose</h3>
-          <p class="mt-2 text-sm leading-relaxed text-zinc-400">
-            Inject faults on both sides: unreachable hosts, rejected auth, cut transfers, silent
-            drops, delayed replies. One reset returns everything to a known state.
-          </p>
+        <div style="padding:48px 0 48px 40px">
+          <div class="mono" style="font-size:11px;color:var(--acc);letter-spacing:0.1em">03</div>
+          <h3 style="margin:14px 0 0;font-size:19px;font-weight:600;letter-spacing:-0.02em">Break things on purpose</h3>
+          <p style="margin:10px 0 0;font-size:14.5px;line-height:1.7;color:var(--mu)">Inject faults on both sides: unreachable hosts, rejected auth, cut transfers, silent drops, delayed replies. One reset returns everything to a known state.</p>
         </div>
       </div>
     </section>
 
-    <section id="protocols" class="mx-auto max-w-5xl px-6 py-16">
-      <h2 class="text-2xl font-semibold tracking-tight">The protocol surface</h2>
-      <p class="mt-2 max-w-2xl text-zinc-400">
-        A file server on HTTP, HTTPS, FTP, TFTP, and SCP — plus receivers for everything your
-        application sends outward.
-      </p>
-      <ul class="mt-8 grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
-        <li class="rounded-lg border border-zinc-800 px-4 py-3">Syslog <span class="text-zinc-500">UDP · TCP · RELP</span></li>
-        <li class="rounded-lg border border-zinc-800 px-4 py-3">SNMP traps <span class="text-zinc-500">v2c · v3 USM</span></li>
-        <li class="rounded-lg border border-zinc-800 px-4 py-3">RADIUS</li>
-        <li class="rounded-lg border border-zinc-800 px-4 py-3">TACACS+</li>
-        <li class="rounded-lg border border-zinc-800 px-4 py-3">DNS</li>
-        <li class="rounded-lg border border-zinc-800 px-4 py-3">NTP</li>
-        <li class="rounded-lg border border-zinc-800 px-4 py-3">Kafka</li>
-        <li class="rounded-lg border border-zinc-800 px-4 py-3">IPFIX</li>
-      </ul>
-      <p class="mt-6 max-w-2xl text-sm text-zinc-500">
-        The free image runs the file server and a demo receiver out of the box. The service
-        receivers above — syslog, SNMP, RADIUS, TACACS+, DNS, NTP, Kafka, IPFIX — unlock with a
-        license, which selects exactly the stands you need.
-      </p>
-    </section>
-    <section id="pricing" class="border-t border-zinc-900">
-      <div class="mx-auto max-w-5xl px-6 py-16">
-        <h2 class="text-2xl font-semibold tracking-tight">Pricing</h2>
-        <p class="mt-2 max-w-2xl text-zinc-400">
-          A license enables a set of stands — the services your tests need. Start free; unlock more
-          per instance, monthly or annual. <span class="text-zinc-300">Pay annually and get two
-          months free.</span>
-        </p>
-        <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <div class="flex flex-col rounded-lg border border-zinc-800 p-5">
-            <div class="text-sm font-medium text-emerald-400">Free</div>
-            <div class="mt-1 text-2xl font-semibold">$0<span class="text-sm font-normal text-zinc-500"> forever</span></div>
-            <p class="mt-3 text-sm text-zinc-400">File server (HTTP) and a demo receiver. No license needed.</p>
-            <ul class="mt-4 space-y-1 text-sm text-zinc-500">
-              <li>HTTP file server</li>
-              <li>Demo receiver</li>
-              <li>Full control API</li>
-            </ul>
+    <section id="protocols" style="max-width:1120px;margin:0 auto;padding:88px 32px">
+      <div style="display:grid;grid-template-columns:380px minmax(0,1fr);gap:64px">
+        <div>
+          <h2 style="margin:0;font-size:34px;font-weight:600;letter-spacing:-0.03em">The protocol surface</h2>
+          <p style="margin:16px 0 0;font-size:15.5px;line-height:1.7;color:var(--mu)">A file server on HTTP, HTTPS, FTP, TFTP, and SCP — plus receivers for everything your application sends outward.</p>
+          <p style="margin:24px 0 0;font-size:13.5px;line-height:1.7;color:var(--di)">The free image runs the file server and a demo receiver out of the box. The service receivers — syslog, SNMP, RADIUS, TACACS+, DNS, NTP, Kafka, IPFIX — unlock with a license, which selects exactly the stands you need.</p>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:var(--bd);border:1px solid var(--bd);border-radius:10px;overflow:hidden">
+          <div style="background:var(--s1);padding:20px 22px;display:flex;flex-direction:column;gap:6px;min-height:96px">
+            <div style="display:flex;align-items:center;gap:8px">
+              <i style="width:5px;height:5px;border-radius:999px;background:#8b6cff;display:block"></i>
+              <span style="font-size:15px;font-weight:500;letter-spacing:-0.01em">Syslog</span>
+            </div>
+            <span class="mono" style="font-size:11.5px;color:var(--di);line-height:1.6">UDP · TCP · RELP</span>
           </div>
-          <div class="flex flex-col rounded-lg border border-zinc-800 p-5">
-            <div class="text-sm font-medium text-zinc-200">Files</div>
-            <div class="mt-1 text-2xl font-semibold">$25<span class="text-sm font-normal text-zinc-500">/mo</span></div>
-            <div class="text-xs text-zinc-500">or $250/yr — 2 months free</div>
-            <p class="mt-3 text-sm text-zinc-400">Every file transport, for import and download testing.</p>
-            <ul class="mt-4 space-y-1 text-sm text-zinc-500">
-              <li>HTTP, HTTPS, FTP</li>
-              <li>TFTP, SCP</li>
-            </ul>
+          <div style="background:var(--s1);padding:20px 22px;display:flex;flex-direction:column;gap:6px;min-height:96px">
+            <div style="display:flex;align-items:center;gap:8px">
+              <i style="width:5px;height:5px;border-radius:999px;background:#8b6cff;display:block"></i>
+              <span style="font-size:15px;font-weight:500;letter-spacing:-0.01em">SNMP traps</span>
+            </div>
+            <span class="mono" style="font-size:11.5px;color:var(--di);line-height:1.6">v2c · v3 USM</span>
           </div>
-          <div class="flex flex-col rounded-lg border border-emerald-700/60 bg-emerald-500/5 p-5">
-            <div class="text-sm font-medium text-emerald-400">Standard</div>
-            <div class="mt-1 text-2xl font-semibold">$50<span class="text-sm font-normal text-zinc-500">/mo</span></div>
-            <div class="text-xs text-zinc-500">or $500/yr — 2 months free</div>
-            <p class="mt-3 text-sm text-zinc-400">Files plus the common network services.</p>
-            <ul class="mt-4 space-y-1 text-sm text-zinc-500">
-              <li>Everything in Files</li>
-              <li>Syslog, SNMP traps</li>
-              <li>DNS, NTP</li>
-            </ul>
+          <div style="background:var(--s1);padding:20px 22px;display:flex;flex-direction:column;gap:6px;min-height:96px">
+            <div style="display:flex;align-items:center;gap:8px">
+              <i style="width:5px;height:5px;border-radius:999px;background:#8b6cff;display:block"></i>
+              <span style="font-size:15px;font-weight:500;letter-spacing:-0.01em">RADIUS</span>
+            </div>
+            <span class="mono" style="font-size:11.5px;color:var(--di);line-height:1.6">authentication · steerable reply</span>
           </div>
-          <div class="flex flex-col rounded-lg border border-zinc-800 p-5">
-            <div class="text-sm font-medium text-zinc-200">Enterprise</div>
-            <div class="mt-1 text-2xl font-semibold">$100<span class="text-sm font-normal text-zinc-500">/mo</span></div>
-            <div class="text-xs text-zinc-500">or $1000/yr — 2 months free</div>
-            <p class="mt-3 text-sm text-zinc-400">Every stand, including AAA and streaming.</p>
-            <ul class="mt-4 space-y-1 text-sm text-zinc-500">
-              <li>Everything in Standard</li>
-              <li>RADIUS, TACACS+</li>
-              <li>Kafka, IPFIX</li>
-            </ul>
+          <div style="background:var(--s1);padding:20px 22px;display:flex;flex-direction:column;gap:6px;min-height:96px">
+            <div style="display:flex;align-items:center;gap:8px">
+              <i style="width:5px;height:5px;border-radius:999px;background:#8b6cff;display:block"></i>
+              <span style="font-size:15px;font-weight:500;letter-spacing:-0.01em">TACACS+</span>
+            </div>
+            <span class="mono" style="font-size:11.5px;color:var(--di);line-height:1.6">authentication · steerable reply</span>
+          </div>
+          <div style="background:var(--s1);padding:20px 22px;display:flex;flex-direction:column;gap:6px;min-height:96px">
+            <div style="display:flex;align-items:center;gap:8px">
+              <i style="width:5px;height:5px;border-radius:999px;background:#8b6cff;display:block"></i>
+              <span style="font-size:15px;font-weight:500;letter-spacing:-0.01em">DNS</span>
+            </div>
+            <span class="mono" style="font-size:11.5px;color:var(--di);line-height:1.6">resolution · nxdomain on demand</span>
+          </div>
+          <div style="background:var(--s1);padding:20px 22px;display:flex;flex-direction:column;gap:6px;min-height:96px">
+            <div style="display:flex;align-items:center;gap:8px">
+              <i style="width:5px;height:5px;border-radius:999px;background:#8b6cff;display:block"></i>
+              <span style="font-size:15px;font-weight:500;letter-spacing:-0.01em">NTP</span>
+            </div>
+            <span class="mono" style="font-size:11.5px;color:var(--di);line-height:1.6">time · stratum control</span>
+          </div>
+          <div style="background:var(--s1);padding:20px 22px;display:flex;flex-direction:column;gap:6px;min-height:96px">
+            <div style="display:flex;align-items:center;gap:8px">
+              <i style="width:5px;height:5px;border-radius:999px;background:#8b6cff;display:block"></i>
+              <span style="font-size:15px;font-weight:500;letter-spacing:-0.01em">Kafka</span>
+            </div>
+            <span class="mono" style="font-size:11.5px;color:var(--di);line-height:1.6">broker, in-process</span>
+          </div>
+          <div style="background:var(--s1);padding:20px 22px;display:flex;flex-direction:column;gap:6px;min-height:96px">
+            <div style="display:flex;align-items:center;gap:8px">
+              <i style="width:5px;height:5px;border-radius:999px;background:#8b6cff;display:block"></i>
+              <span style="font-size:15px;font-weight:500;letter-spacing:-0.01em">IPFIX</span>
+            </div>
+            <span class="mono" style="font-size:11.5px;color:var(--di);line-height:1.6">flow collector</span>
           </div>
         </div>
-        <p class="mt-6 text-sm text-zinc-500">
-          Need a specific mix? <span class="text-zinc-300">Custom</span> plans license exactly the
-          stands you choose. Runs entirely on your infrastructure — offline, one artifact everywhere.
-          <a href="mailto:hello@servienta.com" class="text-emerald-400 hover:text-emerald-300">Talk to us</a>.
-        </p>
       </div>
     </section>
-    <section id="run" class="border-t border-zinc-900 bg-zinc-900/40">
-      <div class="mx-auto max-w-5xl px-6 py-16">
-        <h2 class="text-2xl font-semibold tracking-tight">Run it</h2>
-        <p class="mt-2 max-w-2xl text-zinc-400">
-          One container, no dependencies, works offline. Pull the image, mount a directory of files
-          to serve, and go.
-        </p>
-        <pre class="mt-6 overflow-x-auto rounded-lg border border-zinc-800 bg-zinc-950 p-4 text-sm leading-relaxed text-zinc-300"><code>docker pull ghcr.io/servienta/engine:latest
+
+    <section id="pricing" style="border-top:1px solid var(--bds);background:var(--s2)">
+      <div style="max-width:1120px;margin:0 auto;padding:88px 32px">
+        <h2 style="margin:0;font-size:34px;font-weight:600;letter-spacing:-0.03em">Pricing</h2>
+        <p style="margin:14px 0 0;max-width:620px;font-size:15.5px;line-height:1.7;color:var(--mu)">A license enables a set of stands — the services your tests need. Start free; unlock more per instance, monthly or annual. <span style="color:var(--bo)">Pay annually and get two months free.</span></p>
+        <div style="margin-top:40px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px">
+          <div style="border:1px solid var(--bd);border-radius:12px;padding:24px;background:var(--s1);display:flex;flex-direction:column;position:relative">
+            
+            <div class="mono" style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--mu)">Free</div>
+            <div style="margin-top:14px;font-size:32px;font-weight:600;letter-spacing:-0.03em">$0<span style="font-size:14px;font-weight:400;color:var(--di)"> forever</span></div>
+            <div style="height:16px"></div>
+            <p style="margin:14px 0 0;font-size:13.5px;line-height:1.65;color:var(--mu)">File server (HTTP) and a demo receiver. No license needed.</p>
+            <div style="margin-top:20px;padding-top:18px;border-top:1px solid var(--bd);display:flex;flex-direction:column;gap:8px">
+              <span class="mono" style="font-size:12px;color:var(--di)">HTTP file server</span>
+              <span class="mono" style="font-size:12px;color:var(--di)">Demo receiver</span>
+              <span class="mono" style="font-size:12px;color:var(--di)">Full control API</span>
+            </div>
+          </div>
+          <div style="border:1px solid var(--bd);border-radius:12px;padding:24px;background:var(--s1);display:flex;flex-direction:column;position:relative">
+            
+            <div class="mono" style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--mu)">Files</div>
+            <div style="margin-top:14px;font-size:32px;font-weight:600;letter-spacing:-0.03em">$25<span style="font-size:14px;font-weight:400;color:var(--di)">/mo</span></div>
+            <div style="margin-top:4px;font-size:12px;color:var(--di)">or $250/yr — 2 months free</div>
+            <p style="margin:14px 0 0;font-size:13.5px;line-height:1.65;color:var(--mu)">Every file transport, for import and download testing.</p>
+            <div style="margin-top:20px;padding-top:18px;border-top:1px solid var(--bd);display:flex;flex-direction:column;gap:8px">
+              <span class="mono" style="font-size:12px;color:var(--di)">HTTP, HTTPS, FTP</span>
+              <span class="mono" style="font-size:12px;color:var(--di)">TFTP, SCP</span>
+            </div>
+          </div>
+          <div style="border:1px solid rgba(139,108,255,0.45);border-radius:12px;padding:24px;background:linear-gradient(180deg,rgba(139,108,255,0.09),rgba(139,108,255,0.02));display:flex;flex-direction:column;position:relative">
+            <div style="position:absolute;top:-1px;left:24px;right:24px;height:1px;background:#8b6cff"></div>
+            <div class="mono" style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--acc2)">Standard</div>
+            <div style="margin-top:14px;font-size:32px;font-weight:600;letter-spacing:-0.03em">$50<span style="font-size:14px;font-weight:400;color:var(--di)">/mo</span></div>
+            <div style="margin-top:4px;font-size:12px;color:var(--di)">or $500/yr — 2 months free</div>
+            <p style="margin:14px 0 0;font-size:13.5px;line-height:1.65;color:var(--bo)">Files plus the common network services.</p>
+            <div style="margin-top:20px;padding-top:18px;border-top:1px solid rgba(139,108,255,0.25);display:flex;flex-direction:column;gap:8px">
+              <span class="mono" style="font-size:12px;color:var(--mu)">Everything in Files</span>
+              <span class="mono" style="font-size:12px;color:var(--mu)">Syslog, SNMP traps</span>
+              <span class="mono" style="font-size:12px;color:var(--mu)">DNS, NTP</span>
+            </div>
+          </div>
+          <div style="border:1px solid var(--bd);border-radius:12px;padding:24px;background:var(--s1);display:flex;flex-direction:column;position:relative">
+            
+            <div class="mono" style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--mu)">Enterprise</div>
+            <div style="margin-top:14px;font-size:32px;font-weight:600;letter-spacing:-0.03em">$100<span style="font-size:14px;font-weight:400;color:var(--di)">/mo</span></div>
+            <div style="margin-top:4px;font-size:12px;color:var(--di)">or $1000/yr — 2 months free</div>
+            <p style="margin:14px 0 0;font-size:13.5px;line-height:1.65;color:var(--mu)">Every stand, including AAA and streaming.</p>
+            <div style="margin-top:20px;padding-top:18px;border-top:1px solid var(--bd);display:flex;flex-direction:column;gap:8px">
+              <span class="mono" style="font-size:12px;color:var(--di)">Everything in Standard</span>
+              <span class="mono" style="font-size:12px;color:var(--di)">RADIUS, TACACS+</span>
+              <span class="mono" style="font-size:12px;color:var(--di)">Kafka, IPFIX</span>
+            </div>
+          </div>
+        </div>
+        <p style="margin:28px 0 0;max-width:720px;font-size:13.5px;line-height:1.75;color:var(--di)">Need a specific mix? <span style="color:var(--bo)">Custom</span> plans license exactly the stands you choose. Runs entirely on your infrastructure — offline, one artifact everywhere. <a href="mailto:hello@servienta.com" style="color:var(--acc)">Talk to us</a>.</p>
+      </div>
+    </section>
+
+    <section id="run" style="border-top:1px solid var(--bds)">
+      <div style="max-width:1120px;margin:0 auto;padding:88px 32px">
+        <div style="display:grid;grid-template-columns:380px minmax(0,1fr);gap:64px;align-items:start">
+          <div style="position:sticky;top:96px">
+            <h2 style="margin:0;font-size:34px;font-weight:600;letter-spacing:-0.03em">Run it</h2>
+            <p style="margin:16px 0 0;font-size:15.5px;line-height:1.7;color:var(--mu)">One container, no dependencies, works offline. Pull the image, mount a directory of files to serve, and go.</p>
+          </div>
+          <div style="min-width:0;display:flex;flex-direction:column;gap:20px">
+            <div style="min-width:0;border:1px solid #26262f;border-radius:10px;overflow:hidden;background:#15151b">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #26262f;background:#1c1c23">
+                <span class="mono" style="font-size:11px;color:#71717f">bring the engine up</span>
+                <button class="mono copyBtn" data-target="cmdUp" style="font-size:11px;color:#a1a1ad;cursor:pointer;background:none;border:none">copy</button>
+              </div>
+              <pre id="cmdUp" class="mono" style="margin:0;padding:18px;font-size:12.5px;line-height:1.9;color:#d4d4dd;overflow-x:auto">docker pull ghcr.io/servienta/engine:latest
 
 mkdir -p fixtures &amp;&amp; echo hello &gt; fixtures/hello.txt
 
 docker run --rm \
   -p 8080:8080 -p 8081:8081 -p 9000:9000 \
   -v "$PWD/fixtures:/fixtures:ro" \
-  ghcr.io/servienta/engine:latest</code></pre>
-        <p class="mt-4 text-sm text-zinc-400">Then, from your test suite or a terminal:</p>
-        <pre class="mt-2 overflow-x-auto rounded-lg border border-zinc-800 bg-zinc-950 p-4 text-sm leading-relaxed text-zinc-300"><code># where is everything?
+  ghcr.io/servienta/engine:latest</pre>
+            </div>
+            <p style="margin:0;font-size:14px;color:var(--mu)">Then, from your test suite or a terminal:</p>
+            <div style="min-width:0;border:1px solid #26262f;border-radius:10px;overflow:hidden;background:#15151b">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #26262f;background:#1c1c23">
+                <span class="mono" style="font-size:11px;color:#71717f">drive it from a test</span>
+                <button class="mono copyBtn" data-target="cmdRun" style="font-size:11px;color:#a1a1ad;cursor:pointer;background:none;border:none">copy</button>
+              </div>
+              <pre id="cmdRun" class="mono" style="margin:0;padding:18px;font-size:12.5px;line-height:1.9;color:#d4d4dd;overflow-x:auto"><span style="color:#71717f"># where is everything?</span>
 curl http://localhost:8080/api/v1/endpoints
 
-# the file server serves your fixtures byte-for-byte
+<span style="color:#71717f"># the file server serves your fixtures byte-for-byte</span>
 curl http://localhost:8081/hello.txt
 
-# declare a run, send it traffic, read back what arrived
+<span style="color:#71717f"># declare a run, send it traffic, read back what arrived</span>
 curl -X PUT http://localhost:8080/api/v1/runs/run-1 \
   -d '{"sources": ["172.17.0.1"]}'
 echo 'hello from my app' | nc localhost 9000
 curl 'http://localhost:8080/api/v1/received/reference?run=run-1'
 
-# return to a known state
-curl -X POST http://localhost:8080/api/v1/reset</code></pre>
+<span style="color:#71717f"># return to a known state</span>
+curl -X POST http://localhost:8080/api/v1/reset</pre>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   </main>
 
-  <footer class="border-t border-zinc-900">
-    <div class="mx-auto flex max-w-5xl items-center justify-between px-6 py-8 text-sm text-zinc-500">
+  <footer style="border-top:1px solid var(--bds)">
+    <div style="max-width:1120px;margin:0 auto;padding:32px;display:flex;align-items:center;justify-content:space-between;font-size:13.5px;color:var(--di)">
       <span>© 2026 Servienta</span>
       <span>Runs entirely on your infrastructure.</span>
     </div>
   </footer>
+
+  <script>
+    // Theme toggle (persisted).
+    (function () {
+      var root = document.documentElement, knob = document.getElementById('themeKnob');
+      function apply(t) {
+        root.setAttribute('data-theme', t);
+        if (knob) { knob.style.left = t === 'dark' ? '0' : '50%'; knob.style.right = t === 'dark' ? '50%' : '0'; }
+        try { localStorage.setItem('servienta-theme', t); } catch (e) {}
+      }
+      try { var s = localStorage.getItem('servienta-theme'); if (s) apply(s); } catch (e) {}
+      var btn = document.getElementById('themeBtn');
+      if (btn) btn.addEventListener('click', function () {
+        apply(root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+      });
+      // Copy buttons.
+      document.querySelectorAll('.copyBtn').forEach(function (b) {
+        b.addEventListener('click', function () {
+          var el = document.getElementById(b.dataset.target);
+          if (!el) return;
+          navigator.clipboard.writeText(el.innerText).then(function () {
+            var old = b.textContent; b.textContent = 'copied';
+            setTimeout(function () { b.textContent = old; }, 1600);
+          }).catch(function () {});
+        });
+      });
+    })();
+  </script>
 </body>
 </html>
