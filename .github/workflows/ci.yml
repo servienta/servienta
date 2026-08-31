@@ -2,9 +2,9 @@ name: CI
 on:
   push:
     branches: [main]
-    paths: ["apps/engine/**", ".github/workflows/ci.yml"]
+    paths: ["apps/engine/**", "apps/console/**", ".github/workflows/ci.yml"]
   pull_request:
-    paths: ["apps/engine/**"]
+    paths: ["apps/engine/**", "apps/console/**"]
 
 jobs:
   engine:
@@ -30,9 +30,21 @@ jobs:
       - run: |
           docker build             -t ghcr.io/servienta/engine:latest             -t ghcr.io/servienta/engine:${{ github.sha }}             apps/engine
       - run: docker push --all-tags ghcr.io/servienta/engine
-      # Registry retention: keep the 5 newest versions, delete the rest.
+      - name: Build and push console
+        run: |
+          docker build \
+            -t ghcr.io/servienta/console:latest \
+            -t ghcr.io/servienta/console:${{ github.sha }} \
+            apps/console
+          docker push --all-tags ghcr.io/servienta/console
+      # Registry retention: keep the 5 newest versions of each image.
       - uses: actions/delete-package-versions@v5
         with:
           package-name: engine
+          package-type: container
+          min-versions-to-keep: 5
+      - uses: actions/delete-package-versions@v5
+        with:
+          package-name: console
           package-type: container
           min-versions-to-keep: 5

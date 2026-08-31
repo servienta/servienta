@@ -1,0 +1,19 @@
+# The full stand: the engine (data plane) plus the console (management UI on
+# :8080). The console reaches the engine over the internal network through the
+# engine's versioned contract only (D11). Host ports stay ephemeral except the
+# console's :8080, which is the one thing an operator opens (N4).
+services:
+  engine:
+    build: ./apps/engine
+    volumes:
+      - ${SERVIENTA_FIXTURES:-./fixtures}:/fixtures:ro
+    # No published host ports: only the console talks to it, on the internal net.
+
+  console:
+    build: ./apps/console
+    depends_on: [engine]
+    environment:
+      CONSOLE_ENGINE_BASE: http://engine:8080
+      CONSOLE_ADDR: ":8080"
+    ports:
+      - "8080:8080"

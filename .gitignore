@@ -17,3 +17,4 @@ dist/
 .wrangler/
 .dev.vars
 .turbo/
+apps/console/internal/webui/dist/
