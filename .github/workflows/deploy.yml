@@ -1,8 +1,9 @@
 name: Deploy
 on:
+  workflow_dispatch:
   push:
     branches: [main]
-    paths: ["apps/**", "turbo.json", "pnpm-*.yaml", "package.json"]
+    paths: ["apps/**", "packages/**", ".github/workflows/**", "turbo.json", "pnpm-*.yaml", "package.json"]
 
 jobs:
   deploy:
