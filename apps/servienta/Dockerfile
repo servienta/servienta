@@ -8,5 +8,6 @@ COPY . .
 RUN CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o /servienta ./cmd/servienta
 
 FROM scratch
+LABEL org.opencontainers.image.source="https://github.com/servienta/servienta"
 COPY --from=build /servienta /servienta
 ENTRYPOINT ["/servienta"]

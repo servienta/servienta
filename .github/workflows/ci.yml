@@ -16,3 +16,17 @@ jobs:
         with: { go-version-file: apps/servienta/go.mod }
       - run: go vet ./...
       - run: go test ./... -count=1
+
+  engine-image:
+    needs: engine
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      - run: |
+          docker build             -t ghcr.io/servienta/engine:latest             -t ghcr.io/servienta/engine:${{ github.sha }}             apps/servienta
+      - run: docker push --all-tags ghcr.io/servienta/engine

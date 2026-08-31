@@ -41,7 +41,7 @@ fully operable with the contract and its documentation alone (N2 demands this).
 - **HTTP contract:** stdlib `net/http` (1.22+ routing); OpenAPI schema is authored first and shipped
   in the delivery (R11).
 - **Images:** multi-stage build → static binary → `scratch`/distroless; compose is the delivery
-  entry point (R7). Published to ghcr.io.
+  entry point (R7). Published to ghcr.io as `ghcr.io/servienta/engine` by CI.
 - **Protocol library map** (re-verified for Go under D6):
 
 | Surface | Library | Note |
