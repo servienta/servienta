@@ -10,6 +10,11 @@ export default {
       url.hostname = "servienta.com";
       return Response.redirect(url.toString(), 301);
     }
+    // Clean /docs URL -> the docs page asset.
+    if (url.pathname === "/docs" || url.pathname === "/docs/") {
+      url.pathname = "/docs.html";
+      return env.ASSETS.fetch(new Request(url.toString(), request));
+    }
     return env.ASSETS.fetch(request);
   },
 } satisfies ExportedHandler<Env>;

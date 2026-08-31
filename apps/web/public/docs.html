@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Servienta — Docs</title>
+  <meta name="description" content="How to use Servienta: run the engine, record and read traffic, inject faults, steer replies, and apply a license." />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body class="bg-zinc-950 text-zinc-100 antialiased">
+  <header class="mx-auto flex max-w-5xl items-center justify-between px-6 py-6">
+    <a href="/" class="text-lg font-semibold tracking-tight">Servienta</a>
+    <nav class="flex items-center gap-6 text-sm text-zinc-400">
+      <a href="/" class="hover:text-zinc-100">Home</a>
+      <a href="/#pricing" class="hover:text-zinc-100">Pricing</a>
+      <a href="#quickstart" class="hover:text-zinc-100">Quickstart</a>
+      <a href="#api" class="hover:text-zinc-100">API</a>
+    </nav>
+  </header>
+
+  <div class="mx-auto grid max-w-5xl gap-10 px-6 pb-24 pt-6 md:grid-cols-[200px_1fr]">
+    <aside class="hidden md:block">
+      <nav class="sticky top-6 space-y-1 text-sm text-zinc-400">
+        <a href="#what" class="block hover:text-zinc-100">What it is</a>
+        <a href="#concepts" class="block hover:text-zinc-100">Concepts</a>
+        <a href="#quickstart" class="block hover:text-zinc-100">Quickstart</a>
+        <a href="#receivers" class="block hover:text-zinc-100">Receivers</a>
+        <a href="#responses" class="block hover:text-zinc-100">Response control</a>
+        <a href="#faults" class="block hover:text-zinc-100">Fault injection</a>
+        <a href="#licensing" class="block hover:text-zinc-100">Licensing</a>
+        <a href="#api" class="block hover:text-zinc-100">API reference</a>
+      </nav>
+    </aside>
+
+    <main class="min-w-0 space-y-14">
+      <section id="what">
+        <h1 class="text-3xl font-semibold tracking-tight">Documentation</h1>
+        <p class="mt-4 max-w-2xl text-zinc-400">
+          Servienta gives your test suite a controlled instance of the network services your
+          application talks to — a file server on five transports and receivers for syslog, SNMP
+          traps, RADIUS, TACACS+, DNS, NTP, Kafka, and IPFIX. Bring it up with one command, generate
+          traffic, read back exactly what arrived, inject faults, and reset — reproducibly, offline.
+        </p>
+        <p class="mt-3 max-w-2xl text-sm text-zinc-500">
+          The application under test is out of scope: the engine never reaches into it. It only
+          accepts, serves, and reports what it observed.
+        </p>
+      </section>
+
+      <section id="concepts">
+        <h2 class="text-2xl font-semibold tracking-tight">Core concepts</h2>
+        <dl class="mt-4 space-y-3 text-sm text-zinc-300">
+          <div><dt class="font-medium text-zinc-100">Instance</dt><dd class="text-zinc-400">One bring-up of the engine. Mutations — reset, faults, response controls — are instance-wide.</dd></div>
+          <div><dt class="font-medium text-zinc-100">Run</dt><dd class="text-zinc-400">One test execution inside an instance, identified by a run id you choose. Messages are read back per run.</dd></div>
+          <div><dt class="font-medium text-zinc-100">Source claim</dt><dd class="text-zinc-400">A run declares the source addresses whose traffic belongs to it. The engine attributes each message to a run by source — so two runs share one instance without reading each other's traffic.</dd></div>
+          <div><dt class="font-medium text-zinc-100">Stand</dt><dd class="text-zinc-400">One licensable service. The free image runs the file server (HTTP) and a demo receiver; a license unlocks the rest.</dd></div>
+        </dl>
+      </section>
+
+      <section id="quickstart">
+        <h2 class="text-2xl font-semibold tracking-tight">Quickstart</h2>
+        <p class="mt-2 text-zinc-400">Run the engine, serve a file, record a message, read it back, reset. Free image, no license.</p>
+        <pre class="mt-4 overflow-x-auto rounded-lg border border-zinc-800 bg-black p-4 text-sm leading-relaxed text-zinc-300"><code>docker pull ghcr.io/servienta/engine:latest
+mkdir -p fixtures &amp;&amp; echo hello &gt; fixtures/hello.txt
+
+docker run --rm -p 8080:8080 -p 8081:8081 -p 9000:9000 \
+  -v "$PWD/fixtures:/fixtures:ro" ghcr.io/servienta/engine:latest
+
+# discover endpoints, serve a fixture byte-for-byte
+curl http://localhost:8080/api/v1/endpoints
+curl http://localhost:8081/hello.txt
+
+# declare a run, send traffic, read it back
+curl -X PUT http://localhost:8080/api/v1/runs/run-1 -d '{"sources":["172.17.0.1"]}'
+echo 'hello from my app' | nc localhost 9000
+curl 'http://localhost:8080/api/v1/received/reference?run=run-1'
+
+# reset to a known state
+curl -X POST http://localhost:8080/api/v1/reset</code></pre>
+        <p class="mt-3 rounded-md border border-zinc-800 bg-zinc-900/40 p-3 text-sm text-zinc-400">
+          Your app can't put a run id inside a raw syslog packet, so a run <em>claims the source
+          addresses</em> its traffic comes from. The engine attributes each message to a run by
+          source; one source belongs to one active run.
+        </p>
+      </section>
+
+      <section id="receivers">
+        <h2 class="text-2xl font-semibold tracking-tight">Receivers</h2>
+        <p class="mt-2 text-zinc-400">Send to a service, read it back parsed at <code class="text-zinc-300">/api/v1/received/&lt;service&gt;?run=&lt;id&gt;</code>.</p>
+        <div class="mt-4 overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead class="text-left text-zinc-500"><tr><th class="py-2 pr-4">Service</th><th class="py-2 pr-4">Protocol</th><th class="py-2">Recorded content</th></tr></thead>
+            <tbody class="text-zinc-300">
+              <tr class="border-t border-zinc-800"><td class="py-2 pr-4">reference</td><td class="py-2 pr-4">TCP line (demo, free)</td><td class="py-2">line</td></tr>
+              <tr class="border-t border-zinc-800"><td class="py-2 pr-4">syslog</td><td class="py-2 pr-4">UDP · TCP · RELP</td><td class="py-2">facility, severity, message</td></tr>
+              <tr class="border-t border-zinc-800"><td class="py-2 pr-4">snmp-traps</td><td class="py-2 pr-4">v2c · v3 USM</td><td class="py-2">variable bindings</td></tr>
+              <tr class="border-t border-zinc-800"><td class="py-2 pr-4">radius / tacacs</td><td class="py-2 pr-4">authentication</td><td class="py-2">username (reply steerable)</td></tr>
+              <tr class="border-t border-zinc-800"><td class="py-2 pr-4">dns / ntp</td><td class="py-2 pr-4">resolution / time</td><td class="py-2">query (reply steerable)</td></tr>
+              <tr class="border-t border-zinc-800"><td class="py-2 pr-4">kafka</td><td class="py-2 pr-4">broker (in-process)</td><td class="py-2">topic, key, value</td></tr>
+              <tr class="border-t border-zinc-800"><td class="py-2 pr-4">ipfix</td><td class="py-2 pr-4">collector</td><td class="py-2">flow record fields</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="responses">
+        <h2 class="text-2xl font-semibold tracking-tight">Response control</h2>
+        <p class="mt-2 text-zinc-400">Steer what RADIUS, TACACS+, DNS, and NTP answer, for the run. Default is a successful reply; reset restores it.</p>
+        <pre class="mt-4 overflow-x-auto rounded-lg border border-zinc-800 bg-black p-4 text-sm leading-relaxed text-zinc-300"><code>curl -X PUT .../api/v1/responses/radius -d '{"outcome":"reject","reason":"locked"}'
+curl -X PUT .../api/v1/responses/dns    -d '{"outcome":"nxdomain"}'
+curl -X PUT .../api/v1/responses/ntp    -d '{"outcome":"stratum","stratum":5}'
+curl -X PUT .../api/v1/responses/dns    -d '{}'   # restore default</code></pre>
+      </section>
+
+      <section id="faults">
+        <h2 class="text-2xl font-semibold tracking-tight">Fault injection</h2>
+        <p class="mt-2 text-zinc-400">Force failures on both sides to test your error paths. Reset lifts them.</p>
+        <pre class="mt-4 overflow-x-auto rounded-lg border border-zinc-800 bg-black p-4 text-sm leading-relaxed text-zinc-300"><code># file faults: auth-reject | missing | truncate | corrupt
+curl -X PUT .../api/v1/faults/files/hello.txt -d '{"kind":"truncate"}'
+
+# receiver modes: refuse | drop | delay | cut | error
+curl -X PUT .../api/v1/faults/receivers/syslog -d '{"mode":"drop"}'</code></pre>
+      </section>
+
+      <section id="licensing">
+        <h2 class="text-2xl font-semibold tracking-tight">Licensing</h2>
+        <p class="mt-2 max-w-2xl text-zinc-400">
+          A license enables a set of stands. It is an Ed25519-signed file, validated at startup,
+          fully offline. The free image runs the file server and a demo receiver; the service
+          receivers unlock with a license — Files, Standard, Enterprise, or a custom stand set.
+        </p>
+        <pre class="mt-4 overflow-x-auto rounded-lg border border-zinc-800 bg-black p-4 text-sm leading-relaxed text-zinc-300"><code># mount a license and start
+SERVIENTA_LICENSE=./license.json docker compose up -d
+
+# or paste it in the console: License card -> Apply a license</code></pre>
+        <p class="mt-3 text-sm text-zinc-500">
+          Offline licensing of self-hosted software is compliance clarity, not DRM: it makes what is
+          enabled signed and verifiable, and prevents forgery. Every shipped credential is throwaway
+          and documented as such.
+        </p>
+      </section>
+
+      <section id="api">
+        <h2 class="text-2xl font-semibold tracking-tight">API reference</h2>
+        <p class="mt-2 text-zinc-400">Base path <code class="text-zinc-300">/api/v1</code> on the control port (default 8080). Full schema ships as <code class="text-zinc-300">openapi.yaml</code>.</p>
+        <div class="mt-4 overflow-x-auto">
+          <table class="w-full text-sm">
+            <tbody class="text-zinc-300">
+              <tr class="border-t border-zinc-800"><td class="py-1.5 pr-4 font-mono text-emerald-400">GET</td><td class="py-1.5 pr-4 font-mono">/version</td><td class="py-1.5 text-zinc-400">Contract version</td></tr>
+              <tr class="border-t border-zinc-800"><td class="py-1.5 pr-4 font-mono text-emerald-400">GET</td><td class="py-1.5 pr-4 font-mono">/endpoints</td><td class="py-1.5 text-zinc-400">Service addresses</td></tr>
+              <tr class="border-t border-zinc-800"><td class="py-1.5 pr-4 font-mono text-emerald-400">GET</td><td class="py-1.5 pr-4 font-mono">/license</td><td class="py-1.5 text-zinc-400">License status</td></tr>
+              <tr class="border-t border-zinc-800"><td class="py-1.5 pr-4 font-mono text-amber-400">PUT</td><td class="py-1.5 pr-4 font-mono">/runs/{id}</td><td class="py-1.5 text-zinc-400">Declare a run (claim sources)</td></tr>
+              <tr class="border-t border-zinc-800"><td class="py-1.5 pr-4 font-mono text-red-400">DEL</td><td class="py-1.5 pr-4 font-mono">/runs/{id}</td><td class="py-1.5 text-zinc-400">Release a run</td></tr>
+              <tr class="border-t border-zinc-800"><td class="py-1.5 pr-4 font-mono text-emerald-400">GET</td><td class="py-1.5 pr-4 font-mono">/received/{service}</td><td class="py-1.5 text-zinc-400">Read messages</td></tr>
+              <tr class="border-t border-zinc-800"><td class="py-1.5 pr-4 font-mono text-sky-400">POST</td><td class="py-1.5 pr-4 font-mono">/reset</td><td class="py-1.5 text-zinc-400">Reset the instance</td></tr>
+              <tr class="border-t border-zinc-800"><td class="py-1.5 pr-4 font-mono text-amber-400">PUT</td><td class="py-1.5 pr-4 font-mono">/responses/{service}</td><td class="py-1.5 text-zinc-400">Steer a reply</td></tr>
+              <tr class="border-t border-zinc-800"><td class="py-1.5 pr-4 font-mono text-amber-400">PUT</td><td class="py-1.5 pr-4 font-mono">/faults/files/{fixture}</td><td class="py-1.5 text-zinc-400">File fault</td></tr>
+              <tr class="border-t border-zinc-800"><td class="py-1.5 pr-4 font-mono text-amber-400">PUT</td><td class="py-1.5 pr-4 font-mono">/faults/receivers/{service}</td><td class="py-1.5 text-zinc-400">Receiver fault</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <footer class="border-t border-zinc-900">
+    <div class="mx-auto flex max-w-5xl items-center justify-between px-6 py-8 text-sm text-zinc-500">
+      <span>© 2026 Servienta</span>
+      <a href="/" class="hover:text-zinc-300">servienta.com</a>
+    </div>
+  </footer>
+</body>
+</html>
