@@ -2,11 +2,20 @@
   "$schema": "https://turbo.build/schema.json",
   "tasks": {
     "build": {
-      "outputs": ["dist/**", "public/styles.css"]
+      "outputs": [
+        "dist/**",
+        "public/styles.css"
+      ]
     },
     "deploy": {
-      "dependsOn": ["build"],
-      "cache": false
+      "dependsOn": [
+        "build"
+      ],
+      "cache": false,
+      "passThroughEnv": [
+        "CLOUDFLARE_API_TOKEN",
+        "CLOUDFLARE_ACCOUNT_ID"
+      ]
     },
     "dev": {
       "cache": false,
