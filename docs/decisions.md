@@ -2,7 +2,7 @@
 title: Decision Log
 type: decision-log
 status: active
-updated: 2026-08-31
+updated: 2026-09-01
 ---
 
 # Decision Log
@@ -22,6 +22,31 @@ Revisit trigger: <metric / date / condition>
 ```
 
 ---
+
+## D19 — The compose stand publishes the engine 1:1; the console moves to :5000
+
+Date: 2026-09-01
+Context: the compose stand originally published only the console, on host
+:8080 — the same number as the engine's control port. The engine had no host
+ports at all: the Stand view showed receivers as `[::]:8081 · up` that the
+host could not reach, and every quickstart curl against :8080 hit the console
+instead of the contract. The stand could be managed but not exercised.
+Options considered: (A) publish the engine 1:1 — contract included — and move
+the console off :8080; (B) publish only the data plane, keep control behind a
+console proxy; (C) publish through env-overridable host ports; (D) keep the
+engine unpublished and only label the addresses as internal.
+Choice: **A** — the stand exists to run the loop against, and 1:1 keeps every
+address the engine reports (R7) true on the host, contract at `:8080` exactly
+as the site quickstart and the walkthrough assume. The console listens on
+`:5000`. One exception: `dns` maps to host
+15353 because mDNS owns 5353/udp on desktops.
+Known limits: TFTP transfers reply from ephemeral ports and don't survive the
+NAT (use a standalone engine); host-originated traffic arrives with the Docker
+gateway as its source (172.18.0.1), which is what source-claim attribution
+(D4) will see.
+Reversibility: two-way door — a compose edit.
+Revisit trigger: two stands on one host (host-port collisions → option C), or
+the first user tripped up by NAT'd source attribution.
 
 ## D18 — Active send: the test supplies the target every time
 

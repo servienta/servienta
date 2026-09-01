@@ -6,5 +6,5 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineConfig({
   plugins: [vue(), tailwindcss()],
   build: { outDir: "internal/webui/dist", emptyOutDir: true },
-  server: { proxy: { "/api": "http://localhost:8080" } },
+  server: { proxy: { "/api": "http://localhost:5000" } },
 });

@@ -1,4 +1,4 @@
-// The Servienta console (D11): a Go service in Docker on :8080 that serves the
+// The Servienta console (D11): a Go service in Docker on :5000 that serves the
 // management SPA and talks to the engine through its versioned contract.
 package main
 
@@ -24,7 +24,7 @@ func main() {
 		LicensePath: envOr("CONSOLE_LICENSE_PATH", "/license/license.json"),
 		SPA:         webui.FS(),
 	}).Handler()
-	addr := envOr("CONSOLE_ADDR", ":8080")
+	addr := envOr("CONSOLE_ADDR", ":5000")
 	slog.Info("console listening", "addr", addr)
 	if err := http.ListenAndServe(addr, h); err != nil {
 		slog.Error("serve", "err", err)

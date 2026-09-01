@@ -38,3 +38,21 @@ a:hover { color:var(--ink); }
   text-transform:uppercase; color:var(--ink2); cursor:pointer; }
 .act:hover { color:var(--signal); }
 .rowh:hover { background:var(--band); }
+
+/* Embedded user guide (Docs tab) */
+.docbody { max-width:760px; font-size:15px; line-height:1.65; color:var(--ink); }
+.docbody h1 { margin:0 0 8px; font-size:30px; font-weight:600; letter-spacing:-0.01em; }
+.docbody h2 { margin:36px 0 10px; font-size:21px; font-weight:600; }
+.docbody h3 { margin:26px 0 8px; font-size:16.5px; font-weight:600; }
+.docbody p, .docbody li { color:var(--ink2); }
+.docbody li { margin:4px 0; }
+.docbody strong { color:var(--ink); }
+.docbody code { font-family:'Fragment Mono',monospace; font-size:0.85em; background:var(--band); padding:1px 5px; }
+.docbody pre { background:var(--plate); color:#eef0f1; padding:14px 16px; overflow-x:auto; font-size:12px; line-height:1.75; }
+.docbody pre code { background:none; padding:0; color:inherit; font-size:inherit; }
+.docbody table { border-collapse:collapse; width:100%; margin:14px 0; font-size:13.5px; }
+.docbody th { font-family:'Fragment Mono',monospace; font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink3); text-align:left; padding:8px 14px 8px 0; border-bottom:2px solid var(--ink); }
+.docbody td { padding:8px 14px 8px 0; border-bottom:1px solid var(--rule2); color:var(--ink2); vertical-align:top; }
+.docbody blockquote { margin:14px 0; padding:2px 0 2px 16px; border-left:2px solid var(--signal); }
+.docbody blockquote p { margin:6px 0; }
+.docbody hr { border:none; border-top:1px solid var(--rule); margin:28px 0; }

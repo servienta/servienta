@@ -1,0 +1,9 @@
+# Context for the console image build (repo root). The engine builds from its
+# own context (apps/engine) and is not affected by this file.
+**/node_modules
+**/dist
+.git
+apps/engine
+apps/web
+packages
+fixtures

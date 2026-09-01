@@ -40,7 +40,7 @@ The engine reads `/license.json` (or `SERVIENTA_LICENSE`) at startup, verifies
 signature and expiry, and enables the licensed stands.
 
 ### B. From the console
-Open the console (http://localhost:8080), **License** card → **Apply a
+Open the console (http://localhost:5000), **License** card → **Apply a
 license**, paste the file, **Apply**. The console writes it to a shared volume
 and restarts the engine to pick it up. **Remove license** reverts to free.
 

@@ -3,6 +3,38 @@ import { ref, onMounted, computed } from "vue";
 import { api } from "./api";
 import ThemeToggle from "./components/ThemeToggle.vue";
 import { STANDS } from "../shared/stands";
+import MarkdownIt from "markdown-it";
+import walkthrough from "../../../scripts/walkthrough.sh?raw";
+
+// The user guide, baked into the bundle at build time so the console
+// documents the whole system offline (N2) — no link to the website required.
+const guideFiles = import.meta.glob("../../../docs/guide/*.md", {
+  query: "?raw",
+  import: "default",
+  eager: true,
+}) as Record<string, string>;
+const GUIDE_ORDER = ["README", "quickstart", "engine-api", "receivers", "response-control", "faults", "licensing", "console", "configuration", "extending"];
+const md = new MarkdownIt({ linkify: true });
+const guide = GUIDE_ORDER.flatMap((id) => {
+  const raw = Object.entries(guideFiles).find(([p]) => p.endsWith(`/${id}.md`))?.[1];
+  if (!raw) return [];
+  const body = raw.replace(/^---[\s\S]*?---\s*/, "");
+  const title = /^title:\s*(.+)$/m.exec(raw)?.[1]?.trim() ?? id;
+  return [{ id, title, html: md.render(body) }];
+});
+const docPage = ref(guide[0]?.id ?? "README");
+const docHtml = computed(() => guide.find((g) => g.id === docPage.value)?.html ?? "");
+function docClick(e: MouseEvent) {
+  const a = (e.target as HTMLElement).closest("a");
+  if (!a) return;
+  const href = a.getAttribute("href") ?? "";
+  const m = /^([a-z-]+|README)\.md(#.*)?$/i.exec(href);
+  if (m && guide.some((g) => g.id === m[1])) {
+    e.preventDefault();
+    docPage.value = m[1];
+    window.scrollTo(0, 0);
+  }
+}
 
 const engineOk = ref<boolean | null>(null);
 const version = ref<string | null>(null);
@@ -13,7 +45,13 @@ const service = ref("reference"); const run = ref("");
 const resetMsg = ref<string | null>(null);
 const license = ref<{ mode: string; stands: string[]; customer?: string; expires_at?: number; error?: string } | null>(null);
 const licenseText = ref(""); const licenseMsg = ref<string | null>(null); const uploading = ref(false);
-const view = ref<"stand" | "start">("stand");
+const view = ref<"stand" | "start" | "docs">("stand");
+const copied = ref(false);
+async function copyWalkthrough() {
+  await navigator.clipboard.writeText(walkthrough);
+  copied.value = true;
+  setTimeout(() => (copied.value = false), 1500);
+}
 const apiRef: [string, string, string][] = [
   ["GET", "/api/v1/endpoints", "Service addresses"],
   ["GET", "/api/v1/received/{svc}", "Read recorded messages"],
@@ -52,7 +90,7 @@ async function removeLicense() { if (!confirm("Remove the license and revert to 
   catch (e) { licenseMsg.value = (e as Error).message; } finally { uploading.value = false; } }
 async function waitForEngine() { for (let i = 0; i < 40; i++) { await new Promise((r) => setTimeout(r, 500));
   try { await refresh(); if (engineOk.value) return; } catch {} } }
-function tabStyle(v: "stand" | "start") {
+function tabStyle(v: "stand" | "start" | "docs") {
   return {
     color: view.value === v ? "var(--ink)" : "var(--ink2)",
     paddingBottom: "2px",
@@ -74,6 +112,7 @@ onMounted(refresh);
         <nav class="mono" style="display:flex;gap:22px;font-size:11px;letter-spacing:0.06em;text-transform:uppercase">
           <span class="ctab" :style="tabStyle('stand')" @click="view='stand'">Stand</span>
           <span class="ctab" :style="tabStyle('start')" @click="view='start'">Getting started</span>
+          <span class="ctab" :style="tabStyle('docs')" @click="view='docs'">Docs</span>
         </nav>
         <div style="margin-left:auto;display:flex;align-items:center;gap:20px">
           <ThemeToggle />
@@ -98,8 +137,11 @@ onMounted(refresh);
 
           <div style="margin-top:32px">
             <div class="flabel" style="padding-bottom:8px;border-bottom:2px solid var(--ink)">1 · Reach the engine</div>
-            <p style="margin:12px 0 0;font-size:14px;line-height:1.6;color:var(--ink2)">In this compose stack the engine is not published to your host — only this console is, on <span class="mono">:8080</span>. To curl the engine directly, run it with published ports:</p>
-            <pre class="mono" style="margin:12px 0 0;font-size:12px;line-height:2;color:var(--ink);overflow-x:auto">mkdir -p fixtures &amp;&amp; printf 'link down eth0\n' &gt; fixtures/hello.txt
+            <p style="margin:12px 0 0;font-size:14px;line-height:1.6;color:var(--ink2)">This stand maps the engine 1:1 to your host: the contract on <span class="mono">:8080</span>, every receiver at the address it reports (this console runs on <span class="mono">:5000</span>). Everything below works as-is:</p>
+            <pre class="mono" style="margin:12px 0 0;font-size:12px;line-height:2;color:var(--ink);overflow-x:auto">curl localhost:8080/api/v1/endpoints</pre>
+            <p style="margin:12px 0 0;font-size:14px;line-height:1.6;color:var(--ink2)">The same commands drive a standalone engine, no console attached — stop the stand first, it holds the ports:</p>
+            <pre class="mono" style="margin:12px 0 0;font-size:12px;line-height:2;color:var(--ink);overflow-x:auto">docker compose down
+mkdir -p fixtures &amp;&amp; printf 'link down eth0\n' &gt; fixtures/hello.txt
 docker run --rm -p 8080:8080 -p 8081:8081 -p 9000:9000 \
   -v "$PWD/fixtures:/fixtures:ro" ghcr.io/servienta/engine:latest</pre>
           </div>
@@ -124,8 +166,12 @@ curl -X POST localhost:8080/api/v1/reset</pre>
 
           <div style="margin-top:36px">
             <div class="flabel" style="padding-bottom:8px;border-bottom:2px solid var(--ink)">3 · Run the walkthrough</div>
-            <p style="margin:12px 0 0;font-size:14px;line-height:1.6;color:var(--ink2)">A one-file script that runs every step above against your engine and prints the result in your terminal — <span class="mono" style="font-size:13px">scripts/walkthrough.sh</span> in the repo.</p>
-            <pre class="mono" style="margin:12px 0 0;font-size:12px;line-height:2;color:var(--ink);overflow-x:auto">./scripts/walkthrough.sh</pre>
+            <p style="margin:12px 0 0;font-size:14px;line-height:1.6;color:var(--ink2)">A one-file script that runs every step above against your engine and prints the result in your terminal. Copy it, save as <span class="mono" style="font-size:13px">walkthrough.sh</span>, and run:</p>
+            <pre class="mono" style="margin:12px 0 0;font-size:12px;line-height:2;color:var(--ink);overflow-x:auto">chmod +x walkthrough.sh &amp;&amp; ./walkthrough.sh</pre>
+            <div style="position:relative;margin-top:12px;border:1px solid var(--rule)">
+              <span class="act" style="position:absolute;top:10px;right:14px" @click="copyWalkthrough">{{ copied ? "copied ✓" : "copy" }}</span>
+              <pre class="mono" style="margin:0;padding:14px 16px;font-size:11.5px;line-height:1.75;color:var(--ink);max-height:420px;overflow:auto">{{ walkthrough }}</pre>
+            </div>
           </div>
 
           <div style="margin-top:36px">
@@ -139,7 +185,16 @@ curl -X POST localhost:8080/api/v1/reset</pre>
           </div>
         </div>
 
-        <div v-if="view === 'start'"></div>
+        <div v-if="view === 'docs'" style="display:grid;grid-template-columns:220px minmax(0,1fr);gap:48px;align-items:start">
+          <nav style="position:sticky;top:24px">
+            <div class="flabel" style="padding-bottom:8px;border-bottom:2px solid var(--ink)">User guide</div>
+            <div v-for="g in guide" :key="g.id" class="mono ctab" style="padding:9px 0;font-size:11.5px;border-bottom:1px solid var(--rule2);cursor:pointer"
+              :style="{ color: docPage === g.id ? 'var(--ink)' : 'var(--ink2)' }" @click="docPage = g.id">{{ g.title }}</div>
+          </nav>
+          <article class="docbody" @click="docClick" v-html="docHtml"></article>
+        </div>
+
+        <div v-if="view !== 'stand'"></div>
         <template v-else>
         <div v-if="engineOk === false" class="mono" style="margin-bottom:36px;border-left:2px solid var(--alert);background:var(--band);padding:12px 16px;font-size:11.5px;color:var(--alert)">{{ error }}</div>
 
@@ -189,6 +244,7 @@ curl -X POST localhost:8080/api/v1/reset</pre>
             <h2 style="margin:0;font-size:30px;font-weight:600;letter-spacing:-0.01em">Stand endpoints</h2>
             <span class="act" style="margin-left:auto" @click="refresh">Refresh</span>
           </div>
+          <p style="margin:14px 0 0;max-width:660px;font-size:14px;line-height:1.6;color:var(--ink2)">The stand maps the engine 1:1 to your host, so every address works as written — the contract included (<span class="mono" style="font-size:13px">localhost:8080</span>). One exception: <span class="mono" style="font-size:13px">dns</span> answers on host <span class="mono" style="font-size:13px">15353</span>, since mDNS owns 5353/udp on most desktops.</p>
           <div style="margin-top:20px">
             <div class="flabel" style="display:grid;grid-template-columns:180px minmax(0,1fr) 100px;gap:20px;padding-bottom:8px;border-bottom:2px solid var(--ink)"><span>Service</span><span>Address</span><span>State</span></div>
             <div v-for="(addr, name) in endpoints" :key="name" class="rowh" style="display:grid;grid-template-columns:180px minmax(0,1fr) 100px;gap:20px;align-items:center;padding:8px 0;border-bottom:1px solid var(--rule2)">

@@ -29,7 +29,7 @@ it. It only accepts, serves, and reports what it observed.
 | Piece | What it is | Where it runs |
 | --- | --- | --- |
 | **Engine** | The data plane: receivers, file server, control API | Your infrastructure (Docker), offline-capable |
-| **Console** | Management UI: view the stand, apply a license, reset | Docker on :8080, next to the engine |
+| **Console** | Management UI: view the stand, apply a license, reset | Docker on :5000, next to the engine |
 | **Admin** | Vendor back office: issue licenses, manage customers | Cloudflare (vendor-operated) |
 
 ## Guide contents

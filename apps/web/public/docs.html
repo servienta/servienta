@@ -19,9 +19,10 @@
         <span class="mono" style="font-size:10.5px;color:var(--signal);text-transform:uppercase;letter-spacing:0.1em">docs</span>
       </a>
       <nav class="mono" style="display:flex;align-items:center;gap:26px;font-size:11px;text-transform:uppercase;letter-spacing:0.06em">
-        <a href="/" class="plain navlink">Home</a>
-        <a href="/#licensing" class="plain navlink">Pricing</a>
-        <a href="#quickstart" class="plain navlink">Quickstart</a>
+        <a href="/#schedule" class="plain navlink">Schedule</a>
+        <a href="/#method" class="plain navlink">Method</a>
+        <a href="/#licensing" class="plain navlink">Licensing</a>
+        <a href="/docs" class="plain navlink" style="color:var(--ink)">Docs</a>
         <button id="themeBtn" title="Toggle theme" aria-label="Toggle theme" style="display:flex;align-items:center;justify-content:center;width:20px;height:20px;color:var(--ink2);cursor:pointer;background:none;border:none;padding:0">
           <span style="position:relative;display:block;width:13px;height:13px;border:1px solid currentColor;overflow:hidden">
             <span id="themeKnob" style="position:absolute;top:0;bottom:0;left:50%;right:0;background:currentColor"></span>
@@ -88,6 +89,7 @@ curl -X POST http://localhost:8080/api/v1/reset</pre>
         <div style="margin-top:16px;border-left:2px solid var(--signal);padding:10px 16px;background:var(--band)">
           <p style="margin:0;font-size:14px;line-height:1.65;color:var(--ink2)">Your app can't put a run id inside a raw syslog packet, so a run <em style="color:var(--ink);font-style:normal;font-weight:600">claims the source addresses</em> its traffic comes from. The engine attributes each message to a run by source; one source belongs to one active run.</p>
         </div>
+        <p style="margin:16px 0 0;font-size:15px;line-height:1.65;color:var(--ink2)">The fixture tree is your host directory, mounted read-only — folders map to URL paths, edits are visible immediately, the engine serves bytes as they are and never writes into it. Air-gapped host? Move the image as a file: <span class="mono" style="font-size:13px">docker save</span> → <span class="mono" style="font-size:13px">docker load</span>. Two instances on one machine? In-container ports are fixed, host ports are yours — remap the second one.</p>
       </section>
 
       <section id="receivers">

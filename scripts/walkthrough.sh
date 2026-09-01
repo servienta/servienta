@@ -6,7 +6,7 @@
 #        docker run --rm -p 8080:8080 -p 8081:8081 -p 9000:9000 \
 #          -v "$PWD/fixtures:/fixtures:ro" ghcr.io/servienta/engine:latest
 #   2. in another terminal:
-#        ./scripts/walkthrough.sh
+#        ./walkthrough.sh   (this file — save it anywhere, chmod +x)
 #
 # Override hosts if you mapped different ports: API=host:port FILES=host:port REF=port
 set -euo pipefail

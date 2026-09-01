@@ -98,6 +98,15 @@ func (s *Server) Handler() http.Handler {
 		writeJSON(w, http.StatusAccepted, map[string]string{"status": "license removed; engine reloading"})
 	})
 
+	// An unknown API path is a visible error, never the SPA shell — a JSON
+	// client must not get 200 text/html for a typo'd or engine-contract path.
+	mux.HandleFunc("/api/", func(w http.ResponseWriter, r *http.Request) {
+		writeJSON(w, http.StatusNotFound, map[string]string{
+			"error": "unknown console API path: " + r.URL.Path,
+			"hint":  "the engine is not published on this port; its contract is proxied under /api/engine/… (e.g. GET /api/engine/endpoints)",
+		})
+	})
+
 	// SPA (deep links fall back to index.html).
 	spa := http.FileServer(http.FS(s.cfg.SPA))
 	mux.Handle("/", spaFallback(s.cfg.SPA, spa))

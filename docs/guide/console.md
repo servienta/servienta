@@ -14,7 +14,7 @@ only through the versioned control API — it is that contract's first client.
 The root `docker-compose.yml` runs the engine and console together:
 ```bash
 docker compose up -d
-# console on http://localhost:8080
+# console on http://localhost:5000
 ```
 The engine is **not published to the host** — only the console reaches it, over
 the internal network. A shared volume holds the license.
@@ -32,6 +32,6 @@ the internal network. A shared volume holds the license.
 
 | Env var | Default | Purpose |
 | --- | --- | --- |
-| `CONSOLE_ADDR` | `:8080` | Listen address |
+| `CONSOLE_ADDR` | `:5000` | Listen address |
 | `CONSOLE_ENGINE_BASE` | `http://engine:8080` | Engine control API base |
 | `CONSOLE_LICENSE_PATH` | `/license/license.json` | Shared-volume license path |
