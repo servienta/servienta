@@ -68,7 +68,7 @@ const cols = "minmax(0,1.1fr) 110px minmax(0,1.5fr) 110px 110px 70px";
         <div v-for="s in STANDS" :key="s.id" style="border-right:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:9px 12px;display:flex;align-items:center;gap:9px"
           :style="{ background: stands.includes(s.id) ? 'rgba(47,122,82,0.05)' : 'transparent', cursor: plan === 'custom' ? 'pointer' : 'default' }"
           @click="toggleStand(s.id)">
-          <span style="width:11px;height:11px;flex:none;border:1px solid"
+          <span style="width:9px;height:9px;flex:none;border:1px solid"
             :style="{ borderColor: stands.includes(s.id) ? 'var(--signal)' : 'var(--rule)', background: stands.includes(s.id) ? 'var(--signal)' : 'transparent' }"></span>
           <span class="mono" style="font-size:11.5px;white-space:nowrap" :style="{ color: stands.includes(s.id) ? 'var(--ink)' : 'var(--ink3)' }">{{ s.id }}</span>
         </div>
