@@ -1,47 +1,40 @@
 @import "tailwindcss";
 
-/* Servienta design tokens — admin/console share this system. Light-first
-   (admin default), dark via [data-theme="dark"]. Accent violet. */
+/* Servienta design v2 (admin/console). Archivo Narrow + Fragment Mono,
+   paper/ink, green signal, zero radius. Light-first, dark via [data-theme]. */
 :root {
-  --page:#fafafb; --surface:#ffffff; --bd:#e7e7ec; --bd-soft:#f1f1f5;
-  --fg:#18181d; --body:#3f3f4b; --mu:#71717f; --dim:#9a9aa6;
-  --input-bg:#ffffff; --input-bd:#d4d4dd; --hover:#fafafb; --code-bg:#fafafb;
-  --dot:#c4c4ce; --chip-bg:#f1f1f5; --chip-fg:#3f3f4b;
-  --acc:#6d4ee6; --acc-h:#8b6cff; --ok:#047857; --ok-dot:#10b981;
-  --notice-bg:rgba(16,185,129,0.07); --notice-fg:#047857;
-  --err:#dc2626; --err-bg:rgba(239,68,68,0.06); --err-bd:rgba(239,68,68,0.25);
+  --paper:#eef0f1; --band:#e6e9ea; --field:#ffffff; --plate:#14181a;
+  --ink:#14181a; --ink2:#4a5457; --ink3:#7d888b;
+  --rule:#c4cccd; --rule2:#d8dedf; --signal:#2f7a52; --alert:#a33528; --warn:#a8681f;
 }
 :root[data-theme="dark"] {
-  --page:#0e0e12; --surface:#15151b; --bd:#26262f; --bd-soft:#1c1c23;
-  --fg:#f5f5f7; --body:#d4d4dd; --mu:#a1a1ad; --dim:#71717f;
-  --input-bg:#111116; --input-bd:#33333f; --hover:#1a1a21; --code-bg:#111116;
-  --dot:#3f3f4b; --chip-bg:#26262f; --chip-fg:#d4d4dd;
-  --acc:#8b6cff; --acc-h:#a68eff; --ok:#34d399; --ok-dot:#10b981;
-  --notice-bg:rgba(16,185,129,0.08); --notice-fg:#34d399;
-  --err:#ef4444; --err-bg:rgba(239,68,68,0.08); --err-bd:rgba(239,68,68,0.3);
+  --paper:#14181a; --band:#1a1f21; --field:#0f1214; --plate:#0b0e0f;
+  --ink:#eef0f1; --ink2:#9aa5a8; --ink3:#6b7679;
+  --rule:#2c3437; --rule2:#232a2c; --signal:#5cbb87; --alert:#d97b6c; --warn:#d99a4e;
 }
 * { box-sizing:border-box; }
-body { margin:0; background:var(--page); color:var(--fg);
-  font-family:'IBM Plex Sans',ui-sans-serif,system-ui,sans-serif; -webkit-font-smoothing:antialiased; }
-.mono { font-family:'JetBrains Mono',ui-monospace,monospace; }
+input, select, button, textarea { font-family:inherit; border-radius:0; }
+body { margin:0; background:var(--paper); color:var(--ink);
+  font-family:'Archivo Narrow', ui-sans-serif, system-ui, sans-serif; -webkit-font-smoothing:antialiased; }
+.mono { font-family:'Fragment Mono', ui-monospace, monospace; }
+a { color:var(--signal); text-decoration:none; }
+a:hover { color:var(--ink); }
 
-/* Components */
-.card { border:1px solid var(--bd); border-radius:10px; background:var(--surface); }
-.label { color:var(--mu); font-family:'JetBrains Mono',monospace; font-size:10.5px;
-  letter-spacing:0.09em; text-transform:uppercase; }
-.inp { border:1px solid var(--input-bd); border-radius:7px; padding:8px 11px; font-size:13.5px;
-  background:var(--input-bg); color:var(--fg); outline:none; }
-.inp:focus { border-color:var(--acc-h); box-shadow:0 0 0 3px rgba(139,108,255,0.15); }
-.btn { border:none; background:var(--acc); color:#fff; border-radius:7px; padding:9px 18px;
-  font-size:13.5px; font-weight:500; cursor:pointer; }
-.btn:hover { background:var(--acc-h); }
+/* v2 components */
+.flabel { font-family:'Fragment Mono',monospace; font-size:10.5px; letter-spacing:0.08em;
+  text-transform:uppercase; color:var(--ink3); }
+.field { border:1px solid var(--rule); background:var(--field); color:var(--ink);
+  padding:9px 11px; font-family:'Fragment Mono',monospace; font-size:13px; outline:none; }
+.field:focus { border-color:var(--ink); }
+.btn { border:none; background:var(--ink); color:var(--paper); padding:10px 22px;
+  font-family:'Fragment Mono',monospace; font-size:11px; letter-spacing:0.08em;
+  text-transform:uppercase; cursor:pointer; }
+.btn:hover { background:var(--signal); }
 .btn:disabled { opacity:0.4; cursor:default; }
-.btn-ghost { border:1px solid var(--input-bd); background:transparent; color:var(--fg);
-  border-radius:7px; padding:9px 18px; font-size:13.5px; font-weight:500; cursor:pointer; }
-.btn-ghost:hover { border-color:var(--acc-h); color:var(--acc-h); }
-.link { color:var(--mu); cursor:pointer; }
-.link:hover { color:var(--acc-h); }
-.chip { font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:500;
-  border-radius:5px; padding:3px 8px; background:var(--chip-bg); color:var(--chip-fg); }
-a { color:var(--acc); text-decoration:none; }
-a:hover { color:var(--acc-h); }
+.btn-ghost { border:1px solid var(--ink); background:transparent; color:var(--ink); padding:10px 22px;
+  font-family:'Fragment Mono',monospace; font-size:11px; letter-spacing:0.08em; text-transform:uppercase; cursor:pointer; }
+.btn-ghost:hover { background:var(--ink); color:var(--paper); }
+.act { font-family:'Fragment Mono',monospace; font-size:11px; letter-spacing:0.06em;
+  text-transform:uppercase; color:var(--ink2); cursor:pointer; }
+.act:hover { color:var(--signal); }
+.rowh:hover { background:var(--band); }

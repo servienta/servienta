@@ -1,12 +1,10 @@
 <script setup lang="ts">
 import { RouterLink, RouterView, useRoute, useRouter } from "vue-router";
 import { api } from "./api";
-import Mark from "./components/Mark.vue";
 import ThemeToggle from "./components/ThemeToggle.vue";
 
 const route = useRoute();
 const router = useRouter();
-
 async function signOut() {
   await api("/auth/logout", { method: "POST" }).catch(() => {});
   router.push("/login");
@@ -15,32 +13,33 @@ async function signOut() {
 
 <template>
   <div style="min-height:100vh">
-    <div v-if="!route.meta.public" style="border-bottom:1px solid var(--bd);background:var(--surface)">
-      <div style="max-width:1000px;margin:0 auto;padding:0 24px;height:56px;display:flex;align-items:center;gap:28px">
-        <div style="display:flex;align-items:center;gap:9px">
-          <Mark :size="3" />
-          <span style="font-size:15px;font-weight:600;letter-spacing:-0.02em">Servienta</span>
-          <span class="mono" style="font-size:10.5px;letter-spacing:0.1em;text-transform:uppercase;color:#8b6cff;border:1px solid rgba(139,108,255,0.4);border-radius:4px;padding:2px 6px">admin</span>
+    <header v-if="!route.meta.public" style="border-bottom:1px solid var(--rule)">
+      <div style="max-width:1200px;margin:0 auto;padding:0 40px;height:58px;display:flex;align-items:center;gap:28px">
+        <div style="display:flex;align-items:baseline;gap:12px">
+          <span style="font-size:17px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase">Servienta</span>
+          <span class="mono" style="font-size:10.5px;letter-spacing:0.1em;text-transform:uppercase;color:var(--signal)">admin</span>
         </div>
-        <nav style="display:flex;gap:4px">
+        <nav class="mono" style="display:flex;gap:22px;font-size:11px;letter-spacing:0.06em;text-transform:uppercase">
           <RouterLink to="/" class="tab" active-class="tab-on">Dashboard</RouterLink>
           <RouterLink to="/customers" class="tab" active-class="tab-on">Customers</RouterLink>
           <RouterLink to="/licenses" class="tab" active-class="tab-on">Licenses</RouterLink>
         </nav>
-        <div style="margin-left:auto;display:flex;align-items:center;gap:14px">
+        <div style="margin-left:auto;display:flex;align-items:center;gap:20px">
           <ThemeToggle />
-          <span class="link" style="font-size:13.5px" @click="signOut">Sign out</span>
+          <span class="act" @click="signOut">Sign out</span>
         </div>
       </div>
-    </div>
-    <main style="max-width:1000px;margin:0 auto;padding:32px 24px 80px">
-      <RouterView />
+    </header>
+    <main style="max-width:1200px;margin:0 auto;padding:0 40px">
+      <div :style="route.meta.public ? '' : 'border-left:1px solid var(--rule);border-right:1px solid var(--rule);min-height:calc(100vh - 58px);padding:40px 48px 80px'">
+        <RouterView />
+      </div>
     </main>
   </div>
 </template>
 
 <style scoped>
-.tab { font-size:13.5px; padding:5px 11px; border-radius:6px; color:var(--mu); font-weight:400; }
-.tab:hover { color:var(--fg); }
-.tab-on { color:var(--fg); font-weight:500; background:var(--chip-bg); }
+.tab { color:var(--ink2); padding-bottom:2px; border-bottom:1px solid transparent; }
+.tab:hover { color:var(--ink); }
+.tab-on { color:var(--ink); border-bottom-color:var(--ink); }
 </style>
