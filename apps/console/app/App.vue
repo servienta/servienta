@@ -13,6 +13,15 @@ const service = ref("reference"); const run = ref("");
 const resetMsg = ref<string | null>(null);
 const license = ref<{ mode: string; stands: string[]; customer?: string; expires_at?: number; error?: string } | null>(null);
 const licenseText = ref(""); const licenseMsg = ref<string | null>(null); const uploading = ref(false);
+const view = ref<"stand" | "start">("stand");
+const apiRef: [string, string, string][] = [
+  ["GET", "/api/v1/endpoints", "Service addresses"],
+  ["GET", "/api/v1/received/{svc}", "Read recorded messages"],
+  ["PUT", "/api/v1/runs/{id}", "Declare a run (claim sources)"],
+  ["PUT", "/api/v1/responses/{svc}", "Steer a reply"],
+  ["PUT", "/api/v1/faults/receivers/{svc}", "Inject a receiver fault"],
+  ["POST", "/api/v1/reset", "Reset the instance"],
+];
 
 const grantedSet = computed(() => new Set(license.value?.stands ?? []));
 
@@ -43,6 +52,14 @@ async function removeLicense() { if (!confirm("Remove the license and revert to 
   catch (e) { licenseMsg.value = (e as Error).message; } finally { uploading.value = false; } }
 async function waitForEngine() { for (let i = 0; i < 40; i++) { await new Promise((r) => setTimeout(r, 500));
   try { await refresh(); if (engineOk.value) return; } catch {} } }
+function tabStyle(v: "stand" | "start") {
+  return {
+    color: view.value === v ? "var(--ink)" : "var(--ink2)",
+    paddingBottom: "2px",
+    borderBottom: "1px solid " + (view.value === v ? "var(--ink)" : "transparent"),
+    cursor: "pointer",
+  };
+}
 onMounted(refresh);
 </script>
 
@@ -54,6 +71,10 @@ onMounted(refresh);
           <span style="font-size:17px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase">Servienta</span>
           <span class="mono" style="font-size:10.5px;letter-spacing:0.1em;text-transform:uppercase;color:var(--signal)">console</span>
         </div>
+        <nav class="mono" style="display:flex;gap:22px;font-size:11px;letter-spacing:0.06em;text-transform:uppercase">
+          <span class="ctab" :style="tabStyle('stand')" @click="view='stand'">Stand</span>
+          <span class="ctab" :style="tabStyle('start')" @click="view='start'">Getting started</span>
+        </nav>
         <div style="margin-left:auto;display:flex;align-items:center;gap:20px">
           <ThemeToggle />
           <span class="mono" style="display:inline-flex;align-items:center;gap:8px;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;border-left:1px solid var(--rule);padding-left:20px"
@@ -67,6 +88,59 @@ onMounted(refresh);
 
     <main style="max-width:1200px;margin:0 auto;padding:0 40px">
       <div style="border-left:1px solid var(--rule);border-right:1px solid var(--rule);min-height:calc(100vh - 58px);padding:40px 48px 80px">
+        <div v-if="view === 'start'">
+          <div style="display:flex;align-items:baseline;gap:16px">
+            <span class="mono" style="font-size:12px;color:var(--signal)">§0</span>
+            <h2 style="margin:0;font-size:30px;font-weight:600;letter-spacing:-0.01em">Getting started</h2>
+            <a href="https://servienta.com/docs" target="_blank" class="mono" style="margin-left:auto;font-size:11px;color:var(--ink2)">full docs ↗</a>
+          </div>
+          <p style="margin:14px 0 0;max-width:660px;font-size:15px;line-height:1.6;color:var(--ink2)">This console manages a running engine over its versioned HTTP contract. You can drive the engine from the tabs above, or directly with <span class="mono" style="font-size:13px">curl</span> from your test suite — the calls below are exactly what this console makes.</p>
+
+          <div style="margin-top:32px">
+            <div class="flabel" style="padding-bottom:8px;border-bottom:2px solid var(--ink)">1 · Reach the engine</div>
+            <p style="margin:12px 0 0;font-size:14px;line-height:1.6;color:var(--ink2)">In this compose stack the engine is not published to your host — only this console is, on <span class="mono">:8080</span>. To curl the engine directly, run it with published ports:</p>
+            <pre class="mono" style="margin:12px 0 0;font-size:12px;line-height:2;color:var(--ink);overflow-x:auto">mkdir -p fixtures &amp;&amp; printf 'link down eth0\n' &gt; fixtures/hello.txt
+docker run --rm -p 8080:8080 -p 8081:8081 -p 9000:9000 \
+  -v "$PWD/fixtures:/fixtures:ro" ghcr.io/servienta/engine:latest</pre>
+          </div>
+
+          <div style="margin-top:36px">
+            <div class="flabel" style="padding-bottom:8px;border-bottom:2px solid var(--ink)">2 · The core loop</div>
+            <pre class="mono" style="margin:12px 0 0;font-size:12px;line-height:2;color:var(--ink);overflow-x:auto"><span style="color:var(--ink3)"># what's running, and where</span>
+curl localhost:8080/api/v1/endpoints
+
+<span style="color:var(--ink3)"># serve a mounted fixture, byte-for-byte</span>
+curl localhost:8081/hello.txt
+
+<span style="color:var(--ink3)"># send traffic, read back what arrived</span>
+echo 'hello from my app' | nc localhost 9000
+curl localhost:8080/api/v1/received/reference
+
+<span style="color:var(--ink3)"># steer a reply (licensed services), inject a fault, reset</span>
+curl -X PUT  localhost:8080/api/v1/responses/dns   -d '{"outcome":"nxdomain"}'
+curl -X PUT  localhost:8080/api/v1/faults/receivers/syslog -d '{"mode":"drop"}'
+curl -X POST localhost:8080/api/v1/reset</pre>
+          </div>
+
+          <div style="margin-top:36px">
+            <div class="flabel" style="padding-bottom:8px;border-bottom:2px solid var(--ink)">3 · Run the walkthrough</div>
+            <p style="margin:12px 0 0;font-size:14px;line-height:1.6;color:var(--ink2)">A one-file script that runs every step above against your engine and prints the result in your terminal — <span class="mono" style="font-size:13px">scripts/walkthrough.sh</span> in the repo.</p>
+            <pre class="mono" style="margin:12px 0 0;font-size:12px;line-height:2;color:var(--ink);overflow-x:auto">./scripts/walkthrough.sh</pre>
+          </div>
+
+          <div style="margin-top:36px">
+            <div class="flabel" style="padding-bottom:8px;border-bottom:2px solid var(--ink)">4 · Reference</div>
+            <div class="mono" style="margin-top:12px;display:grid;grid-template-columns:56px minmax(0,1fr) minmax(0,1fr);gap:16px;padding-bottom:8px;border-bottom:1px solid var(--rule);font-size:10.5px;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink3)"><span>Verb</span><span>Path</span><span>Purpose</span></div>
+            <div v-for="e in apiRef" :key="e[1]" class="mono" style="display:grid;grid-template-columns:56px minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:center;padding:8px 0;border-bottom:1px solid var(--rule2);font-size:11.5px">
+              <span :style="{ color: e[0]==='GET' ? 'var(--signal)' : e[0]==='DEL' ? 'var(--alert)' : e[0]==='POST' ? 'var(--ink)' : 'var(--warn)' }">{{ e[0] }}</span>
+              <span style="color:var(--ink)">{{ e[1] }}</span>
+              <span style="color:var(--ink2)">{{ e[2] }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="view === 'start'"></div>
+        <template v-else>
         <div v-if="engineOk === false" class="mono" style="margin-bottom:36px;border-left:2px solid var(--alert);background:var(--band);padding:12px 16px;font-size:11.5px;color:var(--alert)">{{ error }}</div>
 
         <section v-if="license">
@@ -158,6 +232,7 @@ onMounted(refresh);
             </div>
           </div>
         </section>
+        </template>
       </div>
     </main>
   </div>
