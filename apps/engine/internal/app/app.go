@@ -67,7 +67,6 @@ type App struct {
 	Endpoints map[string]string // service/endpoint -> host:port (R7)
 	License   LicenseStatus
 	Senders   map[string]sender.Sender // licensed senders (R13), by stand id
-	Guide     string                   // getting-started text (stdout banner + GET /)
 	cancel    context.CancelFunc
 }
 
@@ -222,15 +221,14 @@ func Start(parent context.Context, cfg Config) (*App, error) {
 		}
 	}
 
-	guide := gettingStarted(lic, endpoints)
-	ctl, err := control.New(store, endpoints, lic, activeSenders, guide).Start(ctx, cfg.ControlAddr)
+	ctl, err := control.New(store, endpoints, lic, activeSenders).Start(ctx, cfg.ControlAddr)
 	if err != nil {
 		cancel()
 		return nil, fmt.Errorf("control: %w", err)
 	}
 	endpoints["control"] = ctl.String()
 
-	return &App{Endpoints: endpoints, License: lic, Senders: activeSenders, Guide: guide, cancel: cancel}, nil
+	return &App{Endpoints: endpoints, License: lic, Senders: activeSenders, cancel: cancel}, nil
 }
 
 func (a *App) Close() { a.cancel() }

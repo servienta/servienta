@@ -15,10 +15,6 @@ export default {
       url.pathname = "/docs.html";
       return env.ASSETS.fetch(new Request(url.toString(), request));
     }
-    if (url.pathname === "/demo" || url.pathname === "/demo/") {
-      url.pathname = "/demo.html";
-      return env.ASSETS.fetch(new Request(url.toString(), request));
-    }
     return env.ASSETS.fetch(request);
   },
 } satisfies ExportedHandler<Env>;

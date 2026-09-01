@@ -9,7 +9,6 @@ import (
 	"net"
 	"net/http"
 	"os"
-	"strconv"
 	"time"
 
 	"github.com/servienta/servienta/apps/engine/internal/core"
@@ -24,11 +23,10 @@ type Server struct {
 	endpoints map[string]string
 	license   any // app.LicenseStatus, kept as any to avoid an import cycle
 	senders   map[string]sender.Sender
-	guide     string
 }
 
-func New(store *core.Store, endpoints map[string]string, licenseStatus any, senders map[string]sender.Sender, guide string) *Server {
-	return &Server{store: store, endpoints: endpoints, license: licenseStatus, senders: senders, guide: guide}
+func New(store *core.Store, endpoints map[string]string, licenseStatus any, senders map[string]sender.Sender) *Server {
+	return &Server{store: store, endpoints: endpoints, license: licenseStatus, senders: senders}
 }
 
 func (s *Server) Start(ctx context.Context, addr string) (net.Addr, error) {
@@ -55,12 +53,6 @@ func (s *Server) handler() http.Handler {
 	})
 	mux.HandleFunc("GET /api/v1/license", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusOK, s.license)
-	})
-	// A one-call self-demo: declare a run, send a line to the demo receiver,
-	// read it back, and narrate the round-trip. Lets a new user see the whole
-	// record → read → reset loop work without wiring anything up.
-	mux.HandleFunc("GET /api/v1/try", func(w http.ResponseWriter, r *http.Request) {
-		s.runTry(w)
 	})
 	// Reload re-reads the mounted license by restarting: the engine still
 	// validates the license only at startup (R12), so applying a new one means
@@ -186,16 +178,6 @@ func (s *Server) handler() http.Handler {
 			writeJSON(w, http.StatusOK, msgs)
 		}
 	})
-	// The first thing a new user curls: return the getting-started guide, not a
-	// 404. Any unmatched path falls here; only "/" gets the guide.
-	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/" {
-			writeError(w, http.StatusNotFound, "not found; see GET / for where to start")
-			return
-		}
-		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-		w.Write([]byte(s.guide))
-	})
 	mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusOK, map[string]bool{"ok": true})
 	})
@@ -210,57 +192,4 @@ func writeJSON(w http.ResponseWriter, status int, v any) {
 
 func writeError(w http.ResponseWriter, status int, msg string) {
 	writeJSON(w, status, map[string]string{"error": msg})
-}
-
-// runTry drives the reference receiver end to end and reports each step.
-func (s *Server) runTry(w http.ResponseWriter) {
-	refAddr := s.endpoints["reference"]
-	if refAddr == "" {
-		writeError(w, http.StatusServiceUnavailable, "the demo receiver is not running")
-		return
-	}
-	runID := "try-" + strconv.FormatInt(time.Now().UnixNano(), 36)
-	steps := []string{}
-
-	// 1. Declare the run, claiming the loopback source we are about to send from.
-	if err := s.store.DeclareRun(runID, []string{"127.0.0.1"}); err != nil {
-		writeJSON(w, http.StatusOK, map[string]any{
-			"ok":   false,
-			"note": "127.0.0.1 is already claimed by another run — try again once it releases, or use your own run id",
-		})
-		return
-	}
-	defer s.store.ReleaseRun(runID)
-	steps = append(steps, "declared run "+runID+", claiming source 127.0.0.1")
-
-	// 2. Send a line to the demo receiver (as your application would).
-	_, port, _ := net.SplitHostPort(refAddr)
-	conn, err := net.DialTimeout("tcp", net.JoinHostPort("127.0.0.1", port), 2*time.Second)
-	if err != nil {
-		writeError(w, http.StatusBadGateway, "could not reach the demo receiver: "+err.Error())
-		return
-	}
-	msg := "hello from the try endpoint"
-	conn.Write([]byte(msg + "\n"))
-	conn.Close()
-	steps = append(steps, "sent \""+msg+"\" to the reference receiver on "+refAddr)
-
-	// 3. Read it back, scoped to this run.
-	var got []core.Message
-	deadline := time.Now().Add(2 * time.Second)
-	for {
-		got, _ = s.store.Received("reference", runID)
-		if len(got) > 0 || time.Now().After(deadline) {
-			break
-		}
-		time.Sleep(20 * time.Millisecond)
-	}
-	steps = append(steps, "read it back at GET /api/v1/received/reference?run="+runID)
-
-	writeJSON(w, http.StatusOK, map[string]any{
-		"ok":       len(got) > 0,
-		"steps":    steps,
-		"received": got,
-		"next":     "now do it yourself: GET / shows the commands",
-	})
 }

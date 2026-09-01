@@ -5,7 +5,7 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"encoding/json"
 	"log/slog"
 	"os"
 	"os/signal"
@@ -61,6 +61,6 @@ func main() {
 		slog.Error("start", "err", err)
 		os.Exit(1)
 	}
-	fmt.Print(a.Guide) // getting-started banner; the same text is served at GET /
+	json.NewEncoder(os.Stdout).Encode(map[string]any{"endpoints": a.Endpoints})
 	<-ctx.Done()
 }
