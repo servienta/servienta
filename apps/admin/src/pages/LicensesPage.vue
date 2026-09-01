@@ -20,6 +20,13 @@ function applyPlan() { const p = planById(plan.value); if (!p) return;
   expires.value = new Date(Date.now() + p.termDays * 86400000).toISOString().slice(0, 10); }
 async function load() { rows.value = await api<LicenseRow[]>("/licenses"); }
 onMounted(() => { applyPlan(); Promise.all([load(), store.loaded ? Promise.resolve() : store.load()]).catch((e) => (error.value = e.message)); });
+function toggleStand(id: string) {
+  if (plan.value !== "custom") return;
+  const i = stands.value.indexOf(id);
+  if (i >= 0) stands.value.splice(i, 1);
+  else stands.value.push(id);
+}
+
 async function issue() { error.value = null;
   try { await api("/licenses", { method: "POST", body: JSON.stringify({ customerId: customerId.value, plan: plan.value, stands: stands.value, expiresAt: new Date(expires.value + "T00:00:00Z").getTime() }) }); await load(); }
   catch (e) { error.value = (e as Error).message; } }
@@ -58,11 +65,13 @@ const cols = "minmax(0,1.1fr) 110px minmax(0,1.5fr) 110px 110px 70px";
     <div style="margin-top:24px">
       <div class="flabel">Stands <span style="text-transform:none;letter-spacing:0" v-if="plan !== 'custom'">· set by plan</span></div>
       <div style="margin-top:10px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));border-top:1px solid var(--rule);border-left:1px solid var(--rule)">
-        <label v-for="s in STANDS" :key="s.id" style="border-right:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:9px 12px;display:flex;align-items:center;gap:9px;cursor:pointer"
-          :style="{ background: stands.includes(s.id) ? 'rgba(47,122,82,0.05)' : 'transparent' }">
-          <input v-model="stands" type="checkbox" :value="s.id" :disabled="plan !== 'custom'" style="width:9px;height:9px;accent-color:#2f7a52;margin:0" />
+        <div v-for="s in STANDS" :key="s.id" style="border-right:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:9px 12px;display:flex;align-items:center;gap:9px"
+          :style="{ background: stands.includes(s.id) ? 'rgba(47,122,82,0.05)' : 'transparent', cursor: plan === 'custom' ? 'pointer' : 'default' }"
+          @click="toggleStand(s.id)">
+          <span style="width:11px;height:11px;flex:none;border:1px solid"
+            :style="{ borderColor: stands.includes(s.id) ? 'var(--signal)' : 'var(--rule)', background: stands.includes(s.id) ? 'var(--signal)' : 'transparent' }"></span>
           <span class="mono" style="font-size:11.5px;white-space:nowrap" :style="{ color: stands.includes(s.id) ? 'var(--ink)' : 'var(--ink3)' }">{{ s.id }}</span>
-        </label>
+        </div>
       </div>
     </div>
   </div>
