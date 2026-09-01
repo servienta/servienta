@@ -10,8 +10,8 @@ with the marketing site and the admin panel (D13).
 
 | Deployable | What it is | Where |
 | --- | --- | --- |
-| **Engine** | The test-services data plane: protocol receivers, five-transport file server, versioned HTTP contract | Go + Docker compose, runs on customer/CI infrastructure |
-| **Console** | Management, settings, statistics | Vue 3 + Tailwind + Go API, one Docker service on :80, TLS at Cloudflare edge — console.servienta.com |
+| **Engine** | The test-services data plane: protocol receivers, five-transport file server, versioned HTTP contract | Go, one Docker container, runs on customer/CI infrastructure |
+| **Console** | Stand management UI | Vue 3 + Tailwind SPA built into the engine container, on :5000 (D20) |
 | **Admin** | Vendor back office: license issuance, customers, plans | Vue 3 + Hono on Cloudflare Workers + Cloudflare D1, single-user login — admin.servienta.com |
 | **Marketing site** | Public website | Static on Workers — servienta.com, www.servienta.com |
 
@@ -21,7 +21,7 @@ environment, read observations off it, and return it to a known state. The appli
 and the system it talks to are **out of scope**: the engine never polls them, never configures
 them, and never depends on them.
 
-Isolation is two-level: an **instance** (one compose project — the unit that mutations like reset
+Isolation is two-level: an **instance** (one container — the unit that mutations like reset
 and fault injection apply to) and a **run** (one test execution inside an instance, whose recorded
 traffic is read back by run id). See D3/D4 in the decision log.
 

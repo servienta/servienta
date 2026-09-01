@@ -1,5 +1,6 @@
 packages:
   - apps/*
+  - apps/servienta/webui
   - packages/*
 
 allowBuilds:

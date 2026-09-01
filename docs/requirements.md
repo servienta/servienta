@@ -39,7 +39,7 @@ console and the marketing site are separate deliverables with their own stack an
 
 Two units of isolation exist, and every requirement below uses them precisely ([D3](decisions.md)):
 
-- **Instance** — one bring-up of the harness: one compose project on one network. Mutations of
+- **Instance** — one bring-up of the harness: one container on one network. Mutations of
   shared behavior — reset (R5), fault injection (R2, R9), response controls (R8) — are
   instance-wide.
 - **Run** — one logical test execution inside an instance, identified by a caller-chosen **run id**.
@@ -133,7 +133,7 @@ serves files of at least several hundred megabytes without holding them in memor
 *Verification:* the suite fetches a small text file, a large binary file, and a deliberately
 malformed file, and compares each byte for byte against the original.
 
-**R7 — One-command startup.** A single compose invocation brings up every harness service on one
+**R7 — One-command startup.** A single `docker run` (D20) brings up every harness service on one
 network and provides a documented, machine-readable way to discover each one's address and port.
 *Verification:* on a machine holding nothing but a container runtime and this delivery, one command
 yields a harness that passes the acceptance suite for every delivered requirement.
@@ -200,7 +200,7 @@ matches what the listener answered).
 
 **N1 — Startup time.** The limit is set from measurement after phase 0, not assigned in advance. It
 must stay small enough that the harness remains usable inside an edit–run loop.
-*Verification:* the time from the compose invocation to every service reporting ready is measured on
+*Verification:* the time from the run command to every service reporting ready is measured on
 every CI run; after phase 0 the agreed limit is recorded in this file, and the suite fails when it
 is exceeded.
 
@@ -209,14 +209,14 @@ services outside the customer's control. The harness must come up on an isolated
 *Verification:* the acceptance suite passes against an instance brought up on a network with no
 external egress, with images built or loaded beforehand.
 
-**N3 — One artifact everywhere.** The same compose description works on a developer machine and in
+**N3 — One artifact everywhere.** The same image and run command work on a developer machine and in
 CI, differing only in environment parameters rather than diverging into two configurations.
-*Verification:* the byte-identical compose description is used by the developer instructions and by
+*Verification:* the byte-identical image and documented run command are used by the developer instructions and by
 CI; the suite passes in both, with differences expressed only through environment parameters.
 
 **N4 — Safe under concurrency.** Isolation is two-level ([D3](decisions.md)). *Instance level:* two
 developers on one host, or two CI jobs on one agent, run their own instances, which must not
-interfere — no hard-coded host ports, no shared mutable state outside the compose project. *Run
+interfere — no hard-coded host ports, no shared mutable state outside the container. *Run
 level:* within one instance, recording and reads are run-scoped per R4, and concurrent runs may
 generate and read traffic freely; instance-wide mutations (R2, R5, R8, R9) require the instance to
 the mutating run alone.
@@ -265,7 +265,7 @@ names the latest phase they have been verified against.
 | R4 | 0, cross-cutting | passing (phase 0 surface) | `TestRunIsolation`, `TestReferenceReceiverRoundTrip` |
 | R5 | 0, cross-cutting | passing (phase 0 surface) | `TestResetTwice` |
 | R6 | 0 | passing — opacity + streaming; large-file at CI scale | `TestFixtureByteCompareAllTransports` |
-| R7 | 0 | in progress — compose written, clean-host check pending | — |
+| R7 | 0 | in progress — single-container delivery (D20), clean-host check pending | — |
 | R8 | 3 | passing — all four services | `TestDNSResponseControl`, `TestNTPResponseControl`, `TestRADIUSResponseControl`, `TestTACACSResponseControl` |
 | R9 | 1 | passing (reference surface) | `TestReceiverModes` |
 | R10 | 0 | passing | `TestReferenceReceiverRoundTrip` |

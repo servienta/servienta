@@ -119,16 +119,23 @@
           <span>Service</span><span>Transport</span><span>Address</span><span>Licensed</span><span>State</span>
         </div>
         <div class="mono schedrow" style="display:grid;grid-template-columns:180px 130px minmax(0,1fr) 110px 90px;gap:20px;padding:9px 0;border-bottom:1px solid var(--rule2);align-items:center">
+          <span style="font-size:12.5px">console (web UI)</span>
+          <span style="font-size:11.5px;color:var(--ink2)">http</span>
+          <span style="font-size:11.5px;color:var(--ink2)">0.0.0.0:5000</span>
+          <span style="font-size:11px;color:var(--ink3)">always</span>
+          <span style="display:flex;align-items:center;gap:7px;font-size:11px;color:var(--signal)"><span style="width:6px;height:6px;background:var(--signal);display:block"></span>up</span>
+        </div>
+        <div class="mono schedrow" style="display:grid;grid-template-columns:180px 130px minmax(0,1fr) 110px 90px;gap:20px;padding:9px 0;border-bottom:1px solid var(--rule2);align-items:center">
           <span style="font-size:12.5px">control API</span>
           <span style="font-size:11.5px;color:var(--ink2)">http</span>
-          <span style="font-size:11.5px;color:var(--ink2)">0.0.0.0:8080</span>
+          <span style="font-size:11.5px;color:var(--ink2)">0.0.0.0:5001</span>
           <span style="font-size:11px;color:var(--ink3)">always</span>
           <span style="display:flex;align-items:center;gap:7px;font-size:11px;color:var(--signal)"><span style="width:6px;height:6px;background:var(--signal);display:block"></span>up</span>
         </div>
         <div class="mono schedrow" style="display:grid;grid-template-columns:180px 130px minmax(0,1fr) 110px 90px;gap:20px;padding:9px 0;border-bottom:1px solid var(--rule2);align-items:center">
           <span style="font-size:12.5px">files</span>
           <span style="font-size:11.5px;color:var(--ink2)">http</span>
-          <span style="font-size:11.5px;color:var(--ink2)">0.0.0.0:8081</span>
+          <span style="font-size:11.5px;color:var(--ink2)">0.0.0.0:8080</span>
           <span style="font-size:11px;color:var(--ink3)">http</span>
           <span style="display:flex;align-items:center;gap:7px;font-size:11px;color:var(--signal)"><span style="width:6px;height:6px;background:var(--signal);display:block"></span>up</span>
         </div>
@@ -184,7 +191,7 @@
         <div class="mono schedrow" style="display:grid;grid-template-columns:180px 130px minmax(0,1fr) 110px 90px;gap:20px;padding:9px 0;border-bottom:1px solid var(--rule2);align-items:center">
           <span style="font-size:12.5px">dns</span>
           <span style="font-size:11.5px;color:var(--ink2)">udp</span>
-          <span style="font-size:11.5px;color:var(--ink2)">udp 0.0.0.0:5353</span>
+          <span style="font-size:11.5px;color:var(--ink2)">udp 0.0.0.0:15353</span>
           <span style="font-size:11px;color:var(--ink3)">dns</span>
           <span style="display:flex;align-items:center;gap:7px;font-size:11px;color:var(--signal)"><span style="width:6px;height:6px;background:var(--signal);display:block"></span>up</span>
         </div>
@@ -216,7 +223,7 @@
         <div style="display:grid;grid-template-columns:52px 280px minmax(0,1fr);gap:32px;padding:22px 0;border-top:1px solid var(--rule);align-items:start">
           <span class="mono" style="font-size:26px;color:var(--rule);line-height:1">01</span>
           <h3 style="margin:0;font-size:23px;font-weight:600;letter-spacing:-0.01em;line-height:1.15">One command up</h3>
-          <p style="margin:0;font-size:16px;line-height:1.6;color:var(--ink2);max-width:620px">A single compose invocation brings up every endpoint on one network — on a laptop, a CI agent, or an isolated host with no internet at all.</p>
+          <p style="margin:0;font-size:16px;line-height:1.6;color:var(--ink2);max-width:620px">A single <span class="mono" style="font-size:14px">docker run</span> brings up every endpoint and the management console in one container — on a laptop, a CI agent, or an isolated host with no internet at all.</p>
         </div>
         <div style="display:grid;grid-template-columns:52px 280px minmax(0,1fr);gap:32px;padding:22px 0;border-top:1px solid var(--rule);align-items:start">
           <span class="mono" style="font-size:26px;color:var(--rule);line-height:1">02</span>
@@ -330,7 +337,7 @@
       <div style="display:flex;align-items:baseline;gap:16px">
         <span class="mono" style="font-size:12px;color:var(--signal)">§4</span>
         <h2 style="margin:0;font-size:34px;font-weight:600;letter-spacing:-0.01em">Run it</h2>
-        <span class="mono" style="margin-left:auto;font-size:11px;color:var(--ink3)">ghcr.io/servienta/engine:latest</span>
+        <span class="mono" style="margin-left:auto;font-size:11px;color:var(--ink3)">ghcr.io/servienta/servienta:latest</span>
       </div>
       <p style="margin:14px 0 0;max-width:640px;font-size:16px;line-height:1.6;color:var(--ink2)">One container, no dependencies, works offline. Pull the image, mount a directory of files to serve, and go.</p>
       <div style="margin-top:32px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:48px">
@@ -339,14 +346,14 @@
             <span class="mono" style="font-size:10.5px;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink3)">A · bring it up</span>
             <button class="mono copyBtn" data-target="cmdUp" style="font-size:10.5px;color:var(--ink2);cursor:pointer;background:none;border:none">copy</button>
           </div>
-          <pre id="cmdUp" class="mono" style="margin:14px 0 0;font-size:12px;line-height:2;color:var(--ink);overflow-x:auto">docker pull ghcr.io/servienta/engine:latest
+          <pre id="cmdUp" class="mono" style="margin:14px 0 0;font-size:12px;line-height:2;color:var(--ink);overflow-x:auto">docker pull ghcr.io/servienta/servienta:latest
 
 mkdir -p fixtures &amp;&amp; echo hello &gt; fixtures/hello.txt
 
 docker run --rm \
-  -p 8080:8080 -p 8081:8081 -p 9000:9000 \
+  -p 5000:5000 -p 5001:5001 -p 8080:8080 -p 9000:9000 \
   -v "$PWD/fixtures:/fixtures:ro" \
-  ghcr.io/servienta/engine:latest</pre>
+  ghcr.io/servienta/servienta:latest</pre>
         </div>
         <div style="min-width:0">
           <div style="display:flex;align-items:baseline;justify-content:space-between;padding-bottom:8px;border-bottom:2px solid var(--ink)">
@@ -354,19 +361,19 @@ docker run --rm \
             <button class="mono copyBtn" data-target="cmdRun" style="font-size:10.5px;color:var(--ink2);cursor:pointer;background:none;border:none">copy</button>
           </div>
           <pre id="cmdRun" class="mono" style="margin:14px 0 0;font-size:12px;line-height:2;color:var(--ink);overflow-x:auto"><span style="color:var(--ink3)"># where is everything?</span>
-curl http://localhost:8080/api/v1/endpoints
+curl http://localhost:5001/api/v1/endpoints
 
 <span style="color:var(--ink3)"># serves your fixtures byte-for-byte</span>
-curl http://localhost:8081/hello.txt
+curl http://localhost:8080/hello.txt
 
 <span style="color:var(--ink3)"># declare a run, send traffic, read it back</span>
-curl -X PUT http://localhost:8080/api/v1/runs/run-1 \
+curl -X PUT http://localhost:5001/api/v1/runs/run-1 \
   -d '{"sources": ["172.17.0.1"]}'
 echo 'hello from my app' | nc localhost 9000
-curl 'http://localhost:8080/api/v1/received/reference?run=run-1'
+curl 'http://localhost:5001/api/v1/received/reference?run=run-1'
 
 <span style="color:var(--ink3)"># return to a known state</span>
-curl -X POST http://localhost:8080/api/v1/reset</pre>
+curl -X POST http://localhost:5001/api/v1/reset</pre>
         </div>
       </div>
       <div style="margin-top:40px;border-top:1px solid var(--rule);padding-top:20px;display:grid;grid-template-columns:180px minmax(0,1fr);gap:32px">

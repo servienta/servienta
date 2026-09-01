@@ -12,7 +12,7 @@ observations no test reads is infrastructure without an owner.
 
 | Phase | Contents | What it unblocks | Status |
 | --- | --- | --- | --- |
-| 0 | R5 (reset), R7 (compose), R1 and R6 (file server), R4 (recording core: `/received`, run declarations), R10 (receiver interface, reference receiver), R11 (contract) | Reproducible runs; import verification; extensibility from the start | **in progress** |
+| 0 | R5 (reset), R7 (one-command startup), R1 and R6 (file server), R4 (recording core: `/received`, run declarations), R10 (receiver interface, reference receiver), R11 (contract) | Reproducible runs; import verification; extensibility from the start | **in progress** |
 | 1 | R2 and R9 (fault injection on both sides) | Verification of error paths | in progress — HTTP + reference surface |
 | 2 | R3.1 and R3.2 (syslog, SNMP traps) | First checks of outbound integrations | in progress — syslog UDP/TCP/RELP + SNMP v2c passing |
 | 3 | R3.3–R3.6 with R8 (RADIUS, TACACS+, DNS, NTP) | Authentication and system-settings screens, failures included | passing — all four + R8 |
@@ -53,7 +53,7 @@ Phase 0 does not start until its inputs are closed:
 | --- | --- | --- |
 | D1 — control-layer runtime | contractor proposes, customer approves | decided 2026-08-31, revised by D6 — Go, see [decisions.md](decisions.md) |
 | Fixture tree available to mount | vendor | closed — [fixture-tree.md](fixture-tree.md) |
-| Acceptance suite in executable form | vendor | closed — [acceptance-suite.md](acceptance-suite.md), `apps/engine/acceptance/` |
+| Acceptance suite in executable form | vendor | closed — [acceptance-suite.md](acceptance-suite.md), `apps/servienta/acceptance/` |
 | Protocol parameters (ports, credentials, community, USM, topics) | vendor | closed — [protocol-parameters.md](protocol-parameters.md) |
 
 The last three rows are the "what the customer provides" list from the requirements. Without the

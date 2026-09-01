@@ -51,7 +51,7 @@ These reply, and you steer the reply. Each records the request too. See
 - **ntp** — time sync; records `{request:true}`
 
 ## kafka — service `kafka`
-An in-process broker. Produce to the `servienta` topic; the engine records each
+An in-process broker. Produce to the `servienta` topic; Servienta records each
 message.
 ```
 content: { "topic":"servienta", "key":"...", "value":"..." }
@@ -67,7 +67,7 @@ content: { "obs_domain_id": 1, "fields": { "sourceIPv4Address":"1.2.3.4", ... } 
 ## Reading back
 
 ```bash
-curl 'http://localhost:8080/api/v1/received/syslog?run=run-1'
+curl 'http://localhost:5001/api/v1/received/syslog?run=run-1'
 ```
 - Omit `?run=` to read everything (attributed or not).
 - An unknown service is `404`, not an empty list (a stopped or unlicensed

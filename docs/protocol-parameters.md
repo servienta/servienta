@@ -17,8 +17,9 @@ never be mistaken for a real one.**
 
 | Service | Parameter | Env var | Default |
 | --- | --- | --- | --- |
-| Control API | listen address | `SERVIENTA_CONTROL_ADDR` | `:8080` |
-| Files: HTTP | listen address | `SERVIENTA_FILES_HTTP_ADDR` | `:8081` |
+| Control API | listen address | `SERVIENTA_CONTROL_ADDR` | `:5001` |
+| Console (web UI) | listen address | `SERVIENTA_UI_ADDR` | `:5000` |
+| Files: HTTP | listen address | `SERVIENTA_FILES_HTTP_ADDR` | `:8080` |
 | Files: HTTPS | listen address / cert | `SERVIENTA_FILES_HTTPS_ADDR` | `:8443`, self-signed throwaway cert generated at startup |
 | Files: HTTPS, FTP, SCP | username / password | `SERVIENTA_FILES_USER` / `SERVIENTA_FILES_PASSWORD` | `servienta` / `throwaway-not-a-secret` |
 | Files: FTP | listen address | `SERVIENTA_FILES_FTP_ADDR` | `:2121` |
@@ -33,9 +34,9 @@ never be mistaken for a real one.**
 | SNMP traps | USM users (built in, not env-configured) | — | `usm-md5-des`, `usm-md5-aes`, `usm-sha-des`, `usm-sha-aes`; auth pass `throwaway-auth`, priv pass `throwaway-priv` |
 | RADIUS | shared secret | `SERVIENTA_RADIUS_SECRET` | `throwaway-radius` |
 | TACACS+ | shared secret | `SERVIENTA_TACACS_SECRET` | `throwaway-tacacs` |
-| DNS / NTP | listen addresses | `SERVIENTA_DNS_ADDR` / `SERVIENTA_NTP_ADDR` | `:5353/udp` / `:1123/udp` |
+| DNS / NTP | listen addresses | `SERVIENTA_DNS_ADDR` / `SERVIENTA_NTP_ADDR` | `:15353/udp` / `:1123/udp` |
 | Kafka | listen address / default topic | `SERVIENTA_KAFKA_ADDR` / topic | `:9092` / any (recorded per topic) |
 | IPFIX | collector address | `SERVIENTA_IPFIX_ADDR` | `:4739/udp` |
 
-In-container ports are fixed (above); **host ports are never fixed** (N4) — compose publishes them
+In-container ports are fixed (above); **host ports are never fixed** (N4) — `docker run -p` publishes them
 ephemerally, and `GET /api/v1/endpoints` reports the live address of every service (R7).

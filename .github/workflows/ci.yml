@@ -2,22 +2,25 @@ name: CI
 on:
   push:
     branches: [main]
-    paths: ["apps/engine/**", "apps/console/**", ".github/workflows/ci.yml"]
+    paths: ["apps/servienta/**", "docs/guide/**", "scripts/**", ".github/workflows/ci.yml", ".dockerignore"]
   pull_request:
-    paths: ["apps/engine/**", "apps/console/**"]
+    paths: ["apps/servienta/**", "docs/guide/**", "scripts/**"]
 
 jobs:
   engine:
     runs-on: ubuntu-latest
-    defaults: { run: { working-directory: apps/engine } }
+    defaults: { run: { working-directory: apps/servienta } }
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
-        with: { go-version-file: apps/engine/go.mod }
+        with: { go-version-file: apps/servienta/go.mod }
       - run: go vet ./...
       - run: go test ./... -count=1
 
-  engine-image:
+  # The single delivered image (D20): engine + embedded UI + user guide.
+  # Build context is the repo root — the SPA build imports docs/guide and
+  # scripts/walkthrough.sh from outside apps/servienta.
+  image:
     needs: engine
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
@@ -28,23 +31,14 @@ jobs:
       - uses: actions/checkout@v4
       - run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
       - run: |
-          docker build             -t ghcr.io/servienta/engine:latest             -t ghcr.io/servienta/engine:${{ github.sha }}             apps/engine
-      - run: docker push --all-tags ghcr.io/servienta/engine
-      - name: Build and push console
-        run: |
           docker build \
-            -t ghcr.io/servienta/console:latest \
-            -t ghcr.io/servienta/console:${{ github.sha }} \
-            -f apps/console/Dockerfile .
-          docker push --all-tags ghcr.io/servienta/console
-      # Registry retention: keep the 5 newest versions of each image.
+            -t ghcr.io/servienta/servienta:latest \
+            -t ghcr.io/servienta/servienta:${{ github.sha }} \
+            -f apps/servienta/Dockerfile .
+          docker push --all-tags ghcr.io/servienta/servienta
+      # Registry retention: keep the 5 newest versions.
       - uses: actions/delete-package-versions@v5
         with:
-          package-name: engine
-          package-type: container
-          min-versions-to-keep: 5
-      - uses: actions/delete-package-versions@v5
-        with:
-          package-name: console
+          package-name: servienta
           package-type: container
           min-versions-to-keep: 5

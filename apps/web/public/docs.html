@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Servienta — Docs</title>
-  <meta name="description" content="How to use Servienta: run the engine, record and read traffic, inject faults, steer replies, and apply a license." />
+  <meta name="description" content="How to use Servienta: run Servienta, record and read traffic, inject faults, steer replies, and apply a license." />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -53,43 +53,43 @@
           <h1 style="margin:0;font-size:40px;font-weight:600;letter-spacing:-0.015em">What it is</h1>
         </div>
         <p style="margin:18px 0 0;max-width:660px;font-size:16px;line-height:1.65;color:var(--ink2)">Servienta gives your test suite a controlled instance of the network services your application talks to — a file server on five transports and receivers for syslog, SNMP traps, RADIUS, TACACS+, DNS, NTP, Kafka, and IPFIX. Bring it up with one command, generate traffic, read back exactly what arrived, inject faults, and reset — reproducibly, offline.</p>
-        <p style="margin:14px 0 0;max-width:660px;font-size:14px;line-height:1.65;color:var(--ink3)">The application under test is out of scope: the engine never reaches into it. It only accepts, serves, and reports what it observed.</p>
+        <p style="margin:14px 0 0;max-width:660px;font-size:14px;line-height:1.65;color:var(--ink3)">The application under test is out of scope: Servienta never reaches into it. It only accepts, serves, and reports what it observed.</p>
       </section>
 
       <section id="concepts">
         <div style="display:flex;align-items:baseline;gap:16px"><span class="mono" style="font-size:12px;color:var(--signal)">§1</span><h2 style="margin:0;font-size:26px;font-weight:600">Core concepts</h2></div>
         <div style="margin-top:20px">
-          <div style="display:grid;grid-template-columns:160px minmax(0,1fr);gap:24px;padding:14px 0;border-top:1px solid var(--rule)"><div class="mono" style="font-size:12.5px;color:var(--ink)">Instance</div><div style="font-size:14.5px;line-height:1.65;color:var(--ink2)">One bring-up of the engine. Mutations — reset, faults, response controls — are instance-wide.</div></div>
+          <div style="display:grid;grid-template-columns:160px minmax(0,1fr);gap:24px;padding:14px 0;border-top:1px solid var(--rule)"><div class="mono" style="font-size:12.5px;color:var(--ink)">Instance</div><div style="font-size:14.5px;line-height:1.65;color:var(--ink2)">One bring-up of Servienta. Mutations — reset, faults, response controls — are instance-wide.</div></div>
           <div style="display:grid;grid-template-columns:160px minmax(0,1fr);gap:24px;padding:14px 0;border-top:1px solid var(--rule)"><div class="mono" style="font-size:12.5px;color:var(--ink)">Run</div><div style="font-size:14.5px;line-height:1.65;color:var(--ink2)">One test execution inside an instance, identified by a run id you choose. Messages are read back per run.</div></div>
-          <div style="display:grid;grid-template-columns:160px minmax(0,1fr);gap:24px;padding:14px 0;border-top:1px solid var(--rule)"><div class="mono" style="font-size:12.5px;color:var(--ink)">Source claim</div><div style="font-size:14.5px;line-height:1.65;color:var(--ink2)">A run declares the source addresses whose traffic belongs to it. The engine attributes each message to a run by source — so two runs share one instance without reading each other's traffic.</div></div>
+          <div style="display:grid;grid-template-columns:160px minmax(0,1fr);gap:24px;padding:14px 0;border-top:1px solid var(--rule)"><div class="mono" style="font-size:12.5px;color:var(--ink)">Source claim</div><div style="font-size:14.5px;line-height:1.65;color:var(--ink2)">A run declares the source addresses whose traffic belongs to it. Servienta attributes each message to a run by source — so two runs share one instance without reading each other's traffic.</div></div>
           <div style="display:grid;grid-template-columns:160px minmax(0,1fr);gap:24px;padding:14px 0;border-top:1px solid var(--rule)"><div class="mono" style="font-size:12.5px;color:var(--ink)">Stand</div><div style="font-size:14.5px;line-height:1.65;color:var(--ink2)">One licensable service. The free image runs the file server (HTTP) and a demo receiver; a license unlocks the rest.</div></div>
         </div>
       </section>
 
       <section id="quickstart">
         <div style="display:flex;align-items:baseline;gap:16px"><span class="mono" style="font-size:12px;color:var(--signal)">§2</span><h2 style="margin:0;font-size:26px;font-weight:600">Quickstart</h2></div>
-        <p style="margin:12px 0 0;font-size:15px;line-height:1.65;color:var(--ink2)">Run the engine, serve a file, record a message, read it back, reset. Free image, no license.</p>
-        <pre class="mono" style="margin:18px 0 0;border-top:2px solid var(--ink);padding-top:16px;font-size:12px;line-height:2;color:var(--ink);overflow-x:auto">docker pull ghcr.io/servienta/engine:latest
+        <p style="margin:12px 0 0;font-size:15px;line-height:1.65;color:var(--ink2)">Run Servienta, serve a file, record a message, read it back, reset. Free image, no license.</p>
+        <pre class="mono" style="margin:18px 0 0;border-top:2px solid var(--ink);padding-top:16px;font-size:12px;line-height:2;color:var(--ink);overflow-x:auto">docker pull ghcr.io/servienta/servienta:latest
 mkdir -p fixtures &amp;&amp; echo hello &gt; fixtures/hello.txt
 
-docker run --rm -p 8080:8080 -p 8081:8081 -p 9000:9000 \
-  -v "$PWD/fixtures:/fixtures:ro" ghcr.io/servienta/engine:latest
+docker run --rm -p 5000:5000 -p 5001:5001 -p 8080:8080 -p 9000:9000 \
+  -v "$PWD/fixtures:/fixtures:ro" ghcr.io/servienta/servienta:latest
 
 <span style="color:var(--ink3)"># discover endpoints, serve a fixture byte-for-byte</span>
-curl http://localhost:8080/api/v1/endpoints
-curl http://localhost:8081/hello.txt
+curl http://localhost:5001/api/v1/endpoints
+curl http://localhost:8080/hello.txt
 
 <span style="color:var(--ink3)"># declare a run, send traffic, read it back</span>
-curl -X PUT http://localhost:8080/api/v1/runs/run-1 -d '{"sources":["172.17.0.1"]}'
+curl -X PUT http://localhost:5001/api/v1/runs/run-1 -d '{"sources":["172.17.0.1"]}'
 echo 'hello from my app' | nc localhost 9000
-curl 'http://localhost:8080/api/v1/received/reference?run=run-1'
+curl 'http://localhost:5001/api/v1/received/reference?run=run-1'
 
 <span style="color:var(--ink3)"># reset to a known state</span>
-curl -X POST http://localhost:8080/api/v1/reset</pre>
+curl -X POST http://localhost:5001/api/v1/reset</pre>
         <div style="margin-top:16px;border-left:2px solid var(--signal);padding:10px 16px;background:var(--band)">
-          <p style="margin:0;font-size:14px;line-height:1.65;color:var(--ink2)">Your app can't put a run id inside a raw syslog packet, so a run <em style="color:var(--ink);font-style:normal;font-weight:600">claims the source addresses</em> its traffic comes from. The engine attributes each message to a run by source; one source belongs to one active run.</p>
+          <p style="margin:0;font-size:14px;line-height:1.65;color:var(--ink2)">Your app can't put a run id inside a raw syslog packet, so a run <em style="color:var(--ink);font-style:normal;font-weight:600">claims the source addresses</em> its traffic comes from. Servienta attributes each message to a run by source; one source belongs to one active run.</p>
         </div>
-        <p style="margin:16px 0 0;font-size:15px;line-height:1.65;color:var(--ink2)">The fixture tree is your host directory, mounted read-only — folders map to URL paths, edits are visible immediately, the engine serves bytes as they are and never writes into it. Air-gapped host? Move the image as a file: <span class="mono" style="font-size:13px">docker save</span> → <span class="mono" style="font-size:13px">docker load</span>. Two instances on one machine? In-container ports are fixed, host ports are yours — remap the second one.</p>
+        <p style="margin:16px 0 0;font-size:15px;line-height:1.65;color:var(--ink2)">The fixture tree is your host directory, mounted read-only — folders map to URL paths, edits are visible immediately, Servienta serves bytes as they are and never writes into it. Air-gapped host? Move the image as a file: <span class="mono" style="font-size:13px">docker save</span> → <span class="mono" style="font-size:13px">docker load</span>. Two instances on one machine? In-container ports are fixed, host ports are yours — remap the second one.</p>
       </section>
 
       <section id="receivers">
@@ -130,7 +130,7 @@ curl -X PUT .../api/v1/faults/receivers/syslog -d '{"mode":"drop"}'</pre>
         <div style="display:flex;align-items:baseline;gap:16px"><span class="mono" style="font-size:12px;color:var(--signal)">§6</span><h2 style="margin:0;font-size:26px;font-weight:600">Licensing</h2></div>
         <p style="margin:12px 0 0;max-width:660px;font-size:15px;line-height:1.65;color:var(--ink2)">A license enables a set of stands. It is an Ed25519-signed file, validated at startup, fully offline. The free image runs the file server and a demo receiver; the service receivers unlock with a license — Files, Standard, Enterprise, or a custom stand set.</p>
         <pre class="mono" style="margin:18px 0 0;border-top:2px solid var(--ink);padding-top:16px;font-size:12px;line-height:2;color:var(--ink);overflow-x:auto"><span style="color:var(--ink3)"># mount a license and start</span>
-SERVIENTA_LICENSE=./license.json docker compose up -d
+curl -X PUT http://localhost:5001/api/v1/license -d @license.json
 
 <span style="color:var(--ink3)"># or paste it in the console: License section -&gt; Apply a license</span></pre>
         <p style="margin:14px 0 0;max-width:660px;font-size:13.5px;line-height:1.7;color:var(--ink3)">Offline licensing of self-hosted software is compliance clarity, not DRM: it makes what is enabled signed and verifiable, and prevents forgery. Every shipped credential is throwaway and documented as such.</p>

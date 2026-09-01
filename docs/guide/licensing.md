@@ -7,12 +7,12 @@ updated: 2026-09-01
 # Licensing
 
 A license enables a set of **stands** (file transports and receivers). It is an
-Ed25519-signed file, validated by the engine at startup, fully offline — no
+Ed25519-signed file, validated by Servienta at startup, fully offline — no
 network, no phone-home.
 
 ## Free vs licensed
 
-- **Free** — no license file. The engine runs the **HTTP file server** and the
+- **Free** — no license file. Servienta runs the **HTTP file server** and the
   **demo receiver**. Enough to try Servienta and to verify file imports.
 - **Licensed** — the mounted license enables exactly its stands: any of the five
   file transports and any of the service receivers (syslog, snmp-traps, radius,
@@ -29,32 +29,41 @@ JSON with `payload_b64` and `signature`.
 
 ## Applying a license
 
-Two ways, both offline:
+Three ways, all offline:
 
-### A. Mount the file and start
-Put the license next to your compose file and mount it:
+### A. Through the contract
 ```bash
-SERVIENTA_LICENSE=./license.json docker compose up -d
+curl -X PUT http://localhost:5001/api/v1/license -d @license.json
 ```
-The engine reads `/license.json` (or `SERVIENTA_LICENSE`) at startup, verifies
-signature and expiry, and enables the licensed stands.
+Servienta stores the file and restarts in place; the signature is verified at
+that startup — the endpoint grants no signing power. `DELETE /api/v1/license`
+reverts to free mode. The stored license lives inside the container: it
+survives `docker restart`, and is simply re-applied after a `docker run --rm`
+recreation.
 
 ### B. From the console
 Open the console (http://localhost:5000), **License** card → **Apply a
-license**, paste the file, **Apply**. The console writes it to a shared volume
-and restarts the engine to pick it up. **Remove license** reverts to free.
+license**, paste the file, **Apply** — the console makes exactly the call
+above. **Remove license** reverts to free.
 
-## What the engine checks
+### C. Mount the file and start
+```bash
+docker run … -v "$PWD/license.json:/license.json:ro" ghcr.io/servienta/servienta:latest
+```
+Servienta reads `/license.json` (or `SERVIENTA_LICENSE`) at startup, verifies
+signature and expiry, and enables the licensed stands.
+
+## What Servienta checks
 
 - **Signature** — against the embedded public key. A tampered or wrongly-signed
   file is refused.
 - **Expiry** — a past `exp` is refused.
-- On refusal the engine runs **free mode and reports the error** in
+- On refusal Servienta runs **free mode and reports the error** in
   `GET /api/v1/license` — never a silent partial start.
 
 ## Honest limits
 
-The engine is source-available and runs offline, so the license mechanism is for
+Servienta is source-available and runs offline, so the license mechanism is for
 **compliance clarity, not DRM**: it makes "what is enabled" signed and
 verifiable, and prevents third-party forgery, but it cannot stop a determined
 licensee from patching an open binary. Instance counts are a contract matter,

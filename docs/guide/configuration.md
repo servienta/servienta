@@ -4,18 +4,19 @@ type: guide
 updated: 2026-09-01
 ---
 
-# Engine configuration
+# Configuration
 
 Every setting is an environment variable with a documented default. In-container
-ports are fixed; host ports are yours to map (compose assigns them, and
+ports are fixed; host ports are yours to map (`docker run -p` assigns them, and
 `GET /api/v1/endpoints` reports the live addresses).
 
 ## Addresses
 
 | Variable | Default | Service |
 | --- | --- | --- |
-| `SERVIENTA_CONTROL_ADDR` | `:8080` | Control API |
-| `SERVIENTA_FILES_HTTP_ADDR` | `:8081` | Files: HTTP |
+| `SERVIENTA_CONTROL_ADDR` | `:5001` | Control API (the contract) |
+| `SERVIENTA_UI_ADDR` | `:5000` | Management console; empty disables it |
+| `SERVIENTA_FILES_HTTP_ADDR` | `:8080` | Files: HTTP |
 | `SERVIENTA_FILES_HTTPS_ADDR` | `:8443` | Files: HTTPS |
 | `SERVIENTA_FILES_FTP_ADDR` | `:2121` | Files: FTP |
 | `SERVIENTA_FILES_TFTP_ADDR` | `:6969` | Files: TFTP |
@@ -27,7 +28,7 @@ ports are fixed; host ports are yours to map (compose assigns them, and
 | `SERVIENTA_SNMP_ADDR` | `:1162` | SNMP traps |
 | `SERVIENTA_RADIUS_ADDR` | `:1812` | RADIUS |
 | `SERVIENTA_TACACS_ADDR` | `:49` | TACACS+ |
-| `SERVIENTA_DNS_ADDR` | `:5353` | DNS |
+| `SERVIENTA_DNS_ADDR` | `:15353` | DNS |
 | `SERVIENTA_NTP_ADDR` | `:1123` | NTP |
 | `SERVIENTA_KAFKA_ADDR` | `:9092` | Kafka |
 | `SERVIENTA_IPFIX_ADDR` | `:4739` | IPFIX |

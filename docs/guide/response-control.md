@@ -7,13 +7,13 @@ updated: 2026-09-01
 # Response control
 
 For the request-response services (RADIUS, TACACS+, DNS, NTP) you set, for the
-run, exactly what the engine answers. The default for every service is a
+run, exactly what Servienta answers. The default for every service is a
 successful, valid reply. Controls are instance-wide and lifted by
 `POST /api/v1/reset`.
 
 Set a control:
 ```bash
-curl -X PUT http://localhost:8080/api/v1/responses/<service> -d '<spec>'
+curl -X PUT http://localhost:5001/api/v1/responses/<service> -d '<spec>'
 ```
 Clear it (restore default): `PUT .../responses/<service> -d '{}'`.
 

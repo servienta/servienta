@@ -5,17 +5,18 @@ file wins.
 
 ## What is being built
 
-Servienta — a provider of testing services. Four deployables (D7, details in
+Servienta — a provider of testing services. Three deployables (D7 as amended by D20, details in
 [docs/stack.md](docs/stack.md)):
 
 - **Engine** — the data plane: protocol receivers, five-transport file server, versioned HTTP
-  contract. Go, Docker compose, runs on customer/CI infrastructure, operable with no internet (N2).
+  contract, embedded management console. Go, one Docker container, runs on customer/CI
+  infrastructure, operable with no internet (N2).
   Scope: [docs/requirements.md](docs/requirements.md). All protocols, Kafka and FTP included, are
-  simulated in-process (D6, D12) — the engine is the delivery's only container.
-- **Console** — management, settings, statistics. One Go service in Docker on the vendor host,
-  listening on :80 (TLS at Cloudflare's edge); serves the Vue 3 + Tailwind SPA and the REST API.
-  SQLite now, Postgres later (D9 as amended by D11). console.servienta.com. Talks to engines only
-  through the versioned engine contract — it is the contract's first client.
+  simulated in-process (D6, D12) — the delivery is exactly one container (D20).
+- **Console** — the management UI, built into the engine container (D20): the engine serves the
+  Vue 3 + Tailwind SPA and the embedded user guide on :5000; the contract stays on :5001. The SPA
+  is a browser client of the contract — it can do nothing a test suite cannot. Stateless. There is
+  no vendor-hosted console and no console.servienta.com.
 - **Admin** — vendor back office (license issuance per D10, customers, plans). Its own Workers
   app at admin.servienta.com: Vue 3 SPA + Hono API + Cloudflare D1 (D13); single-user
   email+password auth with session cookies and email reset (D14).
@@ -90,7 +91,12 @@ written until the phase 0 inputs are closed.
 Decided: D1→D6 (engine runtime: Go), D3 (concurrency model), D4 (source-claim attribution), D5 (R4
 core in phase 0), D7 (topology, domains, free-first), D8 (console/site stack), D9 (data-layer
 portability), D10 (licensing: offline signed license, Free edition, R12), D11 (console and admin in
-Docker on the vendor host; SQLite → Postgres), D12 (Kafka simulated in-process by kfake — the
-engine is the only delivered container), D13 (implementation starts with the marketing site and
-the admin panel on Cloudflare), D14 (admin auth: single-user email+password). Outstanding phase 0 inputs: the fixture tree, the executable acceptance
+Docker on the vendor host; SQLite → Postgres — console hosting superseded by D20), D12 (Kafka
+simulated in-process by kfake — no infrastructure containers in the delivery), D13 (implementation
+starts with the marketing site and the admin panel on Cloudflare), D14 (admin auth: single-user
+email+password), D15→D18 (license = stand list; Free = files-http; pricing tiers; active send,
+R13), D19 (stand ports 1:1 — superseded by D20's layout), D20 (delivery is ONE Docker container,
+`ghcr.io/servienta/servienta`, console and guide built in: console :5000, contract :5001,
+files-http :8080, dns :15353; no compose, no vendor-hosted
+console). Outstanding phase 0 inputs: the fixture tree, the executable acceptance
 suite, the protocol parameters — see `docs/roadmap.md` → "Before phase 0 starts".

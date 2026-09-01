@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
-# Servienta walkthrough — run this against a running engine to see what it does.
+# Servienta walkthrough — run this against a running Servienta to see what it does.
 #
-#   1. start the engine (free image is enough):
+#   1. start Servienta (free image is enough):
 #        mkdir -p fixtures && printf 'link down eth0\n' > fixtures/hello.txt
-#        docker run --rm -p 8080:8080 -p 8081:8081 -p 9000:9000 \
-#          -v "$PWD/fixtures:/fixtures:ro" ghcr.io/servienta/engine:latest
+#        docker run --rm -p 5001:5001 -p 8080:8080 -p 9000:9000 \
+#          -v "$PWD/fixtures:/fixtures:ro" ghcr.io/servienta/servienta:latest
 #   2. in another terminal:
 #        ./walkthrough.sh   (this file — save it anywhere, chmod +x)
 #
 # Override hosts if you mapped different ports: API=host:port FILES=host:port REF=port
 set -euo pipefail
-API="${API:-localhost:8080}"; FILES="${FILES:-localhost:8081}"; REF="${REF:-9000}"
+API="${API:-localhost:5001}"; FILES="${FILES:-localhost:8080}"; REF="${REF:-9000}"
 
 G='\033[1;32m'; C='\033[36m'; D='\033[2m'; R='\033[0m'
 say(){ printf "\n${G}# %s${R}\n" "$*"; }
@@ -18,7 +18,7 @@ do_(){ printf "${C}\$ %s${R}\n" "$*"; eval "$*"; echo; }
 
 command -v curl >/dev/null || { echo "curl is required"; exit 1; }
 curl -sf "http://$API/api/v1/version" >/dev/null 2>&1 || {
-  printf "${R}engine not reachable at %s — start it first (see the header of this script)\n" "$API"; exit 1; }
+  printf "${R}Servienta not reachable at %s — start it first (see the header of this script)\n" "$API"; exit 1; }
 
 say "1 · what's running, and where  (host ports are whatever you mapped)"
 do_ "curl -s http://$API/api/v1/endpoints"

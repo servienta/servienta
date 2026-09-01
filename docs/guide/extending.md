@@ -7,7 +7,7 @@ updated: 2026-09-01
 # Adding a receiver (R10)
 
 A new protocol is added by implementing the documented receiver contract and
-registering it — with no changes to the engine core. The `reference` receiver is
+registering it — with no changes to Servienta core. The `reference` receiver is
 the worked example (`internal/receiver/reference`).
 
 ## The contract
@@ -20,7 +20,7 @@ type Receiver interface {
 }
 ```
 
-`Recorder` is your only write path into the engine:
+`Recorder` is your only write path into Servienta:
 ```go
 type Recorder interface {
     Record(service, sourceIP string, content map[string]any) error

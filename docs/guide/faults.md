@@ -13,7 +13,7 @@ error paths. Faults are instance-wide and lifted by `POST /api/v1/reset`.
 
 Make a named fixture fail on the file server:
 ```bash
-curl -X PUT http://localhost:8080/api/v1/faults/files/hello.txt -d '{"kind":"<kind>"}'
+curl -X PUT http://localhost:5001/api/v1/faults/files/hello.txt -d '{"kind":"<kind>"}'
 ```
 
 | kind | Effect |
@@ -31,7 +31,7 @@ exception: it delivers altered bytes so your integrity check can catch it.)
 
 Put a receiver into a failure mode:
 ```bash
-curl -X PUT http://localhost:8080/api/v1/faults/receivers/syslog \
+curl -X PUT http://localhost:5001/api/v1/faults/receivers/syslog \
   -d '{"mode":"<mode>", "delay_ms": 0}'
 ```
 
@@ -45,14 +45,14 @@ curl -X PUT http://localhost:8080/api/v1/faults/receivers/syslog \
 
 Clear a mode: `-d '{"mode":""}'`.
 
-A deliberate failure mode is **distinguishable from "not running"**: the engine
+A deliberate failure mode is **distinguishable from "not running"**: Servienta
 reports the receiver as alive and in the configured mode.
 
 ## Example
 ```bash
 # make the file server drop mid-transfer
 curl -X PUT .../faults/files/large.bin -d '{"kind":"truncate"}'
-curl http://localhost:8081/large.bin -o out.bin   # your client sees a short read
+curl http://localhost:8080/large.bin -o out.bin   # your client sees a short read
 
 # make syslog silently drop
 curl -X PUT .../faults/receivers/syslog -d '{"mode":"drop"}'

@@ -8,11 +8,11 @@ updated: 2026-08-31
 # Acceptance suite
 
 The executable definition of done (phase 0 input #2, roadmap): a requirement is closed if and only
-if the part of this suite covering it passes. Lives in `apps/engine/acceptance/` (Go tests); it
+if the part of this suite covering it passes. Lives in `apps/servienta/acceptance/` (Go tests); it
 talks to the engine **only through public interfaces** — network listeners and the versioned HTTP
 contract — never through internals.
 
-Run: `go test ./acceptance/...` in `apps/engine/`.
+Run: `go test ./acceptance/...` in `apps/servienta/`.
 
 ## Phase 0 mapping
 

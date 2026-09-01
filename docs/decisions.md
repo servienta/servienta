@@ -23,9 +23,58 @@ Revisit trigger: <metric / date / condition>
 
 ---
 
+## D20 — The delivery is ONE container: engine + console + guide; no compose, no vendor console
+
+Date: 2026-09-01
+Context: owner decision, refined in one sitting. The product reaches a
+customer exactly one way: Docker on their own infrastructure — "чем проще,
+тем лучше". The vendor-hosted console (console.servienta.com, D8/D11) was
+never deployed (no DNS record) and cannot reach engines that run offline on
+customer infrastructure (N2). The interim engine+console compose stand meant
+two images, two ports fighting over :8080, and a delivery that needed a
+compose file.
+Options considered: (A) vendor-hosted console as a portal without live engine
+access; (B) console as a second container next to the engine (compose);
+(C) one container — the engine serves the embedded SPA itself.
+Choice: **C**. One image, `ghcr.io/servienta/servienta`, one `docker run`.
+The engine serves the console SPA (source `apps/engine/webui/`, go:embed) on
+its own port; the SPA is a **browser** client of `/api/v1` — the UI port
+answers `/api/*` with the same handler as the API port, so the contract
+remains the only doorway and there is no CORS. Port layout: console **:5000**,
+contract **:5001**, files-http **:8080**, dns **:15353** in-container (mDNS
+owns 5353/udp on desktops — 1:1 mapping now works everywhere), every other
+service on its own fixed in-container port; host ports stay free (N4).
+The license moves into the contract: `PUT/DELETE /api/v1/license` (contract
+0.1.0 → 0.2.0, additive; openapi.yaml updated) stores/removes
+`/license.json` *inside the container* — no license volume — and the engine
+restarts **in place** (re-exec, no docker restart policy needed), verifying
+the signature at startup as before (R12, D10: no signing power granted).
+The two-container arguments dissolved on inspection: the UI lives in the
+browser, so it survives the engine's restart anyway; CI pulls the same single
+image and simply never opens :5000. D12's intent survives: no
+*infrastructure* containers in the delivery — Kafka, FTP and the rest stay
+simulated in-process. The UI is delivered software, so invariant 11 applies
+to it (Vue/Pinia/Vue Router/Tailwind/markdown-it — all MIT; Go: stdlib).
+The vendor-SaaS console spec (auth, SQLite→Postgres, statistics) is parked.
+CI publishes one package (`servienta`, 5 newest kept); the old `engine` and
+`console` ghcr packages are frozen leftovers. docker-compose.yml is deleted;
+R7/N3 wording in requirements.md now says "a single docker run".
+Amends: D7 (three deployables; console.servienta.com is gone), D8/D11 (the
+console's hosting; the Vue 3 stack stands), D12 (wording), D19 (port layout
+superseded).
+Reversibility: two-way — the SPA is a separable static bundle and the UI
+listener is one config knob (`SERVIENTA_UI_ADDR`); splitting it back out is
+mechanical.
+Revisit trigger: a real need for customer-facing functionality that must not
+live on customer hardware (account self-service, hosted statistics) — that
+reopens a vendor-hosted *portal*, under its own name, not "console".
+
+---
+
 ## D19 — The compose stand publishes the engine 1:1; the console moves to :5000
 
 Date: 2026-09-01
+Status: **superseded by D20 the same day — the compose stand itself is gone; the port layout was redrawn (console :5000, contract :5001, files :8080).**
 Context: the compose stand originally published only the console, on host
 :8080 — the same number as the engine's control port. The engine had no host
 ports at all: the Stand view showed receivers as `[::]:8081 · up` that the
