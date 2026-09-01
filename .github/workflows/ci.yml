@@ -35,7 +35,7 @@ jobs:
           docker build \
             -t ghcr.io/servienta/console:latest \
             -t ghcr.io/servienta/console:${{ github.sha }} \
-            apps/console
+            -f apps/console/Dockerfile .
           docker push --all-tags ghcr.io/servienta/console
       # Registry retention: keep the 5 newest versions of each image.
       - uses: actions/delete-package-versions@v5
