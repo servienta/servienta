@@ -281,3 +281,29 @@ func TestResetTwice(t *testing.T) {
 	}
 	pass() // same run id redeclared, same assertions — nothing survived the reset
 }
+
+// --- GET / and GET /api/v1/try: first-run onboarding ---
+func TestGuideAndTry(t *testing.T) {
+	e := startEngine(t)
+	// GET / returns the getting-started guide, not a 404.
+	res, body := e.do(t, "GET", "/", nil)
+	if res.StatusCode != 200 || !bytes.Contains(body, []byte("Servienta engine")) {
+		t.Fatalf("GET /: %d, want the guide", res.StatusCode)
+	}
+	// GET /api/v1/try drives the demo round-trip and reports it worked.
+	res, body = e.do(t, "GET", "/api/v1/try", nil)
+	if res.StatusCode != 200 {
+		t.Fatalf("try: %d", res.StatusCode)
+	}
+	var out struct {
+		OK       bool             `json:"ok"`
+		Received []map[string]any `json:"received"`
+	}
+	decode(t, body, &out)
+	if !out.OK || len(out.Received) == 0 {
+		t.Fatalf("try did not complete the round-trip: %s", body)
+	}
+	if c := out.Received[0]["content"].(map[string]any); c["line"] != "hello from the try endpoint" {
+		t.Fatalf("try recorded the wrong line: %v", c)
+	}
+}

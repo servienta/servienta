@@ -5,6 +5,24 @@ info:
   title: Servienta engine control API
   version: 0.1.0
 paths:
+  /:
+    get:
+      summary: First-run getting-started guide (plain text) — what's running and what to try next
+      responses:
+        "200": { description: The guide, as text/plain }
+  /api/v1/try:
+    get:
+      summary: One-call self-demo — declares a run, sends to the demo receiver, reads it back, and narrates the round-trip
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean }
+                  steps: { type: array, items: { type: string } }
+                  received: { type: array, items: { type: object } }
   /api/v1/version:
     get:
       summary: Contract version
